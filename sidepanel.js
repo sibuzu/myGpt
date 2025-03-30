@@ -83,8 +83,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('[Sidepanel] Received message:', request);
+    console.log('[Sidepanel] Sender:', sender);
+
     if (request.type === 'selectedText') {
+      console.log('[Sidepanel] Setting selected text to input:', request.text);
       messageInput.value = request.text;
+    } else if (request === 'closeSidePanel') {
+      console.log('[Sidepanel] Closing side panel');
+      window.close();
+    } else {
+      console.log('[Sidepanel] Unknown message type:', request.type);
     }
   });
 });
