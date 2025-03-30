@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icons</title>
+</head>
+<body>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // 設定背景
+            ctx.fillStyle = '#4CAF50';  // 使用綠色作為主色調
+            ctx.fillRect(0, 0, size, size);
+            
+            // 繪製對話框
+            ctx.fillStyle = 'white';
+            const margin = size * 0.15;
+            const boxWidth = size - (margin * 2);
+            const boxHeight = size - (margin * 2);
+            ctx.beginPath();
+            ctx.roundRect(margin, margin, boxWidth, boxHeight, size * 0.1);
+            ctx.fill();
+            
+            // 繪製 "GPT" 文字
+            ctx.fillStyle = '#4CAF50';
+            ctx.font = `bold ${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('GPT', size/2, size/2);
+            
+            // 右鍵點擊 canvas 並選擇 "Save Image As..." 來儲存圖示
+        }
+        
+        // 生成三種尺寸的圖示
+        drawIcon(document.getElementById('canvas16'), 16);
+        drawIcon(document.getElementById('canvas48'), 48);
+        drawIcon(document.getElementById('canvas128'), 128);
+    </script>
+    
+    <div style="margin-top: 20px;">
+        右鍵點擊每個 canvas 並選擇 "另存圖片為..." 來儲存圖示。<br>
+        儲存為：<br>
+        - images/icon16.png<br>
+        - images/icon48.png<br>
+        - images/icon128.png
+    </div>
+</body>
+</html>
