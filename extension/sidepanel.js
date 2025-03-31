@@ -1,3 +1,5 @@
+const API_URL = 'http://localhost:12345';
+
 document.addEventListener('DOMContentLoaded', function () {
   const downloadImagesButton = document.getElementById('downloadImages');
   const statusElement = document.getElementById('status');
@@ -132,13 +134,13 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.storage.local.get(['notifyTelegram'], function(result) {
           if (result.notifyTelegram) {
             // 發送通知到 API
-            fetch('http://localhost:12345/notify/telegram', {
+            fetch(`${API_URL}/notify/telegram`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                message: 'ChatGPT is ready for next input'
+                message: 'ChatGPT is ready.'
               })
             })
             .then(response => response.text())
@@ -193,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // 調用 API
       statusElement.textContent = 'Status: call API ...';
       
-      fetch('http://localhost:12345/images/download', {
+      fetch(`${API_URL}/images/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
