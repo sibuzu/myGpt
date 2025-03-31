@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (request.type === 'selectedText') {
       console.log('[Sidepanel] Setting selected text to input:', request.text);
       messageInput.value = request.text;
-    } else if (request === 'closeSidePanel') {
+    } else if (request.type === 'closePanel') {
       console.log('[Sidepanel] Closing side panel');
       window.close();
     } else if (request.type === 'stateChange') {

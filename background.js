@@ -7,7 +7,7 @@ chrome.action.onClicked.addListener(async (tab) => {
   
   try {
     if (isOpen) {
-      chrome.runtime.sendMessage('closeSidePanel');
+      chrome.runtime.sendMessage({ type: 'closePanel'});
       panelStates.set(tab.windowId, false);
       console.log('[Background] Side panel closed');
     } else {
