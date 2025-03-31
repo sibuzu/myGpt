@@ -69,3 +69,39 @@ if (document.readyState === 'loading') {
 } else {
   startObserving();
 }
+
+// 監聽來自 sidepanel 的消息
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === 'queryImageList') {
+    console.log('[Contents] Querying image list...');
+    const imageList = [];
+    
+    // 查找所有對話回合
+    const turns = document.querySelectorAll('[data-testid^="conversation-turn-"]');
+    
+    turns.forEach(turn => {
+      // 獲取 turnId
+      console.log('[Contents] Turn:', turn);
+      const turnId = turn.getAttribute('data-testid').replace('conversation-turn-', '');
+      
+      // 查找圖片容器
+      const imageContainer = turn.querySelector('.group\\/imagegen-image');
+      if (imageContainer) {
+        // 查找第一個圖片元素
+        const img = imageContainer.querySelector('img');
+        if (img) {
+          imageList.push({
+            turnId: turnId,
+            src: img.src
+          });
+        }
+      }
+    });
+    
+    // 發送結果回 sidepanel
+    chrome.runtime.sendMessage({
+      type: 'imageList',
+      list: imageList
+    });
+  }
+});

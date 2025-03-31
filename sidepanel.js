@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
   queryDataButton.addEventListener('click', function () {
     console.log('[Sidepanel] Querying content data...');
     
-    // 向 content script 發送消息以獲取當前 URL
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (tabs[0]) {
         const currentUrl = tabs[0].url;
@@ -53,8 +52,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         
         // 更新 pageId 顯示
-        const pageIdElement = document.getElementById('pageId'); // 使用原來的 url element
+        const pageIdElement = document.getElementById('pageId');
         pageIdElement.textContent = `PageID: ${pageId}`;
+
+        // 如果有 pageId，請求圖片列表
+        if (pageId) {
+          console.log('[Sidepanel] Requesting image list for pageId:', pageId);
+          chrome.tabs.sendMessage(tabs[0].id, {
+            type: 'queryImageList'
+          });
+        }
       }
     });
   });
@@ -113,6 +120,21 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } else {
       console.log('[Sidepanel] Unknown message type:', request.type);
+    }
+  });
+
+  // 監聽來自 content script 的消息
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === 'imageList') {
+      const imgListElement = document.getElementById('imgList');
+      imgListElement.innerHTML = ''; // 清除舊的列表
+      
+      request.list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'mb-2';
+        div.textContent = `Turn ${item.turnId}: ${item.src.substring(0, 50)}...`;
+        imgListElement.appendChild(div);
+      });
     }
   });
 });
