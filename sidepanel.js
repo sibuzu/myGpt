@@ -127,8 +127,13 @@ document.addEventListener('DOMContentLoaded', function () {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'imageList') {
       const imgListElement = document.getElementById('imgList');
-      imgListElement.innerHTML = ''; // 清除舊的列表
+      const totalTurnsElement = document.getElementById('totalTurns');
       
+      // 更新總數顯示
+      totalTurnsElement.textContent = `Total Turns: ${request.list.length}`;
+      
+      // 清除並更新圖片列表
+      imgListElement.innerHTML = '';
       request.list.forEach(item => {
         const div = document.createElement('div');
         div.className = 'mb-2';
