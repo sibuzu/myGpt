@@ -5,11 +5,12 @@ from typing import List
 import uvicorn
 import os
 import aiohttp
-import asyncio
 import logging
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
 
 # 設定目錄路徑
@@ -97,6 +98,44 @@ async def download_images(request: ImageDownloadRequest):
     result = f"finish download {download_count}/{list_count} images"
     logger.info(result)
     return result
+
+# 新增 Telegram 相關配置
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+
+# 測試 Telegram 通知
+# cmd = f"curl -X POST 'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage' -d 'chat_id={TELEGRAM_CHAT_ID}&text=Hello, World!'" 
+# print(cmd)
+
+# 新增 Telegram 通知請求模型
+class TelegramNotification(BaseModel):
+    message: str
+
+@app.post("/notify/telegram")
+async def send_telegram_notification(notification: TelegramNotification):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.warning("Telegram credentials not configured")
+        return "Telegram notification skipped - not configured"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(TELEGRAM_API_URL, json={
+                "chat_id": TELEGRAM_CHAT_ID,
+                "text": notification.message,
+                "parse_mode": "HTML"
+            }) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    logger.info(f"Telegram notification sent successfully: {result}")
+                    return "Telegram notification sent"
+                else:
+                    error_text = await response.text()
+                    logger.error(f"Failed to send Telegram notification. Status: {response.status}, Response: {error_text}")
+                    return f"Failed to send Telegram notification: {response.status}"
+    except Exception as e:
+        logger.error(f"Error sending Telegram notification: {e}")
+        return f"Error sending Telegram notification: {str(e)}"
 
 if __name__ == "__main__":
     logger.info("Starting API server...")
