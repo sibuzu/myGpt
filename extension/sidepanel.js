@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const sendMessageButton = document.getElementById('sendMessage');
   const chatContainer = document.getElementById('chatContainer');
   const elapsedTimeElement = document.getElementById('elapsedTime');
+  const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
 
   let startTime = null;
 
@@ -95,6 +96,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
+  // 初始化時從 storage 讀取 checkbox 狀態
+  chrome.storage.local.get(['notifyTelegram'], function(result) {
+    notifyTelegramCheckbox.checked = result.notifyTelegram || false;
+  });
+
+  // 監聽 checkbox 變化並保存狀態
+  notifyTelegramCheckbox.addEventListener('change', function() {
+    chrome.storage.local.set({ notifyTelegram: this.checked });
+  });
+
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Sidepanel] Received message:', request);
@@ -111,11 +122,34 @@ document.addEventListener('DOMContentLoaded', function () {
       const stateElement = document.getElementById('state');
       stateElement.textContent = `State: ${request.state}`;
 
-      // 處理計時邏輯
+      // 處理計時邏輯和 Telegram 通知
       if (request.state === 'running' && startTime === null) {
         startTimer();
       } else if (request.state === 'waiting' && startTime) {
         stopTimer();
+        
+        // 檢查是否需要發送 Telegram 通知
+        chrome.storage.local.get(['notifyTelegram'], function(result) {
+          if (result.notifyTelegram) {
+            // 發送通知到 API
+            fetch('http://localhost:12345/notify/telegram', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                message: 'ChatGPT is ready for next input'
+              })
+            })
+            .then(response => response.text())
+            .then(result => {
+              console.log('[Sidepanel] Telegram notification sent:', result);
+            })
+            .catch(error => {
+              console.error('[Sidepanel] Failed to send Telegram notification:', error);
+            });
+          }
+        });
       }
     } else {
       console.log('[Sidepanel] Unknown message type:', request.type);
