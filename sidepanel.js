@@ -92,6 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (request === 'closeSidePanel') {
       console.log('[Sidepanel] Closing side panel');
       window.close();
+    } else if (request.type === 'stateChange') {
+      console.log('[Sidepanel] Updating state display:', request.state);
+      const stateElement = document.getElementById('state');
+      stateElement.textContent = `State: ${request.state}`;
     } else {
       console.log('[Sidepanel] Unknown message type:', request.type);
     }
