@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const queryDataButton = document.getElementById('queryData');
+  const downloadImagesButton = document.getElementById('downloadImages');
+  const statusElement = document.getElementById('status');
   const messageInput = document.getElementById('messageInput');
   const sendMessageButton = document.getElementById('sendMessage');
   const chatContainer = document.getElementById('chatContainer');
@@ -9,15 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    // const year = date.getFullYear();
-    // const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份從 0 開始，需要 +1
-    // const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const seconds = String(date.getSeconds()).padStart(2, '0');
-    // const milliseconds = String(date.getMilliseconds()).padStart(3, '0');
 
-    // return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
     return `${hours}:${minutes}:${seconds}`;
   }
 
@@ -36,9 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Query Content Data
-  queryDataButton.addEventListener('click', function () {
-    console.log('[Sidepanel] Querying content data...');
+  // Download Images button click handler
+  downloadImagesButton.addEventListener('click', function () {
+    console.log('[Sidepanel] Downloading images...');
     
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (tabs[0]) {
@@ -57,10 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 如果有 pageId，請求圖片列表
         if (pageId) {
-          console.log('[Sidepanel] Requesting image list for pageId:', pageId);
           chrome.tabs.sendMessage(tabs[0].id, {
             type: 'queryImageList'
           });
+        } else {
+          statusElement.textContent = 'Status: no image';
+          document.getElementById('imgList').innerHTML = '';
+          document.getElementById('totalTurns').textContent = 'Total Turns: 0';
         }
       }
     });
@@ -129,6 +128,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const imgListElement = document.getElementById('imgList');
       const totalTurnsElement = document.getElementById('totalTurns');
       
+      if (request.list.length === 0) {
+        statusElement.textContent = 'Status: no image';
+        imgListElement.innerHTML = '';
+        totalTurnsElement.textContent = 'Total Turns: 0';
+        return;
+      }
+
       // 更新總數顯示
       totalTurnsElement.textContent = `Total Turns: ${request.list.length}`;
       
@@ -139,6 +145,33 @@ document.addEventListener('DOMContentLoaded', function () {
         div.className = 'mb-2';
         div.textContent = `Turn ${item.turnId}: ${item.src.substring(0, 50)}...`;
         imgListElement.appendChild(div);
+      });
+
+      // 準備 API 請求數據
+      const apiData = {
+        pageId: document.getElementById('pageId').textContent.replace('PageID: ', ''),
+        turns: request.list.map(item => ({
+          id: item.turnId,
+          url: item.src
+        }))
+      };
+
+      // 調用 API
+      statusElement.textContent = 'Status: call API ...';
+      
+      fetch('http://localhost:12345/images/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData)
+      })
+      .then(response => response.text())
+      .then(result => {
+        statusElement.textContent = `Status: ${result}`;
+      })
+      .catch(error => {
+        statusElement.textContent = `Status: API error: ${error.message}`;
       });
     }
   });
