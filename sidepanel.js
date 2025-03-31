@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const apiKeyInput = document.getElementById('apiKey');
-  const saveApiKeyButton = document.getElementById('saveApiKey');
+  const queryDataButton = document.getElementById('queryData');
   const messageInput = document.getElementById('messageInput');
   const sendMessageButton = document.getElementById('sendMessage');
   const chatContainer = document.getElementById('chatContainer');
@@ -37,18 +36,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Load saved API key
-  chrome.storage.sync.get(['apiKey'], function (result) {
-    apiKeyInput.value = result.apiKey || '';
-  });
-
-  // Save API key
-  saveApiKeyButton.addEventListener('click', function () {
-    const apiKey = apiKeyInput.value;
-    chrome.storage.sync.set({
-      apiKey: apiKey
-    }, function () {
-      alert('API key saved!');
+  // Query Content Data
+  queryDataButton.addEventListener('click', function () {
+    console.log('[Sidepanel] Querying content data...');
+    
+    // 向 content script 發送消息以獲取當前 URL
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0]) {
+        const currentUrl = tabs[0].url;
+        console.log('[Sidepanel] Current URL:', currentUrl);
+        
+        // 解析 pageId
+        let pageId = '';
+        if (currentUrl.match(/-[0-9a-f]{12}$/)) {
+          pageId = currentUrl.slice(-12);
+        }
+        
+        // 更新 pageId 顯示
+        const pageIdElement = document.getElementById('pageId'); // 使用原來的 url element
+        pageIdElement.textContent = `PageID: ${pageId}`;
+      }
     });
   });
 
@@ -63,37 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Send message to GPT
   async function sendToGPT(message) {
-    try {
-      const result = await chrome.storage.sync.get(['apiKey']);
-      if (!result.apiKey) {
-        alert('Please set your OpenAI API key first');
-        return;
-      }
-
-      addMessage(message, true);
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${result.apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{
-            role: "user",
-            content: message
-          }]
-        })
-      });
-
-      const data = await response.json();
-      const answer = data.choices[0].message.content;
-      addMessage(answer);
-    } catch (error) {
-      console.error('Error:', error);
-      addMessage('Error: Failed to get response from GPT');
-    }
   }
 
   // Handle send message button
