@@ -1,6 +1,56 @@
 const API_URL = 'http://solarsuna.com:32345';
 let startTime = null;
 
+// 添加提示佇列
+let promptQueue = [];
+let isProcessingQueue = false;
+
+// 更新 promptList 顯示
+function updatePromptList() {
+  const promptListElement = document.getElementById('promptList');
+  promptListElement.innerHTML = '';
+  
+  promptQueue.forEach((prompt, index) => {
+    const div = document.createElement('div');
+    div.className = 'prompt-item';
+    
+    // 截取前12個字符，如果超過則添加...
+    const displayText = prompt.length > 12 ? prompt.substring(0, 12) + '...' : prompt;
+    
+    div.textContent = `${index + 1}. ${displayText}`;
+    promptListElement.appendChild(div);
+  });
+}
+
+// 處理佇列中的提示
+async function processPromptQueue() {
+  if (isProcessingQueue || promptQueue.length === 0) return;
+  
+  const stateElement = document.getElementById('state');
+  const currentState = stateElement.textContent.replace('State: ', '');
+  
+  if (currentState !== 'ready-to-send') return;
+  
+  isProcessingQueue = true;
+  try {
+    const text = promptQueue[0];
+    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+    if (tabs[0]) {
+      await chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'sendMsg',
+        text: text
+      });
+      promptQueue.shift(); // 移除已發送的提示
+      updatePromptList(); // 更新顯示
+      console.log('[Sidepanel] Processed prompt from queue, remaining:', promptQueue.length);
+    }
+  } catch (error) {
+    console.error('[Sidepanel] Error processing prompt queue:', error);
+  } finally {
+    isProcessingQueue = false;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // Initialize SVG icons
   const template = document.getElementById('toggle-icon-template');
@@ -126,20 +176,21 @@ document.addEventListener('DOMContentLoaded', function () {
   sendMsgButton.addEventListener('click', async function() {
     const messageText = messageInput.value.trim();
     if (!messageText) return;
-
-    try {
-      const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-      if (tabs[0]) {
-        await chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'sendMsg',
-          text: messageText
-        });
-        
-        // Clear the input after sending
-        messageInput.value = '';
-      }
-    } catch (error) {
-      console.error('[Sidepanel] Error sending GPT message:', error);
+    
+    const stateElement = document.getElementById('state');
+    const currentState = stateElement.textContent.replace('State: ', '');
+    
+    // 將消息加入佇列
+    promptQueue.push(messageText);
+    updatePromptList(); // 更新顯示
+    console.log('[Sidepanel] Message added to queue:', messageText, 'Queue length:', promptQueue.length);
+    
+    // 清空輸入框
+    messageInput.value = '';
+    
+    // 如果狀態是 ready-to-send，嘗試處理佇列
+    if (currentState === 'ready-to-send') {
+      processPromptQueue();
     }
   });
 
@@ -163,6 +214,9 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (request.state === 'waiting' && startTime) {
           stopTimer();
           handleTelegramNotification();
+        } else if (request.state === 'ready-to-send') {
+          // 當狀態變為 ready-to-send 時處理佇列
+          processPromptQueue();
         }
         break;
       case 'imageList':

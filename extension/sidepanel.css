@@ -185,3 +185,21 @@ input[type="checkbox"] {
   background: #555;
 }
 
+/* Prompt List Styles */
+#promptList {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #4b5563;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.prompt-item {
+  padding: 4px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.prompt-item:last-child {
+  border-bottom: none;
+}
+
