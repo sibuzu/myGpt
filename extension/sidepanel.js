@@ -2,6 +2,20 @@ const API_URL = 'http://solarsuna.com:32345';
 let startTime = null;
 
 document.addEventListener('DOMContentLoaded', function () {
+  // Initialize SVG icons
+  const template = document.getElementById('toggle-icon-template');
+  document.querySelectorAll('.toggle-icon-container').forEach(container => {
+    const clone = template.content.cloneNode(true);
+    const svg = clone.querySelector('svg');
+    const vLine = clone.querySelector('#v-line');
+    
+    if (container.dataset.state === 'open') {
+      vLine.style.display = 'none';
+    }
+    
+    container.appendChild(clone);
+  });
+
   // 元素獲取
   const downloadImagesButton = document.getElementById('downloadImages');
   const statusElement = document.getElementById('status');
