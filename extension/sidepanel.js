@@ -15,7 +15,7 @@ function updatePromptList() {
     div.className = 'prompt-item';
     
     // 截取前12個字符，如果超過則添加...
-    const displayText = prompt.length > 12 ? prompt.substring(0, 12) + '...' : prompt;
+    const displayText = prompt.length > 20 ? prompt.substring(0, 20) + '...' : prompt;
     
     div.textContent = `${index + 1}. ${displayText}`;
     promptListElement.appendChild(div);
@@ -173,23 +173,97 @@ document.addEventListener('DOMContentLoaded', function () {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
+  // 初始化輸入框結構
+  function initializeMessageInput() {
+    // 清空現有內容
+    messageInput.innerHTML = '';
+    
+    // 創建圖片容器
+    const imagesContainer = document.createElement('div');
+    imagesContainer.className = 'images-container';
+    
+    // 創建文字容器
+    const textContainer = document.createElement('div');
+    textContainer.className = 'text-container';
+    textContainer.contentEditable = true;
+    
+    messageInput.appendChild(imagesContainer);
+    messageInput.appendChild(textContainer);
+    
+    // 將焦點設置到文字容器
+    textContainer.focus();
+  }
+
+  // 初始化輸入框
+  initializeMessageInput();
+
+  // 處理貼上事件
+  messageInput.addEventListener('paste', async (e) => {
+    e.preventDefault();
+    
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    const imagesContainer = messageInput.querySelector('.images-container');
+    const textContainer = messageInput.querySelector('.text-container');
+    
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        const blob = item.getAsFile();
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          imagesContainer.appendChild(img);
+        };
+        
+        reader.readAsDataURL(blob);
+      } else if (item.type === 'text/plain') {
+        // 處理純文本
+        const text = await new Promise(resolve => item.getAsString(resolve));
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        
+        // 確保文本插入到 textContainer 中
+        if (!textContainer.contains(range.commonAncestorContainer)) {
+          textContainer.focus();
+          selection.removeAllRanges();
+          range.selectNodeContents(textContainer);
+          range.collapse(false);
+          selection.addRange(range);
+        }
+        
+        document.execCommand('insertText', false, text);
+      }
+    }
+  });
+
   // Send button handler
   sendMsgButton.addEventListener('click', async function() {
-    const messageText = messageInput.value.trim();
-    if (!messageText) return;
+    const textContainer = messageInput.querySelector('.text-container');
+    const imagesContainer = messageInput.querySelector('.images-container');
+    const messageText = textContainer.innerText.trim();
+    const images = imagesContainer.querySelectorAll('img');
+    
+    if (!messageText && images.length === 0) return;
+    
+    let message = messageText;
+    
+    // 如果有圖片，將其轉換為 Markdown 格式
+    if (images.length > 0) {
+      images.forEach((img, index) => {
+        message = `![Image ${index + 1}](${img.src})\n` + message;
+      });
+    }
+    
+    promptQueue.push(message);
+    updatePromptList();
+    
+    // 重新初始化輸入框
+    initializeMessageInput();
     
     const stateElement = document.getElementById('state');
     const currentState = stateElement.textContent.replace('State: ', '');
     
-    // 將消息加入佇列
-    promptQueue.push(messageText);
-    updatePromptList(); // 更新顯示
-    console.log('[Sidepanel] Message added to queue:', messageText, 'Queue length:', promptQueue.length);
-    
-    // 清空輸入框
-    messageInput.value = '';
-    
-    // 如果狀態是 waiting，嘗試處理佇列
     if (currentState === 'waiting') {
       processPromptQueue();
     }
@@ -292,4 +366,11 @@ document.addEventListener('DOMContentLoaded', function () {
       downloadStatusElement.textContent = `Status: API error: ${error.message}`;
     }
   }
+
+  // 防止直接在 messageInput 根元素上編輯
+  messageInput.addEventListener('click', (e) => {
+    if (e.target === messageInput) {
+      messageInput.querySelector('.text-container').focus();
+    }
+  });
 });
