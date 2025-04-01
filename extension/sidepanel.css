@@ -98,6 +98,12 @@ textarea {
   box-sizing: border-box;
 }
 
+.button-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 button {
   background-color: #10b981;
   color: white;
@@ -111,6 +117,11 @@ button {
 
 button:hover {
   background-color: #059669;
+}
+
+button:disabled {
+  background-color: #6ee7b7;
+  cursor: not-allowed;
 }
 
 /* Utility Classes */
