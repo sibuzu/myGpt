@@ -104,25 +104,104 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       list: imageList
     });
   } else if (request.action === 'sendMsg') {
-
     console.log('[Contents] Sending GPT message:', request.text);
+    
     // 找到 ChatGPT 的輸入框
     const promptTextarea = document.querySelector('[id="prompt-textarea"]');
     
     if (promptTextarea) {
-      // 設置文本
-      promptTextarea.innerHTML = `<p>${request.text}</p>`;
-      console.log('[Contents] Prompt textarea:', promptTextarea);
+      // 解析 markdown 格式的圖片
+      const imageMatches = request.text.match(/!\[.*?\]\((.*?)\)\n/g);
+      const textContent = request.text.replace(/!\[.*?\]\((.*?)\)\n/g, '');
+      
+      // 如果有圖片，先處理圖片
+      if (imageMatches) {
+        for (const imgMarkdown of imageMatches) {
+          const imgUrl = imgMarkdown.match(/\((.*?)\)/)[1];
+          
+          try {
+            console.log('[Contents] Processing image:', imgUrl.substring(0, 50) + '...');
+            
+            // 將 base64 圖片轉換為 blob
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            
+            // 確保頁面和輸入框有焦點
+            window.focus();
+            promptTextarea.focus();
+            
+            // 等待焦點設置完成
+            await new Promise(resolve => setTimeout(resolve, 100));
 
+            try {
+              // 使用 input event 直接插入檔案
+              const file = new File([blob], 'image.png', { type: 'image/png' });
+              const dt = new DataTransfer();
+              dt.items.add(file);
+              
+              const inputEvent = new InputEvent('input', {
+                bubbles: true,
+                cancelable: true,
+                inputType: 'insertFromPaste',
+                data: null,
+                dataTransfer: dt
+              });
+              
+              promptTextarea.dispatchEvent(inputEvent);
+              
+              // 如果上面的方法失敗，嘗試使用 drop 事件
+              if (!promptTextarea.querySelector('img')) {
+                const dropEvent = new DragEvent('drop', {
+                  bubbles: true,
+                  cancelable: true,
+                  dataTransfer: dt
+                });
+                promptTextarea.dispatchEvent(dropEvent);
+              }
+            } catch (pasteError) {
+              console.error('[Contents] Primary paste method failed:', pasteError);
+              
+              // 備用方案：使用 FormData 和 XHR
+              try {
+                const formData = new FormData();
+                formData.append('image', blob, 'image.png');
+                
+                // 觸發自定義事件
+                const customEvent = new CustomEvent('imageUpload', {
+                  detail: { formData: formData }
+                });
+                promptTextarea.dispatchEvent(customEvent);
+              } catch (backupError) {
+                console.error('[Contents] Backup paste method failed:', backupError);
+              }
+            }
+            
+            // 等待圖片插入完成
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            console.log('[Contents] Image insertion attempted');
+          } catch (error) {
+            console.error('[Contents] Error handling image:', error);
+          }
+        }
+      }
+      
+      // 處理文本內容
+      if (textContent.trim()) {
+        promptTextarea.focus();
+        document.execCommand('insertText', false, textContent.trim());
+      }
+      
       // 觸發 input 事件以激活發送按鈕
       promptTextarea.dispatchEvent(new Event('input', { 
         bubbles: true,
         cancelable: true 
       }));
       
-      // 等待發送按鈕變為可用，設置最大等待時間為 5 秒 (10次 * 500ms)
+      // 等待發送按鈕變為可用
       await new Promise((resolve, reject) => {
-        const maxAttempts = 10;
+        // 如果有圖片，則等待更久
+        const maxAttempts = imageMatches ? 40 : 10; // 有圖等20秒，無圖等5秒
         let attempts = 0;
         
         const checkButton = () => {
@@ -132,9 +211,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             sendButton.click();
             resolve();
           } else if (attempts >= maxAttempts) {
-            reject(new Error('Timeout waiting for send button'));
+            reject(new Error(`Timeout waiting for send button after ${maxAttempts * 500}ms`));
           } else {
-            console.log('[Contents] Waiting for send button... attempt:', attempts + 1);
+            console.log('[Contents] Waiting for send button... attempt:', attempts + 1, 
+                       `(${attempts * 500}ms / ${maxAttempts * 500}ms)`);
             attempts++;
             setTimeout(checkButton, 500);
           }
@@ -146,3 +226,18 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     }
   }
 });
+
+// 添加必要的輔助函數
+function dataURLtoBlob(dataURL) {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  
+  return new Blob([u8arr], { type: mime });
+}

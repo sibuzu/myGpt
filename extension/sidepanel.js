@@ -14,8 +14,9 @@ function updatePromptList() {
     const div = document.createElement('div');
     div.className = 'prompt-item';
     
-    // 截取前12個字符，如果超過則添加...
-    const displayText = prompt.length > 20 ? prompt.substring(0, 20) + '...' : prompt;
+    // 移除所有圖片的 markdown 格式 (![...](...)格式)
+    const textOnly = prompt.replace(/!\[.*?\]\(.*?\)\n/g, '');
+    const displayText = textOnly.length > 20 ? textOnly.substring(0, 20) + '...' : textOnly;
     
     div.textContent = `${index + 1}. ${displayText}`;
     promptListElement.appendChild(div);
