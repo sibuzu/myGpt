@@ -47,6 +47,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/test")
+async def test():
+    """
+    Test endpoint to verify API is running
+    """
+    logger.info("Test endpoint called")
+    return "my-gpt-api is running"
+
 # 定義數據模型
 class Turn(BaseModel):
     id: str
