@@ -145,6 +145,10 @@ button:hover {
 #imgList {
   font-size: 13px;
   color: #4b5563;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+  padding-bottom: 20px;  /* 添加底部內邊距 */
 }
 
 #imgList div {
@@ -154,6 +158,7 @@ button:hover {
 
 #imgList div:last-child {
   border-bottom: none;
+  margin-bottom: 4px;  /* 為最後一個項目添加底部外邊距 */
 }
 
 /* Checkbox Styling */
