@@ -9,13 +9,25 @@
 <body>
   <div class="container">
     <div class="settings-section">
-      <div id="state">State:</div>
-      <div id="elapsedTime">Elapsed:</div>
-      <div class="notify-section">
-        <label>
-          <input type="checkbox" id="notifyTelegram" style="width: auto; margin-right: 5px;"> Notify Telegram When Ready
-        </label>
-        <button id="sendGpt" style="margin-top: 10px;">Send GPT</button>
+      <div class="panel">
+        <div class="panel-header">
+          State
+          <svg class="toggle-icon" id="toggle-icon" viewBox="0 0 24 24" stroke="#065f46" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-state="closed">
+            <rect x="2" y="2" width="20" height="20" rx="7" ry="7" stroke="#065f46" fill="none" />
+            <line x1="8" y1="12" x2="16" y2="12" stroke="#065f46"/>
+            <line x1="12" y1="8" x2="12" y2="16" stroke="#065f46" id="v-line"/>
+          </svg>
+        </div>
+        <div class="panel-content">
+          <div id="state">State:</div>
+          <div id="elapsedTime">Elapsed:</div>
+          <div class="notify-section">
+            <label>
+              <input type="checkbox" id="notifyTelegram" style="width: auto; margin-right: 5px;"> Notify Telegram When Ready
+            </label>
+          </div>
+          <button id="sendGpt" style="margin-top: 10px;">Send GPT</button>
+        </div>
       </div>
 
       <div class="panel">
@@ -32,7 +44,7 @@
           <div id="status">Status:</div>
           <div id="pageId">PageID:</div>
           <div id="totalTurns">Total Turns: 0</div>
-          <div id="imgList" class="mt-2 max-h-[200px]">
+          <div id="imgList" class="mt-2">
             <!-- Image list will be displayed here -->
           </div>
         </div>
