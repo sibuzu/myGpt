@@ -71,7 +71,7 @@ if (document.readyState === 'loading') {
 }
 
 // 監聽來自 sidepanel 的消息
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === 'queryImageList') {
     console.log('[Contents] Querying image list...');
     const imageList = [];
@@ -120,12 +120,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         cancelable: true 
       }));
       
-      // 找到發送按鈕並點擊
-      const sendButton = document.querySelector('button[data-testid="send-button"]');
-      if (sendButton) {
-        console.log('[Contents] Sending message...');
-        sendButton.click();
-      }
+      // 等待發送按鈕變為可用，設置最大等待時間為 5 秒 (10次 * 500ms)
+      await new Promise((resolve, reject) => {
+        const maxAttempts = 10;
+        let attempts = 0;
+        
+        const checkButton = () => {
+          const sendButton = document.querySelector('button[data-testid="send-button"]:not([disabled])');
+          if (sendButton) {
+            console.log('[Contents] Send button is ready');
+            sendButton.click();
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            reject(new Error('Timeout waiting for send button'));
+          } else {
+            console.log('[Contents] Waiting for send button... attempt:', attempts + 1);
+            attempts++;
+            setTimeout(checkButton, 500);
+          }
+        };
+        checkButton();
+      }).catch(error => {
+        console.error('[Contents] Error:', error.message);
+      });
     }
   }
 });
