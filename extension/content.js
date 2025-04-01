@@ -122,8 +122,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }));
       
       // 找到發送按鈕並點擊
-      const sendButton = document.querySelector('[data-testid="send-button"]');
-      if (sendButton && !sendButton.disabled) {
+      const sendButton = document.querySelector('button[data-testid="send-button"]');
+      if (sendButton) {
         console.log('[Contents] Sending message...');
         // sendButton.click();
       }

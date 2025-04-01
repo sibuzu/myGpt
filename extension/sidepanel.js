@@ -18,12 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 元素獲取
   const downloadImagesButton = document.getElementById('downloadImages');
-  const statusElement = document.getElementById('status');
+  const downloadStatusElement = document.getElementById('downloadStatus');
   const messageInput = document.getElementById('messageInput');
   const chatContainer = document.getElementById('chatContainer');
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
   const sendMsgButton = document.getElementById('sendMsg');
+  const sendStatusElement = document.getElementById('sendStatus');
 
   // 初始化可折疊面板
   const headers = document.querySelectorAll('.panel-header');
@@ -102,14 +103,14 @@ document.addEventListener('DOMContentLoaded', function () {
             type: 'queryImageList'
           });
         } else {
-          statusElement.textContent = 'Status: no image';
+          downloadStatusElement.textContent = 'Status: no image';
           document.getElementById('imgList').innerHTML = '';
           document.getElementById('totalTurns').textContent = 'Total Turns: 0';
         }
       }
     } catch (error) {
       console.error('[Sidepanel] Error in download handler:', error);
-      statusElement.textContent = 'Status: Error occurred';
+      downloadStatusElement.textContent = 'Status: Error occurred';
     }
   });
 
@@ -134,6 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } catch (error) {
       console.error('[Sidepanel] Error sending GPT message:', error);
+      sendStatusElement.textContent = `Status: Error ${error.message}`;
     }
   });
 
@@ -186,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalTurnsElement = document.getElementById('totalTurns');
     
     if (list.length === 0) {
-      statusElement.textContent = 'Status: no image';
+      downloadStatusElement.textContent = 'Status: no image';
       imgListElement.innerHTML = '';
       totalTurnsElement.textContent = 'Total Turns: 0';
       return;
@@ -207,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function handleImageDownload(list) {
     try {
-      statusElement.textContent = 'Status: call API ...';
+      downloadStatusElement.textContent = 'Status: call API ...';
       const response = await fetch(`${API_URL}/images/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -219,9 +221,9 @@ document.addEventListener('DOMContentLoaded', function () {
           }))
         })
       });
-      statusElement.textContent = `Status: ${await response.text()}`;
+      downloadStatusElement.textContent = `Status: ${await response.text()}`;
     } catch (error) {
-      statusElement.textContent = `Status: API error: ${error.message}`;
+      downloadStatusElement.textContent = `Status: API error: ${error.message}`;
     }
   }
 });

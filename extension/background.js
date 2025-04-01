@@ -58,3 +58,48 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   }
 });
+
+// 確保內容腳本已加載
+async function ensureContentScriptInjected(tabId) {
+  try {
+    // 檢查當前頁面的 URL
+    const tab = await chrome.tabs.get(tabId);
+    const url = tab.url;
+
+    // 只在 ChatGPT 相關頁面注入腳本
+    if (url.includes('chat.openai.com') || url.includes('chatgpt.com')) {
+      // 先檢查腳本是否已經注入
+      try {
+        await chrome.tabs.sendMessage(tabId, { type: 'ping' });
+        console.log('[Background] Content script already exists');
+      } catch (error) {
+        // 如果收到錯誤回應，表示腳本尚未注入，這時才注入
+        console.log('[Background] Injecting content script...');
+        await chrome.scripting.executeScript({
+          target: { tabId: tabId },
+          files: ['content.js']
+        });
+        console.log('[Background] Content script injected successfully');
+      }
+    }
+  } catch (error) {
+    console.error('[Background] Error in ensureContentScriptInjected:', error);
+  }
+}
+
+// 監聽標籤頁更新
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    ensureContentScriptInjected(tabId);
+  }
+});
+
+// 處理來自 sidepanel 的消息
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  if (request.action === 'ensureContentScript') {
+    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+    if (tabs[0]) {
+      await ensureContentScriptInjected(tabs[0].id);
+    }
+  }
+});
