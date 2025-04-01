@@ -26,6 +26,20 @@
               <input type="checkbox" id="notifyTelegram" style="width: auto; margin-right: 5px;"> Notify Telegram When Ready
             </label>
           </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          Send Message
+          <svg class="toggle-icon" id="toggle-icon" viewBox="0 0 24 24" stroke="#065f46" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-state="closed">
+            <rect x="2" y="2" width="20" height="20" rx="7" ry="7" stroke="#065f46" fill="none" />
+            <line x1="8" y1="12" x2="16" y2="12" stroke="#065f46"/>
+            <line x1="12" y1="8" x2="12" y2="16" stroke="#065f46" id="v-line"/>
+          </svg>
+        </div>
+        <div class="panel-content">
+          <textarea id="messageInput" placeholder="Type your message..." rows="3"></textarea>
           <button id="sendGpt" style="margin-top: 10px;">Send GPT</button>
         </div>
       </div>
@@ -53,11 +67,6 @@
 
     <div class="chat-section" id="chatContainer">
       <!-- Chat messages will be inserted here -->
-    </div>
-
-    <div class="input-section">
-      <textarea id="messageInput" placeholder="Type your message..." rows="3"></textarea>
-      <button id="sendMessage">Send Message</button>
     </div>
   </div>
   <script src="sidepanel.js"></script>

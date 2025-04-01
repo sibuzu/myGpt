@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const downloadImagesButton = document.getElementById('downloadImages');
   const statusElement = document.getElementById('status');
   const messageInput = document.getElementById('messageInput');
-  const sendMessageButton = document.getElementById('sendMessage');
   const chatContainer = document.getElementById('chatContainer');
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
