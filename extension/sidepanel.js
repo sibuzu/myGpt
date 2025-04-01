@@ -29,7 +29,7 @@ async function processPromptQueue() {
   const stateElement = document.getElementById('state');
   const currentState = stateElement.textContent.replace('State: ', '');
   
-  if (currentState !== 'ready-to-send') return;
+  if (currentState !== 'waiting') return;
   
   isProcessingQueue = true;
   try {
@@ -188,8 +188,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // 清空輸入框
     messageInput.value = '';
     
-    // 如果狀態是 ready-to-send，嘗試處理佇列
-    if (currentState === 'ready-to-send') {
+    // 如果狀態是 waiting，嘗試處理佇列
+    if (currentState === 'waiting') {
       processPromptQueue();
     }
   });
@@ -214,8 +214,8 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (request.state === 'waiting' && startTime) {
           stopTimer();
           handleTelegramNotification();
-        } else if (request.state === 'ready-to-send') {
-          // 當狀態變為 ready-to-send 時處理佇列
+        } else if (request.state === 'waiting') {
+          // 當狀態變為 waiting 時處理佇列
           processPromptQueue();
         }
         break;
