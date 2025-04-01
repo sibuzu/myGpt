@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
   const sendMsgButton = document.getElementById('sendMsg');
+  const clearQueueButton = document.getElementById('clearQueue');
   
   // 初始化可折疊面板
   const headers = document.querySelectorAll('.panel-header');
@@ -192,6 +193,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (currentState === 'waiting') {
       processPromptQueue();
     }
+  });
+
+  // Clear button handler
+  clearQueueButton.addEventListener('click', function() {
+    promptQueue = [];  // 清空佇列
+    updatePromptList(); // 更新顯示
+    console.log('[Sidepanel] Queue cleared');
   });
 
   // Message listeners
