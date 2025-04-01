@@ -48,6 +48,7 @@ body {
 
 .panel-content {
   padding: 12px;
+  margin: 0;
   display: none;
   animation: fadeIn 0.3s ease-in-out;
 }

@@ -9,12 +9,8 @@
 <body>
   <div class="container">
     <div class="settings-section">
-      <div id="state">
-        State:
-      </div>
-      <div id="elapsedTime">
-        Elapsed:
-      </div>
+      <div id="state">State:</div>
+      <div id="elapsedTime">Elapsed:</div>
       <div class="notify-section">
         <label>
           <input type="checkbox" id="notifyTelegram" style="width: auto; margin-right: 5px;"> Notify Telegram When Ready
@@ -23,7 +19,7 @@
       </div>
 
       <div class="panel">
-        <div class="panel-header" onclick="togglePanel(this)">
+        <div class="panel-header">
           Image Download
           <svg class="toggle-icon" id="toggle-icon" viewBox="0 0 24 24" stroke="#065f46" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-state="closed">
             <rect x="2" y="2" width="20" height="20" rx="7" ry="7" stroke="#065f46" fill="none" />
@@ -33,15 +29,9 @@
         </div>
         <div class="panel-content">
           <button id="downloadImages">Download</button>
-          <div id="status">
-            Status:
-          </div>
-          <div id="pageId">
-            PageID:
-          </div>
-          <div id="totalTurns">
-            Total Turns: 0
-          </div>
+          <div id="status">Status:</div>
+          <div id="pageId">PageID:</div>
+          <div id="totalTurns">Total Turns: 0</div>
           <div id="imgList" class="mt-2 max-h-[300px] overflow-y-auto">
             <!-- Image list will be displayed here -->
           </div>

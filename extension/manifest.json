@@ -12,7 +12,7 @@
   "host_permissions": [
     "https://chat.openai.com/*",
     "https://chatgpt.com/*",
-    "http://localhost:12345/*"
+    "http://solarsuna.com:32345/*"
   ],
   "action": {
     "default_icon": {
