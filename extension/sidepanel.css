@@ -2,7 +2,7 @@
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
-  padding: 16px;
+  padding: 4px;
   background-color: #f2f4f7;
   height: 100vh;
   box-sizing: border-box;
@@ -14,19 +14,6 @@ body {
   height: 100%;
 }
 
-/* Settings Section */
-.settings-section {
-  background-color: white;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.notify-section {
-  margin: 12px 0;
-}
-
 /* Panel Styles */
 .panel {
   background-color: white;
@@ -34,6 +21,10 @@ body {
   border: 1px solid #666666;
   overflow: hidden;
   margin-top: 12px;
+}
+
+.panel-first {
+  margin-top: 0;
 }
 
 .panel-header {
