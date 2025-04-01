@@ -123,19 +123,11 @@ button:hover {
 
 /* Utility Classes */
 .mb-2 {
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .mt-2 {
-  margin-top: 8px;
-}
-
-.max-h-[300px] {
-  max-height: 300px;
-}
-
-.overflow-y-auto {
-  overflow-y: auto;
+  margin-top: 2px;
 }
 
 /* Animation */
