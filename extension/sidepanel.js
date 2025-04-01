@@ -125,19 +125,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Send button handler
   sendMsgButton.addEventListener('click', async function() {
-    const messageText = messageInput.value.trim();
-    if (!messageText) return;
-
     try {
       const tabs = await chrome.tabs.query({active: true, currentWindow: true});
       if (tabs[0]) {
         await chrome.tabs.sendMessage(tabs[0].id, {
           action: 'sendMsg',
-          text: messageText
+          text: 'Hi, GPT'
         });
-        
-        // Clear the input after sending
-        messageInput.value = '';
       }
     } catch (error) {
       console.error('[Sidepanel] Error sending GPT message:', error);
