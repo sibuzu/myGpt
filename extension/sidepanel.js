@@ -24,8 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
   const sendMsgButton = document.getElementById('sendMsg');
-  const sendStatusElement = document.getElementById('sendStatus');
-
+  
   // 初始化可折疊面板
   const headers = document.querySelectorAll('.panel-header');
   headers.forEach(header => {
@@ -141,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     } catch (error) {
       console.error('[Sidepanel] Error sending GPT message:', error);
-      sendStatusElement.textContent = `Status: Error ${error.message}`;
     }
   });
 
