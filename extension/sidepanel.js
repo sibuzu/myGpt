@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const chatContainer = document.getElementById('chatContainer');
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
+  const sendHiGPTButton = document.getElementById('sendHiGPT');
 
   let startTime = null;
 
@@ -210,5 +211,16 @@ document.addEventListener('DOMContentLoaded', function () {
         statusElement.textContent = `Status: API error: ${error.message}`;
       });
     }
+  });
+
+  // 添加 Send Hi GPT 按鈕處理
+  sendHiGPTButton.addEventListener('click', async function() {
+    // 發送消息到 content script
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'sendHiGPT',
+        text: 'Hi, GPT'
+      });
+    });
   });
 });

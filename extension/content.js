@@ -36,7 +36,7 @@ function checkState() {
 
   // 如果都沒找到，則為 not-found
   console.log('[Contents] Current state: not-found');
-  logAllDataTestIds(); // 當狀態是 not-found 時列出所有 data-testid
+  logAllDataTestIds();
   chrome.runtime.sendMessage({
     type: 'stateChange',
     state: 'not-found'
@@ -103,5 +103,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       type: 'imageList',
       list: imageList
     });
+  } else if (request.action === 'sendHiGPT') {
+    // 找到 ChatGPT 的輸入框
+    const promptTextarea = document.querySelector('[id="prompt-textarea"]');
+    if (promptTextarea) {
+      // 設置文本
+      promptTextarea.value = request.text;
+      
+      // 觸發 input 事件以激活發送按鈕
+      promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+      
+      // 找到發送按鈕並點擊
+      const sendButton = document.querySelector('[data-testid="send-button"]');
+      if (sendButton && !sendButton.disabled) {
+        sendButton.click();
+      }
+    }
   }
 });

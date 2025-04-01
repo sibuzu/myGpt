@@ -38,7 +38,7 @@
         "https://chat.openai.com/*",
         "https://chatgpt.com/*"
       ],
-      "js": ["contents.js"]
+      "js": ["content.js"]
     }
   ]
 }
