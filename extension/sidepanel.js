@@ -1,6 +1,7 @@
 const API_URL = 'http://localhost:12345';
 
 document.addEventListener('DOMContentLoaded', function () {
+  // 原有的元素獲取
   const downloadImagesButton = document.getElementById('downloadImages');
   const statusElement = document.getElementById('status');
   const messageInput = document.getElementById('messageInput');
@@ -9,6 +10,27 @@ document.addEventListener('DOMContentLoaded', function () {
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
   const sendGptButton = document.getElementById('sendGpt');
+
+  // 初始化可折疊面板
+  const headers = document.querySelectorAll('.panel-header');
+  headers.forEach(header => {
+    header.addEventListener('click', function() {
+      const content = this.nextElementSibling;
+      const icon = this.querySelector('#toggle-icon');
+      const verticalLine = icon.querySelector('#v-line');
+      const isOpen = content.style.display === 'block';
+
+      content.style.display = isOpen ? 'none' : 'block';
+
+      if (isOpen) {
+        verticalLine.style.display = 'block';  // show "+" when closed
+        icon.setAttribute('data-state', 'closed');
+      } else {
+        verticalLine.style.display = 'none';   // hide vertical bar to make it "-"
+        icon.setAttribute('data-state', 'open');
+      }
+    });
+  });
 
   let startTime = null;
 
