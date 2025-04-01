@@ -4,3 +4,14 @@ log/
 include/
 lib/
 log/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python

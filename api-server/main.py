@@ -47,12 +47,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/test")
-async def test():
+@app.get("/")
+async def root():
     """
-    Test endpoint to verify API is running
+    Root endpoint to verify API is running
     """
-    logger.info("Test endpoint called")
+    logger.info("Root endpoint called")
     return "my-gpt-api is running"
 
 # 定義數據模型
