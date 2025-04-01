@@ -103,20 +103,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       type: 'imageList',
       list: imageList
     });
-  } else if (request.action === 'sendHiGPT') {
+  } else if (request.action === 'sendGpt') {
+
+    console.log('[Contents] Sending GPT message:', request.text);
     // 找到 ChatGPT 的輸入框
     const promptTextarea = document.querySelector('[id="prompt-textarea"]');
+    console.log('[Contents] Prompt textarea:', promptTextarea);
+    
     if (promptTextarea) {
       // 設置文本
-      promptTextarea.value = request.text;
-      
+      promptTextarea.innerHTML = `<p>${request.text}</p>`;
+      console.log('[Contents] Prompt textarea:', promptTextarea);
+
       // 觸發 input 事件以激活發送按鈕
-      promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+      promptTextarea.dispatchEvent(new Event('input', { 
+        bubbles: true,
+        cancelable: true 
+      }));
       
       // 找到發送按鈕並點擊
       const sendButton = document.querySelector('[data-testid="send-button"]');
       if (sendButton && !sendButton.disabled) {
-        sendButton.click();
+        console.log('[Contents] Sending message...');
+        // sendButton.click();
       }
     }
   }
