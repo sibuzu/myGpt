@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const chatContainer = document.getElementById('chatContainer');
   const elapsedTimeElement = document.getElementById('elapsedTime');
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
-  const sendGptButton = document.getElementById('sendGpt');
+  const sendMsgButton = document.getElementById('sendMsg');
 
   // 初始化可折疊面板
   const headers = document.querySelectorAll('.panel-header');
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function stopTimer() {
     if (startTime) {
-      const endTime = Date.now();
+      const endTime = Date.now ();
       const elapsed = (endTime - startTime) / 1000;
       elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
       startTime = null;
@@ -108,13 +108,13 @@ document.addEventListener('DOMContentLoaded', function () {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  // Send GPT button handler
-  sendGptButton.addEventListener('click', async function() {
+  // Send button handler
+  sendMsgButton.addEventListener('click', async function() {
     try {
       const tabs = await chrome.tabs.query({active: true, currentWindow: true});
       if (tabs[0]) {
         await chrome.tabs.sendMessage(tabs[0].id, {
-          action: 'sendGpt',
+          action: 'sendMsg',
           text: 'Hi, GPT'
         });
       }

@@ -103,7 +103,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       type: 'imageList',
       list: imageList
     });
-  } else if (request.action === 'sendGpt') {
+  } else if (request.action === 'sendMsg') {
 
     console.log('[Contents] Sending GPT message:', request.text);
     // 找到 ChatGPT 的輸入框
