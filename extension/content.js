@@ -21,11 +21,11 @@ function logAllDataTestIds() {
 
 // 檢查當前狀態
 function checkState() {
-  console.log('[Contents] Checking state...');
+  // console.log('[Contents] Checking state...');
 
   for (const [state, selector] of Object.entries(STATE_SELECTORS)) {
     if (document.querySelector(selector)) {
-      console.log('[Contents] Current state:', state);
+      // console.log('[Contents] Current state:', state);
       chrome.runtime.sendMessage({
         type: 'stateChange',
         state: state
@@ -45,7 +45,7 @@ function checkState() {
 
 // 設置 MutationObserver
 const observer = new MutationObserver((mutations) => {
-  console.log('[Contents] DOM mutation detected');
+  // console.log('[Contents] DOM mutation detected');
   checkState();
 });
 
@@ -108,7 +108,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Contents] Sending GPT message:', request.text);
     // 找到 ChatGPT 的輸入框
     const promptTextarea = document.querySelector('[id="prompt-textarea"]');
-    console.log('[Contents] Prompt textarea:', promptTextarea);
     
     if (promptTextarea) {
       // 設置文本
@@ -125,7 +124,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const sendButton = document.querySelector('button[data-testid="send-button"]');
       if (sendButton) {
         console.log('[Contents] Sending message...');
-        // sendButton.click();
+        sendButton.click();
       }
     }
   }
