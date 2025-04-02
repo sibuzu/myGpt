@@ -268,16 +268,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const textContainer = messageInput.querySelector('.text-container');
     const imagesContainer = messageInput.querySelector('.images-container');
     const messageText = textContainer.innerText.trim();
-    const images = imagesContainer.querySelectorAll('img');
+    const images = Array.from(imagesContainer.querySelectorAll('img'));  // 轉換為陣列以保持順序
 
     if (!messageText && images.length === 0) return;
 
     let message = messageText;
 
-    // 如果有圖片，將其轉換為 Markdown 格式
+    // 如果有圖片，將其轉換為 Markdown 格式（反轉陣列以保持原始貼上順序）
     if (images.length > 0) {
-      images.forEach((img, index) => {
-        message = `![Image ${index + 1}](${img.src})\n` + message;
+      images.reverse().forEach((img, index) => {
+        message = `![Image ${images.length - index}](${img.src})\n` + message;
       });
     }
 
