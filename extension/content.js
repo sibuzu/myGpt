@@ -110,16 +110,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     const promptTextarea = document.querySelector('[id="prompt-textarea"]');
     
     if (promptTextarea) {
-      // 解析 markdown 格式的圖片
-      const imageMatches = request.text.match(/!\[.*?\]\((.*?)\)\n/g);
-      const textContent = request.text.replace(/!\[.*?\]\((.*?)\)\n/g, '');
-      
-      // 如果有圖片，先處理圖片
-      if (imageMatches) {
-        for (const imgMarkdown of imageMatches) {
-          const imgUrl = imgMarkdown.match(/\((.*?)\)/)[1];
-          
-          try {
+      try {
+        // 解析 markdown 格式的圖片
+        const imageMatches = request.text.match(/!\[.*?\]\((.*?)\)\n/g);
+        const textContent = request.text.replace(/!\[.*?\]\((.*?)\)\n/g, '');
+        
+        // 如果有圖片，先處理圖片
+        if (imageMatches) {
+          // 一次只處理一組圖片
+          for (const imgMarkdown of imageMatches) {
+            const imgUrl = imgMarkdown.match(/\((.*?)\)/)[1];
+            
             console.log('[Contents] Processing image:', imgUrl.substring(0, 50) + '...');
             
             // 將 base64 圖片轉換為 blob
@@ -133,96 +134,35 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             // 等待焦點設置完成
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            try {
-              // 使用 input event 直接插入檔案
-              const file = new File([blob], 'image.png', { type: 'image/png' });
-              const dt = new DataTransfer();
-              dt.items.add(file);
-              
-              const inputEvent = new InputEvent('input', {
-                bubbles: true,
-                cancelable: true,
-                inputType: 'insertFromPaste',
-                data: null,
-                dataTransfer: dt
-              });
-              
-              promptTextarea.dispatchEvent(inputEvent);
-              
-              // 如果上面的方法失敗，嘗試使用 drop 事件
-              if (!promptTextarea.querySelector('img')) {
-                const dropEvent = new DragEvent('drop', {
-                  bubbles: true,
-                  cancelable: true,
-                  dataTransfer: dt
-                });
-                promptTextarea.dispatchEvent(dropEvent);
-              }
-            } catch (pasteError) {
-              console.error('[Contents] Primary paste method failed:', pasteError);
-              
-              // 備用方案：使用 FormData 和 XHR
-              try {
-                const formData = new FormData();
-                formData.append('image', blob, 'image.png');
-                
-                // 觸發自定義事件
-                const customEvent = new CustomEvent('imageUpload', {
-                  detail: { formData: formData }
-                });
-                promptTextarea.dispatchEvent(customEvent);
-              } catch (backupError) {
-                console.error('[Contents] Backup paste method failed:', backupError);
-              }
-            }
+            // 嘗試插入圖片
+            await insertImage(promptTextarea, blob);
             
             // 等待圖片插入完成
             await new Promise(resolve => setTimeout(resolve, 500));
-            
-            console.log('[Contents] Image insertion attempted');
-          } catch (error) {
-            console.error('[Contents] Error handling image:', error);
           }
         }
-      }
-      
-      // 處理文本內容
-      if (textContent.trim()) {
-        promptTextarea.focus();
-        document.execCommand('insertText', false, textContent.trim());
-      }
-      
-      // 觸發 input 事件以激活發送按鈕
-      promptTextarea.dispatchEvent(new Event('input', { 
-        bubbles: true,
-        cancelable: true 
-      }));
-      
-      // 等待發送按鈕變為可用
-      await new Promise((resolve, reject) => {
-        // 如果有圖片，則等待更久
-        const maxAttempts = imageMatches ? 40 : 10; // 有圖等20秒，無圖等5秒
-        let attempts = 0;
         
-        const checkButton = () => {
-          const sendButton = document.querySelector('button[data-testid="send-button"]:not([disabled])');
-          if (sendButton) {
-            console.log('[Contents] Send button is ready');
-            sendButton.click();
-            resolve();
-          } else if (attempts >= maxAttempts) {
-            reject(new Error(`Timeout waiting for send button after ${maxAttempts * 500}ms`));
-          } else {
-            console.log('[Contents] Waiting for send button... attempt:', attempts + 1, 
-                       `(${attempts * 500}ms / ${maxAttempts * 500}ms)`);
-            attempts++;
-            setTimeout(checkButton, 500);
-          }
-        };
-        checkButton();
-      }).catch(error => {
-        console.error('[Contents] Error:', error.message);
-      });
+        // 處理文本內容
+        if (textContent.trim()) {
+          promptTextarea.focus();
+          document.execCommand('insertText', false, textContent.trim());
+        }
+        
+        // 觸發 input 事件以激活發送按鈕
+        promptTextarea.dispatchEvent(new Event('input', { 
+          bubbles: true,
+          cancelable: true 
+        }));
+        
+        // 等待發送按鈕變為可用並點擊
+        await waitForAndClickSendButton(imageMatches ? 40 : 10);
+        
+        // 等待回應完成
+        await waitForResponse();
+        
+      } catch (error) {
+        console.error('[Contents] Error processing message:', error);
+      }
     }
   }
 });
@@ -240,4 +180,81 @@ function dataURLtoBlob(dataURL) {
   }
   
   return new Blob([u8arr], { type: mime });
+}
+
+async function insertImage(textarea, blob) {
+  try {
+    // 使用 input event 直接插入檔案
+    const file = new File([blob], 'image.png', { type: 'image/png' });
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      inputType: 'insertFromPaste',
+      data: null,
+      dataTransfer: dt
+    });
+    
+    textarea.dispatchEvent(inputEvent);
+    
+    // 如果上面的方法失敗，嘗試使用 drop 事件
+    if (!textarea.querySelector('img')) {
+      const dropEvent = new DragEvent('drop', {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dt
+      });
+      textarea.dispatchEvent(dropEvent);
+    }
+  } catch (error) {
+    console.error('[Contents] Image insertion failed:', error);
+    // 備用方案：使用 FormData
+    const formData = new FormData();
+    formData.append('image', blob, 'image.png');
+    textarea.dispatchEvent(new CustomEvent('imageUpload', {
+      detail: { formData: formData }
+    }));
+  }
+}
+
+async function waitForAndClickSendButton(maxAttempts) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    
+    const checkButton = () => {
+      const sendButton = document.querySelector('button[data-testid="send-button"]:not([disabled])');
+      if (sendButton) {
+        console.log('[Contents] Send button is ready');
+        sendButton.click();
+        resolve();
+      } else if (attempts >= maxAttempts) {
+        reject(new Error(`Timeout waiting for send button after ${maxAttempts * 500}ms`));
+      } else {
+        console.log('[Contents] Waiting for send button... attempt:', attempts + 1, 
+                   `(${attempts * 500}ms / ${maxAttempts * 500}ms)`);
+        attempts++;
+        setTimeout(checkButton, 500);
+      }
+    };
+    checkButton();
+  });
+}
+
+async function waitForResponse() {
+  return new Promise((resolve) => {
+    const checkResponse = () => {
+      // 檢查是否有正在生成的回應
+      const responseInProgress = document.querySelector('.result-streaming');
+      if (!responseInProgress) {
+        console.log('[Contents] Response completed');
+        resolve();
+      } else {
+        console.log('[Contents] Waiting for response to complete...');
+        setTimeout(checkResponse, 1000);
+      }
+    };
+    setTimeout(checkResponse, 1000); // 給一些時間讓回應開始生成
+  });
 }
