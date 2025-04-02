@@ -52,6 +52,34 @@ body {
   transition: transform 0.3s ease;
 }
 
+/* Chat Section */
+.chat-section {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 16px 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.user-message {
+  background-color: #e9ecef;
+  margin-left: auto;
+}
+
+.gpt-message {
+  background-color: #f8f9fa;
+  margin-right: auto;
+}
+
 /* Input Section */
 .input-section {
   background: white;
@@ -70,11 +98,36 @@ body {
   box-sizing: border-box;
   overflow-y: auto;
   outline: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .message-input[placeholder]:empty:before {
   content: attr(placeholder);
   color: #6c757d;
+}
+
+.message-input .images-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.message-input .images-container:empty {
+  display: none;
+  margin-bottom: 0;
+}
+
+.message-input .images-container img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.message-input .text-container {
+  flex: 1;
 }
 
 .button-container {
@@ -103,89 +156,14 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 8px;
+  margin-left: 4px;
+  margin-top: 15px;
 }
 
 .pause-checkbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
   margin: 0;
-}
-
-/* Prompt List Styles */
-#promptList {
-  margin-top: 8px;
-  font-size: 13px;
-  color: #4b5563;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.prompt-item {
-  padding: 4px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.prompt-item:last-child {
-  border-bottom: none;
-}
-
-/* Status Elements */
-#state, #elapsedTime, #status, #pageId, #totalTurns {
-  margin: 4px 0;
-  font-size: 14px;
-  color: #4b5563;
-}
-
-/* Image List */
-#imgList {
-  font-size: 13px;
-  color: #4b5563;
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 4px;
-  padding-bottom: 20px;
-}
-
-#imgList div {
-  padding: 4px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-#imgList div:last-child {
-  border-bottom: none;
-  margin-bottom: 4px;
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
 
 /* Utility Classes */
