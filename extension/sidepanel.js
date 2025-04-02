@@ -1,10 +1,12 @@
 const API_URL = 'http://solarsuna.com:32345';
 let startTime = null;
 let isPaused = false;
-
-// 添加提示佇列
 let promptQueue = [];
 let isProcessingQueue = false;
+
+// 狀態相關變數
+let currentState = null;     // 當前狀態
+let previousState = null;    // 前一個狀態
 
 // 更新 promptList 顯示
 function updatePromptList() {
@@ -66,9 +68,17 @@ async function processPromptQueue() {
         action: 'sendMsg',
         text: text
       });
+      
+      // 先移除已處理的提示並更新顯示
       promptQueue.shift();
       updatePromptList();
       console.log('[Sidepanel] Processed prompt from queue, remaining:', promptQueue.length);
+      
+      // 然後等待 2 秒
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 注意：不在這裡繼續處理下一個提示
+      // 等待 state 變化事件處理程序來觸發下一個提示的處理
     }
   } catch (error) {
     console.error('[Sidepanel] Error processing prompt queue:', error);
@@ -287,9 +297,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // 重新初始化輸入框
     initializeMessageInput();
 
-    const stateElement = document.getElementById('state');
-    const currentState = stateElement.textContent.replace('State: ', '');
-
     if (currentState === 'input-mode') {
       processPromptQueue();
     }
@@ -315,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
         break;
       case 'stateChange':
         const stateElement = document.getElementById('state');
-        currentState = request.state;  // 更新當前狀態
+        currentState = request.state;
         stateElement.textContent = `State: ${currentState}`;
 
         if (currentState === 'running' && !startTime) {
@@ -327,8 +334,13 @@ document.addEventListener('DOMContentLoaded', function () {
               handleTelegramNotification();
             }
           }
-          processPromptQueue();
+          // 只有從非 input-mode 狀態切換過來時才處理佇列
+          if (previousState !== 'input-mode') {
+            processPromptQueue();
+          }
         }
+        
+        previousState = currentState;   // 更新前一個狀態
         break;
       case 'imageList':
         handleImageList(request.list);
