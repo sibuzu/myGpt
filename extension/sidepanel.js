@@ -6,7 +6,7 @@ let isProcessingQueue = false;
 
 // 狀態相關變數
 let currentState = null;     // 當前狀態
-let previousState = null;    // 前一個狀態
+let canSend = true;         // 控制是否可以發送訊息
 
 // 更新 promptList 顯示
 function updatePromptList() {
@@ -47,17 +47,21 @@ pauseQueueCheckbox.addEventListener('change', function(e) {
   
   // 如果取消暫停，嘗試處理佇列
   if (!isPaused) {
+    canSend = true;
     processPromptQueue();
   }
 });
 
 async function processPromptQueue() {
-  if (isProcessingQueue || promptQueue.length === 0 || isPaused) return;
+  if (isProcessingQueue || promptQueue.length === 0 || isPaused || !canSend) return;
 
   if (currentState !== 'input-mode') {
     console.log('[Sidepanel] Current state is not input-mode:', currentState);
     return;
   }
+
+  // 設 canSend=false，避免連續觸發，只有state changed後，canSend才會被重設為true。
+  canSend = false;
 
   isProcessingQueue = true;
   try {
@@ -341,6 +345,54 @@ document.addEventListener('DOMContentLoaded', function () {
     fileInput.value = '';
   });
 
+  // Script button handler
+  const scriptBtn = document.getElementById('scriptBtn');
+  const scriptInput = document.getElementById('scriptInput');
+
+  scriptBtn.addEventListener('click', () => {
+    scriptInput.click();
+  });
+
+  scriptInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const script = JSON.parse(text);
+
+      // 處理每個 prompt
+      for (const item of script) {
+        let message = item.prompt;
+
+        // 如果有圖片，將其轉換為 Markdown 格式
+        if (item.images && item.images.length > 0) {
+          for (let i = 0; i < item.images.length; i++) {
+            message = `![Image ${i + 1}](${item.images[i]})\n` + message;
+          }
+        }
+
+        // 加入到 prompt queue
+        promptQueue.push(message);
+      }
+
+      // 更新顯示
+      updatePromptList();
+
+      // 如果當前是 input-mode，開始處理佇列
+      if (currentState === 'input-mode') {
+        processPromptQueue();
+      }
+
+      console.log('[Sidepanel] Script loaded, prompts added:', script.length);
+    } catch (error) {
+      console.error('[Sidepanel] Error processing script file:', error);
+    }
+
+    // 清空 input 值以支援重複載入相同檔案
+    scriptInput.value = '';
+  });
+
   // Message listeners
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Sidepanel] Received message:', request);
@@ -357,6 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
         currentState = request.state;
         stateElement.textContent = `State: ${currentState}`;
 
+        if (currentState != 'input-mode') {
+          // 當前不是 input-mode，表示已經開始執行，可以準備發送下一個(當再次變成 input-mode 時)
+          canSend = true;
+        }
+
         if (currentState === 'running' && !startTime) {
           startTimer();
         } else if (currentState === 'input-mode') {
@@ -366,13 +423,8 @@ document.addEventListener('DOMContentLoaded', function () {
               handleTelegramNotification();
             }
           }
-          // 只有從非 input-mode 狀態切換過來時才處理佇列
-          if (previousState !== 'input-mode') {
-            processPromptQueue();
-          }
+          processPromptQueue();
         }
-        
-        previousState = currentState;   // 更新前一個狀態
         break;
       case 'imageList':
         handleImageList(request.list);
