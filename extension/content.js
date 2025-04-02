@@ -1,6 +1,6 @@
 // 定義狀態和對應的選擇器
 const STATE_SELECTORS = {
-  'waiting': 'button[data-testid="send-button"][disabled], button[data-testid="composer-speech-button"]',
+  'input-mode': 'button[data-testid="send-button"][disabled], button[data-testid="composer-speech-button"]',
   'ready-to-send': 'button[data-testid="send-button"]:not([disabled])',
   'running': 'button[data-testid="stop-button"]'
 };

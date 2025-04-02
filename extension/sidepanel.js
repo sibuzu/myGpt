@@ -1,5 +1,6 @@
 const API_URL = 'http://solarsuna.com:32345';
 let startTime = null;
+let isPaused = false;
 
 // 添加提示佇列
 let promptQueue = [];
@@ -9,40 +10,53 @@ let isProcessingQueue = false;
 function updatePromptList() {
   const promptListElement = document.getElementById('promptList');
   promptListElement.innerHTML = '';
-  
+
   promptQueue.forEach((prompt, index) => {
     const div = document.createElement('div');
     div.className = 'prompt-item';
-    
+
     // 移除所有圖片的 markdown 格式 (![...](...)格式)
     const textOnly = prompt.replace(/!\[.*?\]\(.*?\)\n/g, '');
     const displayText = textOnly.length > 20 ? textOnly.substring(0, 20) + '...' : textOnly;
-    
+
     div.textContent = `${index + 1}. ${displayText}`;
     promptListElement.appendChild(div);
   });
 }
 
 // 處理佇列中的提示
+const pauseQueueCheckbox = document.getElementById('pauseQueue');
+
+// 監聽 pause checkbox 變化
+pauseQueueCheckbox.addEventListener('change', function(e) {
+  isPaused = e.target.checked;
+  console.log('[Sidepanel] Queue paused:', isPaused);
+  
+  // 如果取消暫停，嘗試處理佇列
+  if (!isPaused) {
+    processPromptQueue();
+  }
+});
+
 async function processPromptQueue() {
-  if (isProcessingQueue || promptQueue.length === 0) return;
-  
-  const stateElement = document.getElementById('state');
-  const currentState = stateElement.textContent.replace('State: ', '');
-  
-  if (currentState !== 'waiting') return;
-  
+  if (isProcessingQueue || promptQueue.length === 0 || isPaused) return;
+
+  if (currentState !== 'input-mode') {
+    console.log('[Sidepanel] Current state is not input-mode:', currentState);
+    return;
+  }
+
   isProcessingQueue = true;
   try {
     const text = promptQueue[0];
-    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs[0]) {
       await chrome.tabs.sendMessage(tabs[0].id, {
         action: 'sendMsg',
         text: text
       });
-      promptQueue.shift(); // 移除已發送的提示
-      updatePromptList(); // 更新顯示
+      promptQueue.shift();
+      updatePromptList();
       console.log('[Sidepanel] Processed prompt from queue, remaining:', promptQueue.length);
     }
   } catch (error) {
@@ -59,11 +73,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const clone = template.content.cloneNode(true);
     const svg = clone.querySelector('svg');
     const vLine = clone.querySelector('#v-line');
-    
+
     if (container.dataset.state === 'open') {
       vLine.style.display = 'none';
     }
-    
+
     container.appendChild(clone);
   });
 
@@ -76,18 +90,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const notifyTelegramCheckbox = document.getElementById('notifyTelegram');
   const sendMsgButton = document.getElementById('sendMsg');
   const clearQueueButton = document.getElementById('clearQueue');
-  
+
   // 初始化可折疊面板
   const headers = document.querySelectorAll('.panel-header');
   headers.forEach(header => {
-    header.addEventListener('click', function() {
+    header.addEventListener('click', function () {
       const content = this.nextElementSibling;
       const icon = this.querySelector('.toggle-icon');
       const verticalLine = icon.querySelector('#v-line');
       const isOpen = content.style.display === 'block';
 
       content.style.display = isOpen ? 'none' : 'block';
-      
+
       if (isOpen) {
         verticalLine.style.display = 'block';
         icon.setAttribute('data-state', 'closed');
@@ -112,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function stopTimer() {
     if (startTime) {
-      const endTime = Date.now ();
+      const endTime = Date.now();
       const elapsed = (endTime - startTime) / 1000;
       elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
       startTime = null;
@@ -127,25 +141,25 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // 監聽 checkbox 變化並保存狀態
-  notifyTelegramCheckbox.addEventListener('change', function() {
+  notifyTelegramCheckbox.addEventListener('change', function () {
     chrome.storage.local.set({ notifyTelegram: this.checked }).catch(error => {
       console.error('[Sidepanel] Error saving to storage:', error);
     });
   });
 
   // Download Images button click handler
-  downloadImagesButton.addEventListener('click', async function() {
+  downloadImagesButton.addEventListener('click', async function () {
     try {
-      const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tabs[0]) {
         const currentUrl = tabs[0].url;
         console.log('[Sidepanel] Current URL:', currentUrl);
-        
+
         let pageId = '';
         if (currentUrl.match(/-[0-9a-f]{12}$/)) {
           pageId = currentUrl.slice(-12);
         }
-        
+
         const pageIdElement = document.getElementById('pageId');
         pageIdElement.textContent = `PageID: ${pageId}`;
 
@@ -178,19 +192,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function initializeMessageInput() {
     // 清空現有內容
     messageInput.innerHTML = '';
-    
+
     // 創建圖片容器
     const imagesContainer = document.createElement('div');
     imagesContainer.className = 'images-container';
-    
+
     // 創建文字容器
     const textContainer = document.createElement('div');
     textContainer.className = 'text-container';
     textContainer.contentEditable = true;
-    
+
     messageInput.appendChild(imagesContainer);
     messageInput.appendChild(textContainer);
-    
+
     // 將焦點設置到文字容器
     textContainer.focus();
   }
@@ -201,29 +215,29 @@ document.addEventListener('DOMContentLoaded', function () {
   // 處理貼上事件
   messageInput.addEventListener('paste', async (e) => {
     e.preventDefault();
-    
+
     const items = (e.clipboardData || e.originalEvent.clipboardData).items;
     const imagesContainer = messageInput.querySelector('.images-container');
     const textContainer = messageInput.querySelector('.text-container');
-    
+
     for (const item of items) {
       if (item.type.indexOf('image') === 0) {
         const blob = item.getAsFile();
         const reader = new FileReader();
-        
-        reader.onload = function(event) {
+
+        reader.onload = function (event) {
           const img = document.createElement('img');
           img.src = event.target.result;
           imagesContainer.appendChild(img);
         };
-        
+
         reader.readAsDataURL(blob);
       } else if (item.type === 'text/plain') {
         // 處理純文本
         const text = await new Promise(resolve => item.getAsString(resolve));
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
-        
+
         // 確保文本插入到 textContainer 中
         if (!textContainer.contains(range.commonAncestorContainer)) {
           textContainer.focus();
@@ -232,46 +246,46 @@ document.addEventListener('DOMContentLoaded', function () {
           range.collapse(false);
           selection.addRange(range);
         }
-        
+
         document.execCommand('insertText', false, text);
       }
     }
   });
 
   // Send button handler
-  sendMsgButton.addEventListener('click', async function() {
+  sendMsgButton.addEventListener('click', async function () {
     const textContainer = messageInput.querySelector('.text-container');
     const imagesContainer = messageInput.querySelector('.images-container');
     const messageText = textContainer.innerText.trim();
     const images = imagesContainer.querySelectorAll('img');
-    
+
     if (!messageText && images.length === 0) return;
-    
+
     let message = messageText;
-    
+
     // 如果有圖片，將其轉換為 Markdown 格式
     if (images.length > 0) {
       images.forEach((img, index) => {
         message = `![Image ${index + 1}](${img.src})\n` + message;
       });
     }
-    
+
     promptQueue.push(message);
     updatePromptList();
-    
+
     // 重新初始化輸入框
     initializeMessageInput();
-    
+
     const stateElement = document.getElementById('state');
     const currentState = stateElement.textContent.replace('State: ', '');
-    
-    if (currentState === 'waiting') {
+
+    if (currentState === 'input-mode') {
       processPromptQueue();
     }
   });
 
   // Clear button handler
-  clearQueueButton.addEventListener('click', function() {
+  clearQueueButton.addEventListener('click', function () {
     promptQueue = [];  // 清空佇列
     updatePromptList(); // 更新顯示
     console.log('[Sidepanel] Queue cleared');
@@ -290,15 +304,18 @@ document.addEventListener('DOMContentLoaded', function () {
         break;
       case 'stateChange':
         const stateElement = document.getElementById('state');
-        stateElement.textContent = `State: ${request.state}`;
-        
-        if (request.state === 'running' && !startTime) {
+        currentState = request.state;  // 更新當前狀態
+        stateElement.textContent = `State: ${currentState}`;
+
+        if (currentState === 'running' && !startTime) {
           startTimer();
-        } else if (request.state === 'waiting' && startTime) {
-          stopTimer();
-          handleTelegramNotification();
-        } else if (request.state === 'waiting') {
-          // 當狀態變為 waiting 時處理佇列
+        } else if (currentState === 'input-mode') {
+          if (startTime) {
+            stopTimer();
+            if (promptQueue.length === 0) {
+              handleTelegramNotification();
+            }
+          }
           processPromptQueue();
         }
         break;
@@ -327,7 +344,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function handleImageList(list) {
     const imgListElement = document.getElementById('imgList');
     const totalTurnsElement = document.getElementById('totalTurns');
-    
+
     if (list.length === 0) {
       downloadStatusElement.textContent = 'Status: no image';
       imgListElement.innerHTML = '';
@@ -337,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     totalTurnsElement.textContent = `Total Turns: ${list.length}`;
     imgListElement.innerHTML = '';
-    
+
     list.forEach(item => {
       const div = document.createElement('div');
       div.className = 'mb-2';
