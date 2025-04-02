@@ -70,6 +70,31 @@ if (document.readyState === 'loading') {
   startObserving();
 }
 
+async function DelayRandTime(minSec, maxSec, passRate) {
+  if (passRate <= 0 || passRate > 1) {
+      throw new Error('passRate must be between 0 and 1');
+  }
+
+  while (true) {
+      // 產生 [minSec, maxSec] 範圍內的隨機秒數
+      const delayTime = minSec + Math.random() * (maxSec - minSec);
+      
+      // 等待指定的時間
+      await new Promise(resolve => setTimeout(resolve, delayTime * 1000));
+      
+
+      // 產生 (0,1) 範圍內的隨機數
+      const k = Math.random();
+      
+      console.log('[DelayRandTime] delayTime:', delayTime, 'k:', k, 'passRate:', passRate);
+
+      // 如果隨機數小於通過率，則結束等待
+      if (k < passRate) {
+          return;
+      }
+  }
+}
+
 // 監聽來自 sidepanel 的消息
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === 'queryImageList') {
@@ -230,12 +255,12 @@ async function waitForAndClickSendButton(maxAttempts) {
         sendButton.click();
         resolve();
       } else if (attempts >= maxAttempts) {
-        reject(new Error(`Timeout waiting for send button after ${maxAttempts * 500}ms`));
+        reject(new Error(`Timeout waiting for send button after ${maxAttempts * 2000}ms`));
       } else {
         console.log('[Contents] Waiting for send button... attempt:', attempts + 1, 
-                   `(${attempts * 500}ms / ${maxAttempts * 500}ms)`);
+                   `(${attempts * 2000}ms / ${maxAttempts * 2000}ms)`);
         attempts++;
-        setTimeout(checkButton, 500);
+        setTimeout(checkButton, 2000);
       }
     };
     checkButton();
