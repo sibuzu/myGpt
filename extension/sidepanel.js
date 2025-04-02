@@ -365,9 +365,10 @@ document.addEventListener('DOMContentLoaded', function () {
       for (const item of script) {
         let message = item.prompt;
 
-        // 如果有圖片，將其轉換為 Markdown 格式
+        // 如果有圖片，將其按原始順序加入
         if (item.images && item.images.length > 0) {
-          for (let i = 0; i < item.images.length; i++) {
+          // 從最後一張開始加入，這樣在最終顯示時會保持原始順序
+          for (let i = item.images.length - 1; i >= 0; i--) {
             message = `![Image ${i + 1}](${item.images[i]})\n` + message;
           }
         }
