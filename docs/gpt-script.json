@@ -1,0 +1,19 @@
+[
+  {
+      "prompt": "Hello, GPT"
+  },
+  {
+      "prompt": "Can you draw?",
+      "files": [],
+      "images": []
+  },
+  {
+      "prompt": "參考第二張圖的畫法，重新畫第一張圖，角色、構圖都是用第一張圖，第二張圖的角色不用進來。",
+      "files": ["/Users/simonsu/tmp/mypic.jpg",
+                "/Users/simonsu/tmp/mypic6.jpg"],
+      "images": [
+          "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+          "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+      ]
+  }
+]
