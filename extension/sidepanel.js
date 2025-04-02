@@ -78,8 +78,8 @@ async function processPromptQueue() {
       updatePromptList();
       console.log('[Sidepanel] Processed prompt from queue, remaining:', promptQueue.length);
       
-      // 然後等待 2 秒
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // 然後等待 1~5 秒, rate = 25%
+      await DelayRandTime(1, 5, 0.25);
       
       // 注意：不在這裡繼續處理下一個提示
       // 等待 state 變化事件處理程序來觸發下一個提示的處理
@@ -89,6 +89,31 @@ async function processPromptQueue() {
   } finally {
     isProcessingQueue = false;
   }
+}
+
+async function DelayRandTime(minSec, maxSec, passRate) {
+    if (passRate <= 0 || passRate > 1) {
+        throw new Error('passRate must be between 0 and 1');
+    }
+
+    while (true) {
+        // 產生 [minSec, maxSec] 範圍內的隨機秒數
+        const delayTime = minSec + Math.random() * (maxSec - minSec);
+        
+        // 等待指定的時間
+        await new Promise(resolve => setTimeout(resolve, delayTime * 1000));
+        
+
+        // 產生 (0,1) 範圍內的隨機數
+        const k = Math.random();
+        
+        console.log('[DelayRandTime] delayTime:', delayTime, 'k:', k, 'passRate:', passRate);
+
+        // 如果隨機數小於通過率，則結束等待
+        if (k < passRate) {
+            return;
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
