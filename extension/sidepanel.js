@@ -17,7 +17,18 @@ function updatePromptList() {
 
     // 移除所有圖片的 markdown 格式 (![...](...)格式)
     const textOnly = prompt.replace(/!\[.*?\]\(.*?\)\n/g, '');
-    const displayText = textOnly.length > 20 ? textOnly.substring(0, 20) + '...' : textOnly;
+    // 計算圖片數量
+    const imageCount = (prompt.match(/!\[.*?\]\(.*?\)\n/g) || []).length;
+    let displayText = textOnly;
+    
+    if (imageCount > 0) {
+      // 若有圖片，顯示 [n] 前綴加上最多18個字
+      displayText = displayText.length > 18 ? displayText.substring(0, 18) + '...' : displayText;
+      displayText = `[${imageCount}] ${displayText}`;
+    } else {
+      // 若無圖片，顯示最多20個字
+      displayText = displayText.length > 20 ? displayText.substring(0, 20) + '...' : displayText;
+    }
 
     div.textContent = `${index + 1}. ${displayText}`;
     promptListElement.appendChild(div);
