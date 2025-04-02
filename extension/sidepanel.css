@@ -134,6 +134,7 @@ body {
   display: flex;
   gap: 8px;
   margin-top: 8px;
+  align-items: center;
 }
 
 button {
@@ -151,9 +152,18 @@ button:hover {
   background-color: #059669;
 }
 
-button:disabled {
-  background-color: #6ee7b7;
-  cursor: not-allowed;
+.pause-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  margin-top: 15px;
+}
+
+.pause-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
 }
 
 /* Utility Classes */
