@@ -40,3 +40,5 @@ htmlcov/
 .coverage.*
 coverage.xml
 *.cover
+
+/git_diff

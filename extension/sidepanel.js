@@ -309,6 +309,38 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[Sidepanel] Queue cleared');
   });
 
+  // Upload button handler
+  const uploadBtn = document.getElementById('uploadBtn');
+  const fileInput = document.getElementById('fileInput');
+
+  uploadBtn.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', async (e) => {
+    const files = e.target.files;
+    if (!files.length) return;
+
+    const imagesContainer = messageInput.querySelector('.images-container');
+    
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        
+        reader.onload = (event) => {
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          imagesContainer.appendChild(img);
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    // 清空 file input 的值，這樣相同的檔案可以再次上傳
+    fileInput.value = '';
+  });
+
   // Message listeners
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[Sidepanel] Received message:', request);
