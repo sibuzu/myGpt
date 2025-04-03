@@ -72,6 +72,9 @@ async function processPromptQueue() {
         action: 'sendMsg',
         text: text
       });
+
+      // send telegram
+      sendTelegram(text);
       
       // 先移除已處理的提示並更新顯示
       promptQueue.shift();
