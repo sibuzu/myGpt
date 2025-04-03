@@ -44,8 +44,7 @@ async function sendTelegram(msg) {
       '<': '&lt;',
       '>': '&gt;',
       '&': '&amp;'
-    })[char])
-    .replace(/[[\]()~`>#+=|{}.!-]/g, char => '\\' + char);
+    })[char]);
 
   try {
     const result = await chrome.storage.local.get(['notifyTelegram']);
@@ -101,7 +100,9 @@ async function processPromptQueue() {
       });
 
       // send telegram
-      await sendTelegram("send " + text);
+      // Remove markdown image format (![...](...)格式) and send text only
+      const textOnly = text.replace(/!\[.*?\]\(.*?\)\n/g, '');
+      await sendTelegram("send " + textOnly);
 
       // 先移除已處理的提示並更新顯示
       promptQueue.shift();
