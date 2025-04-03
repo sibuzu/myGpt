@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
           if (startTime) {
             stopTimer();
             if (promptQueue.length === 0) {
-              handleTelegramNotification();
+              sendTelegram('ChatGPT is ready.');
             }
           }
           processPromptQueue();
@@ -458,14 +458,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  async function handleTelegramNotification() {
+  async function sendTelegram(msg) {
     try {
       const result = await chrome.storage.local.get(['notifyTelegram']);
       if (result.notifyTelegram) {
         const response = await fetch(`${API_URL}/notify/telegram`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: 'ChatGPT is ready.' })
+          body: JSON.stringify({ message: msg })
         });
         console.log('[Sidepanel] Telegram notification sent:', await response.text());
       }
