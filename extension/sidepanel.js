@@ -22,7 +22,7 @@ function updatePromptList() {
     // 計算圖片數量
     const imageCount = (prompt.match(/!\[.*?\]\(.*?\)\n/g) || []).length;
     let displayText = textOnly;
-    
+
     if (imageCount > 0) {
       // 若有圖片，顯示 [n] 前綴加上最多18個字
       displayText = displayText.length > 18 ? displayText.substring(0, 18) + '...' : displayText;
@@ -37,14 +37,39 @@ function updatePromptList() {
   });
 }
 
+async function sendTelegram(msg) {
+  // Escape HTML and Telegram special characters
+  const escapedMsg = msg
+    .replace(/[<>&]/g, char => ({
+      '<': '&lt;',
+      '>': '&gt;',
+      '&': '&amp;'
+    })[char])
+    .replace(/[[\]()~`>#+=|{}.!-]/g, char => '\\' + char);
+
+  try {
+    const result = await chrome.storage.local.get(['notifyTelegram']);
+    if (result.notifyTelegram) {
+      const response = await fetch(`${API_URL}/notify/telegram`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: escapedMsg })
+      });
+      console.log('[Sidepanel] Telegram notification sent:', await response.text());
+    }
+  } catch (error) {
+    console.error('[Sidepanel] Failed to send Telegram notification:', error);
+  }
+}
+
 // 處理佇列中的提示
 const pauseQueueCheckbox = document.getElementById('pauseQueue');
 
 // 監聽 pause checkbox 變化
-pauseQueueCheckbox.addEventListener('change', function(e) {
+pauseQueueCheckbox.addEventListener('change', function (e) {
   isPaused = e.target.checked;
   console.log('[Sidepanel] Queue paused:', isPaused);
-  
+
   // 如果取消暫停，嘗試處理佇列
   if (!isPaused) {
     canSend = true;
@@ -53,10 +78,12 @@ pauseQueueCheckbox.addEventListener('change', function(e) {
 });
 
 async function processPromptQueue() {
+  console.log('[Sidepanel] processPromptQueue -Current state:', currentState);
+  // send telegram
+  // await sendTelegram("processPromptQueue");
   if (isProcessingQueue || promptQueue.length === 0 || isPaused || !canSend) return;
 
   if (currentState !== 'input-mode') {
-    console.log('[Sidepanel] Current state is not input-mode:', currentState);
     return;
   }
 
@@ -74,16 +101,16 @@ async function processPromptQueue() {
       });
 
       // send telegram
-      sendTelegram(text);
-      
+      await sendTelegram("send " + text);
+
       // 先移除已處理的提示並更新顯示
       promptQueue.shift();
       updatePromptList();
       console.log('[Sidepanel] Processed prompt from queue, remaining:', promptQueue.length);
-      
+
       // 然後等待 1~5 秒, rate = 25%
       await DelayRandTime(1, 5, 0.25);
-      
+
       // 注意：不在這裡繼續處理下一個提示
       // 等待 state 變化事件處理程序來觸發下一個提示的處理
     }
@@ -95,28 +122,28 @@ async function processPromptQueue() {
 }
 
 async function DelayRandTime(minSec, maxSec, passRate) {
-    if (passRate <= 0 || passRate > 1) {
-        throw new Error('passRate must be between 0 and 1');
+  if (passRate <= 0 || passRate > 1) {
+    throw new Error('passRate must be between 0 and 1');
+  }
+
+  while (true) {
+    // 產生 [minSec, maxSec] 範圍內的隨機秒數
+    const delayTime = minSec + Math.random() * (maxSec - minSec);
+
+    // 等待指定的時間
+    await new Promise(resolve => setTimeout(resolve, delayTime * 1000));
+
+
+    // 產生 (0,1) 範圍內的隨機數
+    const k = Math.random();
+
+    console.log('[DelayRandTime] delayTime:', delayTime, 'k:', k, 'passRate:', passRate);
+
+    // 如果隨機數小於通過率，則結束等待
+    if (k < passRate) {
+      return;
     }
-
-    while (true) {
-        // 產生 [minSec, maxSec] 範圍內的隨機秒數
-        const delayTime = minSec + Math.random() * (maxSec - minSec);
-        
-        // 等待指定的時間
-        await new Promise(resolve => setTimeout(resolve, delayTime * 1000));
-        
-
-        // 產生 (0,1) 範圍內的隨機數
-        const k = Math.random();
-        
-        console.log('[DelayRandTime] delayTime:', delayTime, 'k:', k, 'passRate:', passRate);
-
-        // 如果隨機數小於通過率，則結束等待
-        if (k < passRate) {
-            return;
-        }
-    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -172,9 +199,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function startTimer() {
-    if (startTime) return;
-    startTime = Date.now();
-    elapsedTimeElement.textContent = `Elapsed: -- (${formatTimestamp(startTime)})`;
+    if (!startTime) {
+      startTime = Date.now();
+    }
+    const endTime = Date.now();
+    const elapsed = (endTime - startTime) / 1000;
+    elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
   }
 
   function stopTimer() {
@@ -354,21 +384,21 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!files.length) return;
 
     const imagesContainer = messageInput.querySelector('.images-container');
-    
+
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-        
+
         reader.onload = (event) => {
           const img = document.createElement('img');
           img.src = event.target.result;
           imagesContainer.appendChild(img);
         };
-        
+
         reader.readAsDataURL(file);
       }
     }
-    
+
     // 清空 file input 的值，這樣相同的檔案可以再次上傳
     fileInput.value = '';
   });
@@ -423,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // Message listeners
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     console.log('[Sidepanel] Received message:', request);
 
     switch (request.type) {
@@ -443,41 +473,25 @@ document.addEventListener('DOMContentLoaded', function () {
           canSend = true;
         }
 
-        if (currentState === 'running' && !startTime) {
+        if (currentState === 'running') {
           startTimer();
         } else if (currentState === 'input-mode') {
           if (startTime) {
             stopTimer();
             if (promptQueue.length === 0) {
-              sendTelegram('ChatGPT is ready.');
+              await sendTelegram('ChatGPT is ready2.');
             }
           }
-          processPromptQueue();
+          await processPromptQueue();
         }
         break;
       case 'imageList':
-        handleImageList(request.list);
+        await handleImageList(request.list);
         break;
     }
   });
 
-  async function sendTelegram(msg) {
-    try {
-      const result = await chrome.storage.local.get(['notifyTelegram']);
-      if (result.notifyTelegram) {
-        const response = await fetch(`${API_URL}/notify/telegram`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: msg })
-        });
-        console.log('[Sidepanel] Telegram notification sent:', await response.text());
-      }
-    } catch (error) {
-      console.error('[Sidepanel] Failed to send Telegram notification:', error);
-    }
-  }
-
-  function handleImageList(list) {
+  async function handleImageList(list) {
     const imgListElement = document.getElementById('imgList');
     const totalTurnsElement = document.getElementById('totalTurns');
 
@@ -498,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
       imgListElement.appendChild(div);
     });
 
-    handleImageDownload(list);
+    await handleImageDownload(list);
   }
 
   async function handleImageDownload(list) {
