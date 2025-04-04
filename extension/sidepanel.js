@@ -205,14 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const endTime = Date.now();
     const elapsed = (endTime - startTime) / 1000;
-    elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
+    elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(startTime)})`;
   }
 
   function stopTimer() {
     if (startTime) {
       const endTime = Date.now();
       const elapsed = (endTime - startTime) / 1000;
-      elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
+      elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(startTime)})`;
       startTime = null;
     }
   }
@@ -418,17 +418,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     try {
       const text = await file.text();
-      const script = JSON.parse(text);
+      const scriptData = JSON.parse(text);
+
+      // 檢查是否為新格式（至少要有 prompt 陣列）
+      if (!scriptData.prompt || !Array.isArray(scriptData.prompt)) {
+        console.error('[Sidepanel] Invalid script format: missing prompt array');
+        return;
+      }
 
       // 處理每個 prompt
-      for (const item of script) {
+      for (const item of scriptData.prompt) {
         let message = item.prompt;
 
-        // 如果有圖片，將其按原始順序加入
-        if (item.images && item.images.length > 0) {
+        // 如果有圖片檔案且 scriptData.images 存在，處理圖片
+        if (item.files && item.files.length > 0 && scriptData.images) {
           // 從最後一張開始加入，這樣在最終顯示時會保持原始順序
-          for (let i = item.images.length - 1; i >= 0; i--) {
-            message = `![Image ${i + 1}](${item.images[i]})\n` + message;
+          for (let i = item.files.length - 1; i >= 0; i--) {
+            const filePath = item.files[i];
+            const base64Image = scriptData.images[filePath];
+            if (base64Image) {
+              message = `![Image ${i + 1}](${base64Image})\n` + message;
+            }
           }
         }
 
@@ -444,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
         processPromptQueue();
       }
 
-      console.log('[Sidepanel] Script loaded, prompts added:', script.length);
+      console.log('[Sidepanel] Script loaded, prompts added:', scriptData.prompt.length);
     } catch (error) {
       console.error('[Sidepanel] Error processing script file:', error);
     }

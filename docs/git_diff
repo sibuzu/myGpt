@@ -1,0 +1,218 @@
+diff --git a/docs/gen_stickers.py b/docs/gen_stickers.py
+index dab0077..648781f 100644
+--- a/docs/gen_stickers.py
++++ b/docs/gen_stickers.py
+@@ -20,6 +20,9 @@ GREETINGS = [
+     "賛成！", "まじ？", "本当？", "なぜ？", "どう？", "マジか",
+     "失礼！", "ありがとう！", "完璧", "今度",
+     "ごめん！", "OK!", "Thank you!", "Sorry!", 
++    "お休み",
++    "大丈夫です", "すみません", "おはよう", "こんにちは", "こんばんは",
++    "元気",
+     "大丈夫", "頑張れ！", "ありがとう！"
+ ]
+ 
+diff --git a/docs/myscript.json b/docs/myscript.json
+index dd14dcd..f33d8d9 100644
+--- a/docs/myscript.json
++++ b/docs/myscript.json
+@@ -1,133 +1,14 @@
+ {
+   "prompt": [
+     {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{え、マジで？} {うそでしょ？} {まじか} {なんで？}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
++      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{大丈夫} {お休み} {大丈夫です} {すみません}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+       "files": [
+         "/Users/simonsu/圖庫/a10.png",
+         "/Users/simonsu/圖庫/a10x.png"
+       ]
+     },
+     {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{どうして？} {まさか！} {うん、そうだね} {もちろん}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{いいね！} {賛成！} {その通り！} {無理！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{勘弁して！} {頑張れ！} {ファイト！} {ドンマイ！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{了解です} {なるほど} {すみません} {大丈夫}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{助かる} {ぴえん} {まじかよ！} {やったぜ！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{やったー！} {楽しみ！} {泣ける} {つらい}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{がっかり} {わからない} {了解ぽよ} {おつぽん}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{それな} {ええっ！} {ありえん！} {まじで？}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{驚き！} {ひえー！} {うわー！} {ビビる！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{衝撃！} {度肝！} {当然！} {全く！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{承知！} {異議なし} {最高！} {流石！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{無理！} {勘弁！} {お断り！} {困る！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{拒否！} {残念！} {泣ける！} {辛い！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{意味不明！} {混乱！} {了解！} {それな！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{賛成！} {まじ？} {本当？} {なぜ？}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{どう？} {マジか} {失礼！} {ありがとう！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{完璧} {今度} {ごめん！} {OK!}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+-      "files": [
+-        "/Users/simonsu/圖庫/a10.png",
+-        "/Users/simonsu/圖庫/a10x.png"
+-      ]
+-    },
+-    {
+-      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{Thank you!} {Sorry!} {大丈夫} {頑張れ！}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
++      "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。每张贴圖表現不同的情緒與手勢，搭配以下4句日文文字：{おはよう} {こんにちは} {こんばんは} {元気}。風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與日文字效果文字。背景需為透明色，方便製作LINE貼圖使用。",
+       "files": [
+         "/Users/simonsu/圖庫/a10.png",
+         "/Users/simonsu/圖庫/a10x.png"
+diff --git a/extension/sidepanel.js b/extension/sidepanel.js
+index 887404d..2d5a8e1 100644
+--- a/extension/sidepanel.js
++++ b/extension/sidepanel.js
+@@ -205,14 +205,14 @@ document.addEventListener('DOMContentLoaded', function () {
+     }
+     const endTime = Date.now();
+     const elapsed = (endTime - startTime) / 1000;
+-    elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
++    elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(startTime)})`;
+   }
+ 
+   function stopTimer() {
+     if (startTime) {
+       const endTime = Date.now();
+       const elapsed = (endTime - startTime) / 1000;
+-      elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(endTime)})`;
++      elapsedTimeElement.textContent = `Elapsed: ${elapsed.toFixed(2)}s (${formatTimestamp(startTime)})`;
+       startTime = null;
+     }
+   }
+@@ -418,17 +418,27 @@ document.addEventListener('DOMContentLoaded', function () {
+ 
+     try {
+       const text = await file.text();
+-      const script = JSON.parse(text);
++      const scriptData = JSON.parse(text);
++
++      // 檢查是否為新格式（至少要有 prompt 陣列）
++      if (!scriptData.prompt || !Array.isArray(scriptData.prompt)) {
++        console.error('[Sidepanel] Invalid script format: missing prompt array');
++        return;
++      }
+ 
+       // 處理每個 prompt
+-      for (const item of script) {
++      for (const item of scriptData.prompt) {
+         let message = item.prompt;
+ 
+-        // 如果有圖片，將其按原始順序加入
+-        if (item.images && item.images.length > 0) {
++        // 如果有圖片檔案且 scriptData.images 存在，處理圖片
++        if (item.files && item.files.length > 0 && scriptData.images) {
+           // 從最後一張開始加入，這樣在最終顯示時會保持原始順序
+-          for (let i = item.images.length - 1; i >= 0; i--) {
+-            message = `![Image ${i + 1}](${item.images[i]})\n` + message;
++          for (let i = item.files.length - 1; i >= 0; i--) {
++            const filePath = item.files[i];
++            const base64Image = scriptData.images[filePath];
++            if (base64Image) {
++              message = `![Image ${i + 1}](${base64Image})\n` + message;
++            }
+           }
+         }
+ 
+@@ -444,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
+         processPromptQueue();
+       }
+ 
+-      console.log('[Sidepanel] Script loaded, prompts added:', script.length);
++      console.log('[Sidepanel] Script loaded, prompts added:', scriptData.prompt.length);
+     } catch (error) {
+       console.error('[Sidepanel] Error processing script file:', error);
+     }
