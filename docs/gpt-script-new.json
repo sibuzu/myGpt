@@ -1,0 +1,25 @@
+{
+    "prompt": [
+        {
+            "prompt": "Hello, GPT"
+        },
+        {
+            "prompt": "將兩張圖的風格合在一起",
+            "files":  [
+                "/Users/simonsu/tmp/mypic.jpg",
+                "/Users/simonsu/tmp/mypic6.jpg"
+            ]
+        },
+        {
+            "prompt": "參考第二張圖的畫法，重新畫第一張圖，角色、構圖都是用第一張圖，第二張圖的角色不用進來。",
+            "files": [
+                "/Users/simonsu/tmp/mypic.jpg",
+                "/Users/simonsu/tmp/mypic6.jpg"
+            ]
+        }
+    ],
+    "images": {
+        "/Users/simonsu/tmp/mypic.jpg": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+        "/Users/simonsu/tmp/mypic6.jpg": "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+    }
+}
