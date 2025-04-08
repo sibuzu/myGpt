@@ -1,0 +1,16 @@
+
+I need to refund my subscription of ChatGPT.  It dosen't fit my need.
+
+I subscribe ChatGPT pro for GPT-4o image generation.
+According to subscription plan, I have "Unlimited access to all reasoning models and GPT‑4o"
+However, I got the message of quota limited, say
+"目前您今天的圖片產生次數已達上限，為了確保每位使用者都能享有良好體驗，我們系統有每日生成圖片的限制。您的配額將在 5 小時 46 分鐘後 重置，屆時您就可以繼續製作新的貼圖了！"
+
+It is quite unreasonable for PRO user. The image generation is quite slow.  It requires 3 minutes to generate one image on average.  Even I don't sleep to generate images, it can only generate 480 images in a day.  In real, I generate far less than 480 images in a day.  I heard the Plus can generate 100 images in a day.  If it is true, it would far better if I subscribe 10 members of Plus than one member of pro.
+
+ To be worse, I would generate transparent PNG image, but GPT‑4o sometimes give me white-gray grid like background.  It seems transparent but not.  It makes me to need to generate the same images again and again.  
+
+
+ Give me REAL PLAN of "Unlimited access to 4o"; otherwise REFUND it.  I cannot even query my quote.  When I am working in middle way and I am told I need to wait for another 5 hours.  It is very bad for my work.
+
+ My PRO account: sibuzu.gpt@gmail.com

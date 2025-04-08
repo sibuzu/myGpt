@@ -4,6 +4,7 @@ log/
 include/
 lib/
 log/
+share/
 
 # Docker
 .docker/

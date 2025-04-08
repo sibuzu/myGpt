@@ -240,8 +240,11 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('[Sidepanel] Current URL:', currentUrl);
 
         let pageId = '';
-        if (currentUrl.match(/-[0-9a-f]{12}$/)) {
-          pageId = currentUrl.slice(-12);
+        // 先移除 URL 中 ? 後面的所有內容
+        const baseUrl = currentUrl.split('?')[0];
+        
+        if (baseUrl.match(/-[0-9a-f]{12}$/)) {
+          pageId = baseUrl.slice(-12);
         }
 
         const pageIdElement = document.getElementById('pageId');
@@ -322,6 +325,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
 
+        // console.log('[Sidepanel] text:', text);
+        
         // 確保文本插入到 textContainer 中
         if (!textContainer.contains(range.commonAncestorContainer)) {
           textContainer.focus();
@@ -331,7 +336,9 @@ document.addEventListener('DOMContentLoaded', function () {
           selection.addRange(range);
         }
 
-        document.execCommand('insertText', false, text);
+        const text2 = text.replace(/\n/g, '\r').trim();
+        console.log('[Sidepanel] text2:', text2);
+        document.execCommand('insertText', false, text2);
       }
     }
   });
@@ -340,9 +347,16 @@ document.addEventListener('DOMContentLoaded', function () {
   sendMsgButton.addEventListener('click', async function () {
     const textContainer = messageInput.querySelector('.text-container');
     const imagesContainer = messageInput.querySelector('.images-container');
+    // 使用 innerText 而不是 textContent 來保留換行，但不包含隱藏元素
     const messageText = textContainer.innerText.trim();
     const images = Array.from(imagesContainer.querySelectorAll('img'));  // 轉換為陣列以保持順序
 
+    // console.log('[Sidepanel] messageInput:', messageInput);
+    // console.log('[Sidepanel] textContainer:', textContainer);
+    // console.log('[Sidepanel] imagesContainer:', imagesContainer);
+    // console.log('[Sidepanel] textContainer.innerText:', textContainer.innerText);
+    // console.log('[Sidepanel] Message:', messageText);
+    
     if (!messageText && images.length === 0) return;
 
     let message = messageText;
@@ -490,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function () {
           if (startTime) {
             stopTimer();
             if (promptQueue.length === 0) {
-              await sendTelegram('ChatGPT is ready2.');
+              await sendTelegram('ChatGPT is ready.');
             }
           }
           await processPromptQueue();
