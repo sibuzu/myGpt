@@ -16,9 +16,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 複製應用程式代碼
 COPY main.py .
+COPY api_missav.py .
+COPY api_images.py .
+COPY api_notify.py .
 
 # 創建必要的目錄
-RUN mkdir -p images log
+RUN mkdir -p images log missav
 
 # 設置環境變數
 ENV PYTHONUNBUFFERED=1
