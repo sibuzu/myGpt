@@ -43,7 +43,8 @@ task_manager = TaskManager(
 
 def update_download_progress(video_id: str, d: dict):
     """更新下載進度的回調函數"""
-    if video_id not in download_tasks or d['status'] != 'downloading':
+    task_status = task_manager.get_task(video_id)
+    if not task_status or d['status'] != 'downloading':
         return
 
     try:
@@ -55,42 +56,45 @@ def update_download_progress(video_id: str, d: dict):
         total_progress = current_percent
         
         # 獲取上次記錄的進度
-        last_progress = getattr(download_tasks[video_id], 'last_logged_progress', -1)
+        last_progress = task_status.last_logged_progress
         
         # 只有當進度增加超過 0.5% 時才記錄日誌
         if total_progress - last_progress >= 0.5:
             logger.info(f"[{video_id}] 下載進度: {total_progress:.1f}%, 剩餘時間: {d.get('_eta_str', 'N/A')}, 速度: {d.get('_speed_str', 'N/A')}")
             # 更新最後記錄的進度
-            download_tasks[video_id].last_logged_progress = total_progress
-        
+            task_status.last_logged_progress = total_progress
+            
         # 更新任務狀態
-        download_tasks[video_id].progress = total_progress
-        download_tasks[video_id].message = (
+        task_status.progress = total_progress
+        task_status.message = (
             f"下載進度: {d.get('_percent_str', '0%')} "
             f"速度: {d.get('_speed_str', 'N/A')} "
             f"剩餘時間: {d.get('_eta_str', 'N/A')}"
         )
+        task_manager.set_task(task_status)
     except Exception as e:
         logger.error(f"Error in update_download_progress for {video_id}: {e}")
 
 def update_postprocess_progress(video_id: str, d: dict):
     """更新後處理進度的回調函數"""
-    if video_id not in download_tasks:
+    task_status = task_manager.get_task(video_id)
+    if not task_status:
         return
 
     try:
         if d['status'] == 'started':
             message = f"開始處理: {d.get('postprocessor')}"
-            download_tasks[video_id].message = message
+            task_status.message = message
             logger.info(f"Postprocess for {video_id}: {message}")
         elif d['status'] == 'processing':
             message = f"處理中: {d.get('postprocessor')}"
-            download_tasks[video_id].message = message
+            task_status.message = message
             logger.info(f"Postprocess for {video_id}: {message}")
         elif d['status'] == 'finished':
             message = f"處理完成: {d.get('postprocessor')}"
-            download_tasks[video_id].message = message
+            task_status.message = message
             logger.info(f"Postprocess for {video_id}: {message}")
+        task_manager.set_task(task_status)
     except Exception as e:
         logger.error(f"Error in update_postprocess_progress for {video_id}: {e}")
 
@@ -99,11 +103,12 @@ async def perform_download(info: MissavInfo):
     base_filename = os.path.join(MISSAV_PATH, video_id)
     video_path = f"{base_filename}.mp4"
     
-    task_status = download_tasks.get(video_id)
+    task_status = task_manager.get_task(video_id)
     if not task_status:
         return
         
     task_status.status = DownloadStatus.DOWNLOADING
+    task_manager.set_task(task_status)
     
     try:
         # 下載圖片
@@ -115,12 +120,14 @@ async def perform_download(info: MissavInfo):
                         f.write(await response.read())
                     task_status.completed_files += 1
                     task_status.progress = 33
+                    task_manager.set_task(task_status)
         
         # 保存 info json
         with open(f"{base_filename}.json", 'w', encoding='utf-8') as f:
             json.dump(info.dict(), f, ensure_ascii=False, indent=2)
         task_status.completed_files += 1
         task_status.progress = 66
+        task_manager.set_task(task_status)
         
         # 下載視頻
         ydl_opts = {
@@ -138,10 +145,12 @@ async def perform_download(info: MissavInfo):
         task_status.completed_files += 1
         task_status.progress = 100
         task_status.status = DownloadStatus.COMPLETED
+        task_manager.set_task(task_status)
         
     except Exception as e:
         task_status.status = DownloadStatus.FAILED
         task_status.errors.append(str(e))
+        task_manager.set_task(task_status)
         logger.error(f"Error downloading {video_id}: {e}")
 
 async def process_download_queue():
@@ -224,10 +233,10 @@ async def download_missav(info: MissavInfo):
 
 @router.get("/status/{task_id}")
 async def get_download_status(task_id: str):
-    if task_id not in download_tasks:
+    task = task_manager.get_task(task_id)
+    if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     
-    task = download_tasks[task_id]
     return {
         "task_id": task_id,
         "status": task.status.value,
@@ -313,6 +322,7 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
+
 
 
 
