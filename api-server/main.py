@@ -310,6 +310,7 @@ async def download_missav(info: MissavInfo):
     video_id = info.title.split()[0]
     base_filename = os.path.join(MISSAV_PATH, video_id)
     video_path = f"{base_filename}.mp4"
+    logger.info(f"Received download request for {info.title}")
 
     # 檢查影片是否已存在
     if os.path.exists(video_path):
