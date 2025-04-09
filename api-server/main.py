@@ -8,6 +8,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 import multiprocessing
 
+# 獲取 logger
+logger = logging.getLogger(__name__)
+
 def setup_logging():
     # 設定目錄路徑
     LOG_PATH = os.path.join(os.path.dirname(__file__), "log")

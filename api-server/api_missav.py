@@ -275,6 +275,7 @@ async def get_download_status(task_id: str):
 async def get_download_queue():
     # 建立當前佇列的快照
     queue_snapshot = []
+    all_tasks = task_manager.get_all_tasks()
     
     # 首先加入正在下載的任務（status 為 DOWNLOADING 的任務）
     downloading_tasks = [
@@ -289,7 +290,7 @@ async def get_download_queue():
             "timestamp": task.timestamp.isoformat(),
             "title": task.video_id
         }
-        for task_id, task in download_tasks.items()
+        for task_id, task in all_tasks.items()
         if task.status == DownloadStatus.DOWNLOADING
     ]
     queue_snapshot.extend(downloading_tasks)
@@ -307,7 +308,7 @@ async def get_download_queue():
             "timestamp": task.timestamp.isoformat(),
             "title": task.video_id
         }
-        for task_id, task in download_tasks.items()
+        for task_id, task in all_tasks.items()
         if task.status == DownloadStatus.QUEUED
     ]
     # 根據 position 排序等待中的任務
@@ -328,7 +329,7 @@ async def get_download_queue():
             "timestamp": task.timestamp.isoformat(),
             "title": task.video_id
         }
-        for task_id, task in download_tasks.items()
+        for task_id, task in all_tasks.items()
         if task.status in [DownloadStatus.COMPLETED, DownloadStatus.FAILED, DownloadStatus.SKIPPED]
         and task.timestamp > cutoff_time
     ]
@@ -345,5 +346,6 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
+
 
 
