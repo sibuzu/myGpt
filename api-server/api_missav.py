@@ -100,7 +100,11 @@ def update_postprocess_progress(video_id: str, d: dict):
 
 async def perform_download(info: MissavInfo):
     video_id = info.title.split()[0]
-    base_filename = os.path.join(MISSAV_PATH, video_id)
+    # 建立影片專屬目錄
+    video_dir = os.path.join(MISSAV_PATH, video_id)
+    os.makedirs(video_dir, exist_ok=True)
+    
+    base_filename = os.path.join(video_dir, video_id)
     video_path = f"{base_filename}.mp4"
     
     task_status = task_manager.get_task(video_id)
@@ -194,7 +198,11 @@ async def process_download_queue():
 async def download_missav(info: MissavInfo):
     logger.info(f"Received download request for {info.title}")
     video_id = info.title.split()[0]
-    base_filename = os.path.join(MISSAV_PATH, video_id)
+    # 建立影片專屬目錄
+    video_dir = os.path.join(MISSAV_PATH, video_id)
+    os.makedirs(video_dir, exist_ok=True)
+    
+    base_filename = os.path.join(video_dir, video_id)
     video_path = f"{base_filename}.mp4"
 
     # 檢查影片是否已存在
@@ -346,6 +354,8 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
+
+
 
 
 
