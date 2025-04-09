@@ -9,29 +9,44 @@ from dotenv import load_dotenv
 import multiprocessing
 
 def setup_logging():
-    # 只在主進程中配置日誌
+    # 設定目錄路徑
+    LOG_PATH = os.path.join(os.path.dirname(__file__), "log")
+    os.makedirs(LOG_PATH, exist_ok=True)
+    
+    # 配置日誌
+    log_file = os.path.join(LOG_PATH, f"api_{datetime.now().strftime('%Y%m%d')}.log")
+    
+    # 創建 root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    
+    # 清除現有的 handlers
+    if root_logger.handlers:
+        for handler in root_logger.handlers:
+            root_logger.removeHandler(handler)
+    
+    # 添加文件 handler
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=5,
+        encoding='utf-8'
+    )
+    file_handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
+    )
+    root_logger.addHandler(file_handler)
+    
+    # 添加控制台 handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s')
+    )
+    root_logger.addHandler(console_handler)
+    
+    # 只在主進程中輸出初始化消息
     if multiprocessing.current_process().name == 'MainProcess':
-        # 設定目錄路徑
-        LOG_PATH = os.path.join(os.path.dirname(__file__), "log")
-        os.makedirs(LOG_PATH, exist_ok=True)
-        
-        # 配置日誌
-        log_file = os.path.join(LOG_PATH, f"api_{datetime.now().strftime('%Y%m%d')}.log")
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(processName)s - %(levelname)s - %(message)s',
-            handlers=[
-                RotatingFileHandler(
-                    log_file,
-                    maxBytes=10*1024*1024,  # 10MB
-                    backupCount=5,
-                    encoding='utf-8'
-                ),
-                logging.StreamHandler()
-            ]
-        )
-        logger = logging.getLogger(__name__)
-        logger.info("Logging system initialized in main process")
+        logging.info("Logging system initialized in main process")
 
 # 在應用啟動前設置日誌
 setup_logging()

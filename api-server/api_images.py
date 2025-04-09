@@ -37,6 +37,7 @@ async def download_image(session: aiohttp.ClientSession, url: str, filepath: str
 async def download_images(request: ImageDownloadRequest):
     logger.info(f"Received download request for PageID: {request.pageId}")
     logger.info("Processing turns:")
+    print(f"DEBUG: Received download request for PageID: {request.pageId}")
     
     download_count = 0
     list_count = len(request.turns)

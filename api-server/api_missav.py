@@ -67,7 +67,15 @@ def update_download_progress(video_id: str, d: dict):
         
         # 計算總體進度
         total_progress = current_percent
-        logger.info(f"Download progress for {video_id}: {total_progress:.1f}%")
+        
+        # 獲取上次記錄的進度
+        last_progress = getattr(download_tasks[video_id], 'last_logged_progress', -1)
+        
+        # 只有當進度增加超過 0.5% 時才記錄日誌
+        if total_progress - last_progress >= 0.5:
+            logger.info(f"[{video_id}] 下載進度: {total_progress:.1f}%, 剩餘時間: {d.get('_eta_str', 'N/A')}, 速度: {d.get('_speed_str', 'N/A')}")
+            # 更新最後記錄的進度
+            download_tasks[video_id].last_logged_progress = total_progress
         
         # 更新任務狀態
         download_tasks[video_id].progress = total_progress
@@ -324,6 +332,7 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
+
 
 
 
