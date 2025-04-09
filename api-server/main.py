@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 import uvicorn
 import os
 import aiohttp
@@ -9,6 +9,8 @@ import logging
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
+import yt_dlp
+import json
 
 load_dotenv()
 app = FastAPI()
@@ -17,10 +19,12 @@ app = FastAPI()
 BASE_DIR = os.path.dirname(__file__)
 IMAGE_PATH = os.path.join(BASE_DIR, "images")
 LOG_PATH = os.path.join(BASE_DIR, "log")
+MISSAV_PATH = os.path.join(BASE_DIR, "missav")
 
 # 確保必要的目錄存在
 os.makedirs(IMAGE_PATH, exist_ok=True)
 os.makedirs(LOG_PATH, exist_ok=True)
+os.makedirs(MISSAV_PATH, exist_ok=True)
 
 # 配置日誌
 log_file = os.path.join(LOG_PATH, f"api_{datetime.now().strftime('%Y%m%d')}.log")
@@ -144,6 +148,80 @@ async def send_telegram_notification(notification: TelegramNotification):
     except Exception as e:
         logger.error(f"Error sending Telegram notification: {e}")
         return f"Error sending Telegram notification: {str(e)}"
+
+class MissavInfo(BaseModel):
+    description: str
+    image: str
+    source: str
+    title: str
+    url: str
+
+@app.post("/missav/download")
+async def download_missav(info: MissavInfo):
+    logger.info(f"Received missav download request for: {info.title}")
+    
+    # 從標題提取影片編號
+    video_id = info.title.split()[0]
+    base_filename = os.path.join(MISSAV_PATH, video_id)
+    
+    download_count = 0
+    errors = []
+    
+    # 下載視頻
+    try:
+        ydl_opts = {
+            'format': 'best',
+            'outtmpl': f'{base_filename}.mp4',
+            'quiet': True,
+            'protocol': 'm3u8',
+            'ffmpeg_location': '/usr/bin/ffmpeg'  # 根據你的系統設置 ffmpeg 路徑
+        }
+        yt_dlp.YoutubeDL(ydl_opts).download([info.source])
+        download_count += 1
+        logger.info(f"Successfully downloaded video: {video_id}")
+    except Exception as e:
+        error_msg = f"Failed to download video: {str(e)}"
+        logger.error(error_msg)
+        errors.append(error_msg)
+    
+    # 下載圖片
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(info.image) as response:
+                if response.status == 200:
+                    image_path = f"{base_filename}.jpg"
+                    with open(image_path, 'wb') as f:
+                        f.write(await response.read())
+                    download_count += 1
+                    logger.info(f"Successfully downloaded image: {video_id}.jpg")
+                else:
+                    error_msg = f"Failed to download image: HTTP {response.status}"
+                    logger.error(error_msg)
+                    errors.append(error_msg)
+    except Exception as e:
+        error_msg = f"Failed to download image: {str(e)}"
+        logger.error(error_msg)
+        errors.append(error_msg)
+    
+    # 保存 info json
+    try:
+        with open(f"{base_filename}.json", 'w', encoding='utf-8') as f:
+            json.dump(info.dict(), f, ensure_ascii=False, indent=2)
+        download_count += 1
+        logger.info(f"Successfully saved info: {video_id}.json")
+    except Exception as e:
+        error_msg = f"Failed to save info: {str(e)}"
+        logger.error(error_msg)
+        errors.append(error_msg)
+    
+    result = {
+        "success": download_count,
+        "total": 3,
+        "errors": errors if errors else None
+    }
+    
+    logger.info(f"Download complete: {result}")
+    return result
 
 if __name__ == "__main__":
     logger.info("Starting API server...")
