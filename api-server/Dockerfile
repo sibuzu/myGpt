@@ -4,9 +4,10 @@ FROM python:3.10.8-slim
 # 設置工作目錄
 WORKDIR /app
 
-# install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg
-RUN apt-get install -y procps
+# install ffmpeg and required packages
+RUN apt-get update && \
+    apt-get install -y ffmpeg procps && \
+    rm -rf /var/lib/apt/lists/*
 
 # 複製 requirements.txt
 COPY requirements.txt .
@@ -33,5 +34,5 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # 暴露端口
 EXPOSE 12345
 
-# 啟動應用
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "12345"]
+# 啟動應用（使用多工作進程）
+CMD ["python", "main.py"]
