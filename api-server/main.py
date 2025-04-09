@@ -158,12 +158,22 @@ class MissavInfo(BaseModel):
 
 def my_hook(d):
     if d['status'] == 'downloading':
-        progress = (
-            f"下載進度: {d.get('_percent_str', '0%')} "
-            f"速度: {d.get('_speed_str', 'N/A')} "
-            f"剩餘時間: {d.get('_eta_str', 'N/A')}"
-        )
-        logger.info(progress)
+        # 獲取當前進度百分比
+        current_percent = float(d.get('_percent_str', '0%').replace('%', ''))
+        
+        # 使用靜態變數記錄上次記錄的進度
+        if not hasattr(my_hook, 'last_percent'):
+            my_hook.last_percent = 0
+        
+        # 只有當進度增加超過1%時才記錄
+        if current_percent - my_hook.last_percent >= 1:
+            progress = (
+                f"下載進度: {d.get('_percent_str', '0%')} "
+                f"速度: {d.get('_speed_str', 'N/A')} "
+                f"剩餘時間: {d.get('_eta_str', 'N/A')}"
+            )
+            logger.info(progress)
+            my_hook.last_percent = current_percent
     elif d['status'] == 'finished':
         logger.info('原始文件下載完成，等待 ffmpeg 處理...')
 
