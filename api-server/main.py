@@ -170,27 +170,6 @@ def get_percent(d):
     per = re.sub(r'\x1b\[[0-9;]*m', '', per)
     return float(per)
 
-def my_hook(d):
-    if d['status'] == 'downloading':
-        # 獲取當前進度百分比
-        current_percent = get_percent(d)
-        
-        # 使用靜態變數記錄上次記錄的進度
-        if not hasattr(my_hook, 'last_percent'):
-            my_hook.last_percent = 0
-        
-        # 只有當進度增加超過1%時才記錄
-        if current_percent - my_hook.last_percent >= 1 or True:
-            progress = (
-                f"下載進度: {d.get('_percent_str', '0%')} "
-                f"速度: {d.get('_speed_str', 'N/A')} "
-                f"剩餘時間: {d.get('_eta_str', 'N/A')}"
-            )
-            logger.info(progress)
-            my_hook.last_percent = current_percent
-    elif d['status'] == 'finished':
-        logger.info('原始文件下載完成，等待 ffmpeg 處理...')
-
 def postprocess_hook(d):
     if d['status'] == 'started':
         logger.info(f'開始 ffmpeg 處理: {d.get("postprocessor")}')
@@ -300,21 +279,55 @@ async def perform_download(info: MissavInfo):
         logger.error(f"Error downloading {video_id}: {e}")
 
 def update_download_progress(video_id: str, d: dict):
-    if video_id in download_tasks and d['status'] == 'downloading':
-        current_percent = get_percent(d)
-        download_tasks[video_id].progress = 66 + (current_percent * 0.33)
-        download_tasks[video_id].message = (
+    if d['status'] == 'downloading':
+        # 獲取當前進度百分比
+        cleaned_string = re.sub(r'\x1b\[[0-9;]*m', '', d.get('_percent_str', '0%'))
+        current_percent = float(cleaned_string.replace('%', ''))
+        
+        # 構建進度消息
+        progress = (
             f"下載進度: {d.get('_percent_str', '0%')} "
             f"速度: {d.get('_speed_str', 'N/A')} "
             f"剩餘時間: {d.get('_eta_str', 'N/A')}"
         )
 
+        # 使用靜態變數記錄上次記錄的進度
+        if not hasattr(update_download_progress, 'last_percent'):
+            update_download_progress.last_percent = 0
+        
+        # 只有當進度增加超過1%時才記錄
+        if current_percent - update_download_progress.last_percent >= 1:
+            logger.info(progress)
+            update_download_progress.last_percent = current_percent
+
+        # 更新任務狀態
+        if video_id in download_tasks:
+            download_tasks[video_id].progress = 66 + (current_percent * 0.33)
+            download_tasks[video_id].message = progress
+
+    elif d['status'] == 'finished':
+        progress = '原始文件下載完成，等待 ffmpeg 處理...'
+        logger.info(progress)
+        if video_id in download_tasks:
+            download_tasks[video_id].message = progress
+
 def update_postprocess_progress(video_id: str, d: dict):
-    if video_id in download_tasks:
-        if d['status'] == 'started':
-            download_tasks[video_id].message = f"開始處理: {d.get('postprocessor')}"
-        elif d['status'] == 'finished':
-            download_tasks[video_id].message = f"處理完成: {d.get('postprocessor')}"
+    # 記錄日誌
+    if d['status'] == 'started':
+        message = f'開始 ffmpeg 處理: {d.get("postprocessor")}'
+        logger.info(message)
+        if video_id in download_tasks:
+            download_tasks[video_id].message = message
+    elif d['status'] == 'processing':
+        message = f'ffmpeg 處理中: {d.get("postprocessor")}'
+        logger.info(message)
+        if video_id in download_tasks:
+            download_tasks[video_id].message = message
+    elif d['status'] == 'finished':
+        message = f'ffmpeg 處理完成: {d.get("postprocessor")}'
+        logger.info(message)
+        if video_id in download_tasks:
+            download_tasks[video_id].message = message
 
 @app.post("/missav/download")
 async def download_missav(info: MissavInfo):
