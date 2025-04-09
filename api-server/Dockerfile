@@ -4,6 +4,9 @@ FROM python:3.10.8-slim
 # 設置工作目錄
 WORKDIR /app
 
+# install ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
+
 # 複製 requirements.txt
 COPY requirements.txt .
 
