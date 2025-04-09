@@ -155,25 +155,40 @@ async def perform_download(info: MissavInfo):
 
 async def process_download_queue():
     while True:
-        async with queue_lock:
-            if not download_queue:
-                return
-            info = download_queue.popleft()
-            video_id = info.title.split()[0]
-            
-            # 更新狀態：從排隊到下載中
-            if video_id in download_tasks:
-                download_tasks[video_id].status = DownloadStatus.DOWNLOADING
-                download_tasks[video_id].position = None
+        # 檢查當前正在下載的任務數量
+        downloading_tasks = [
+            task for task in task_manager.get_all_tasks().values()
+            if task.status == DownloadStatus.DOWNLOADING
+        ]
         
-        async with download_semaphore:
+        if len(downloading_tasks) >= MAX_CONCURRENT_DOWNLOADS:
+            # 如果已達到最大下載數，等待一段時間後再檢查
+            await asyncio.sleep(5)
+            continue
+
+        # 從隊列中獲取下一個任務
+        next_task_info = task_manager.get_from_queue()
+        if not next_task_info:
+            # 如果隊列為空，結束處理
+            return
+
+        info = MissavInfo(**next_task_info)
+        video_id = info.title.split()[0]
+        
+        # 更新任務狀態為下載中
+        task_status = task_manager.get_task(video_id)
+        if task_status:
+            task_status.status = DownloadStatus.DOWNLOADING
+            task_status.position = None
+            task_manager.set_task(task_status)
+            
             try:
                 await perform_download(info)
             except Exception as e:
                 logger.error(f"Error processing queued download for {info.title}: {e}")
-                if video_id in download_tasks:
-                    download_tasks[video_id].status = DownloadStatus.FAILED
-                    download_tasks[video_id].errors.append(str(e))
+                task_status.status = DownloadStatus.FAILED
+                task_status.errors.append(str(e))
+                task_manager.set_task(task_status)
 
 @router.post("/download")
 async def download_missav(info: MissavInfo):
@@ -206,8 +221,14 @@ async def download_missav(info: MissavInfo):
                 "position": existing_task.position
             }
 
-    # 創建新任務
-    if download_semaphore._value > 0:
+    # 檢查當前正在下載的任務數量
+    downloading_tasks = [
+        task for task in task_manager.get_all_tasks().values()
+        if task.status == DownloadStatus.DOWNLOADING
+    ]
+
+    # 如果當前下載數量小於最大限制，直接開始下載
+    if len(downloading_tasks) < MAX_CONCURRENT_DOWNLOADS:
         task = TaskStatus(video_id, DownloadStatus.DOWNLOADING)
         task_manager.set_task(task)
         asyncio.create_task(perform_download(info))
@@ -218,10 +239,12 @@ async def download_missav(info: MissavInfo):
             "message": "Download started"
         }
     else:
+        # 否則加入隊列
         queue_position = task_manager.get_queue_length() + 1
         task = TaskStatus(video_id, DownloadStatus.QUEUED, queue_position)
         task_manager.set_task(task)
         task_manager.add_to_queue(info.dict())
+        # 確保隊列處理任務正在運行
         asyncio.create_task(process_download_queue())
         logger.info(f"Queued download for {video_id} at position {queue_position}")
         return {
@@ -322,10 +345,5 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
-
-
-
-
-
 
 
