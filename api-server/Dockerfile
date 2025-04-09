@@ -22,6 +22,10 @@ RUN mkdir -p images log
 # 設置環境變數
 ENV PYTHONUNBUFFERED=1
 
+# 設置時區為 Asia/Taipei (UTC+8)
+ENV TZ=Asia/Taipei
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 暴露端口
 EXPOSE 12345
 

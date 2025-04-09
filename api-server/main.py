@@ -246,14 +246,7 @@ async def perform_download(info: MissavInfo):
     task_status = download_tasks.get(video_id)
     if not task_status:
         return
-    
-    # 檢查影片檔案是否已存在
-    if os.path.exists(video_path):
-        logger.info(f"Video file already exists: {video_path}")
-        task_status.status = DownloadStatus.SKIPPED
-        task_status.message = "Video file already exists"
-        return
-    
+        
     task_status.status = DownloadStatus.DOWNLOADING
     
     try:
@@ -315,6 +308,36 @@ def update_postprocess_progress(video_id: str, d: dict):
 @app.post("/missav/download")
 async def download_missav(info: MissavInfo):
     video_id = info.title.split()[0]
+    base_filename = os.path.join(MISSAV_PATH, video_id)
+    video_path = f"{base_filename}.mp4"
+
+    # 檢查影片是否已存在
+    if os.path.exists(video_path):
+        logger.info(f"Video file already exists: {video_path}")
+        return {
+            "task_id": video_id,
+            "status": "skipped",
+            "message": "Video file already exists"
+        }
+
+    # 檢查是否已在任務列表中
+    if video_id in download_tasks:
+        task = download_tasks[video_id]
+        status = task.status.value
+        if status == DownloadStatus.DOWNLOADING.value:
+            return {
+                "task_id": video_id,
+                "status": status,
+                "message": "Task is already downloading",
+                "progress": task.progress
+            }
+        elif status == DownloadStatus.QUEUED.value:
+            return {
+                "task_id": video_id,
+                "status": status,
+                "message": "Task is already in queue",
+                "position": task.position
+            }
     
     # 創建任務狀態
     if download_semaphore._value > 0:  # 有可用的下載槽
