@@ -11,6 +11,7 @@ import asyncio
 from collections import deque
 from typing import Dict, Optional
 import yt_dlp
+from task_manager import TaskManager, TaskStatus, DownloadStatus
 
 # 創建路由器
 router = APIRouter(prefix="/missav", tags=["missav"])
@@ -34,26 +35,11 @@ class MissavInfo(BaseModel):
     title: str
     url: str
 
-class DownloadStatus(Enum):
-    QUEUED = "queued"
-    DOWNLOADING = "downloading"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    SKIPPED = "skipped"
-
-class TaskStatus:
-    def __init__(self, video_id: str, status: DownloadStatus, position: Optional[int] = None):
-        self.video_id = video_id
-        self.status = status
-        self.position = position
-        self.progress = 0
-        self.message = ""
-        self.errors = []
-        self.completed_files = 0
-        self.timestamp = datetime.now()
-
-# 全局任務狀態存儲
-download_tasks: Dict[str, TaskStatus] = {}
+# 創建任務管理器實例
+task_manager = TaskManager(
+    host=os.getenv('REDIS_HOST', 'localhost'),
+    port=int(os.getenv('REDIS_PORT', 6379))
+)
 
 def update_download_progress(video_id: str, d: dict):
     """更新下載進度的回調函數"""
@@ -190,6 +176,8 @@ async def download_missav(info: MissavInfo):
     # 檢查影片是否已存在
     if os.path.exists(video_path):
         logger.info(f"Video file already exists: {video_path}")
+        task = TaskStatus(video_id, DownloadStatus.SKIPPED)
+        task_manager.set_task(task)
         return {
             "task_id": video_id,
             "status": "skipped",
@@ -197,43 +185,36 @@ async def download_missav(info: MissavInfo):
         }
 
     # 檢查是否已在任務列表中
-    if video_id in download_tasks:
-        task = download_tasks[video_id]
-        status = task.status.value
-        if status == DownloadStatus.DOWNLOADING.value:
+    existing_task = task_manager.get_task(video_id)
+    if existing_task:
+        if existing_task.status in [DownloadStatus.DOWNLOADING, DownloadStatus.QUEUED]:
+            logger.info(f"Task {video_id} is already {existing_task.status.value}")
             return {
                 "task_id": video_id,
-                "status": status,
-                "message": "Task is already downloading",
-                "progress": task.progress
+                "status": existing_task.status.value,
+                "message": f"Task is already {existing_task.status.value}",
+                "progress": existing_task.progress,
+                "position": existing_task.position
             }
-        elif status == DownloadStatus.QUEUED.value:
-            return {
-                "task_id": video_id,
-                "status": status,
-                "message": "Task is already in queue",
-                "position": task.position
-            }
-    
-    # 創建任務狀態
-    if download_semaphore._value > 0:  # 有可用的下載槽
-        task_status = TaskStatus(video_id, DownloadStatus.DOWNLOADING)
-        download_tasks[video_id] = task_status
-        # 非阻塞方式啟動下載
+
+    # 創建新任務
+    if download_semaphore._value > 0:
+        task = TaskStatus(video_id, DownloadStatus.DOWNLOADING)
+        task_manager.set_task(task)
         asyncio.create_task(perform_download(info))
+        logger.info(f"Started download for {video_id}")
         return {
             "task_id": video_id,
             "status": "started",
             "message": "Download started"
         }
     else:
-        # 加入佇列
-        queue_position = len(download_queue) + 1
-        task_status = TaskStatus(video_id, DownloadStatus.QUEUED, queue_position)
-        download_tasks[video_id] = task_status
-        download_queue.append(info)
-        # 確保佇列處理器在運行
+        queue_position = task_manager.get_queue_length() + 1
+        task = TaskStatus(video_id, DownloadStatus.QUEUED, queue_position)
+        task_manager.set_task(task)
+        task_manager.add_to_queue(info.dict())
         asyncio.create_task(process_download_queue())
+        logger.info(f"Queued download for {video_id} at position {queue_position}")
         return {
             "task_id": video_id,
             "status": "queued",
@@ -332,6 +313,8 @@ async def get_download_queue():
             "total": len(queue_snapshot)
         }
     }
+
+
 
 
 
