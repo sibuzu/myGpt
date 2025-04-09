@@ -156,6 +156,25 @@ class MissavInfo(BaseModel):
     title: str
     url: str
 
+def my_hook(d):
+    if d['status'] == 'downloading':
+        progress = (
+            f"下載進度: {d.get('_percent_str', '0%')} "
+            f"速度: {d.get('_speed_str', 'N/A')} "
+            f"剩餘時間: {d.get('_eta_str', 'N/A')}"
+        )
+        logger.info(progress)
+    elif d['status'] == 'finished':
+        logger.info('原始文件下載完成，等待 ffmpeg 處理...')
+
+def postprocess_hook(d):
+    if d['status'] == 'started':
+        logger.info(f'開始 ffmpeg 處理: {d.get("postprocessor")}')
+    elif d['status'] == 'processing':
+        logger.info(f'ffmpeg 處理中: {d.get("postprocessor")}')
+    elif d['status'] == 'finished':
+        logger.info(f'ffmpeg 處理完成: {d.get("postprocessor")}')
+
 @app.post("/missav/download")
 async def download_missav(info: MissavInfo):
     logger.info(f"Received missav download request for: {info.title}")
@@ -174,7 +193,11 @@ async def download_missav(info: MissavInfo):
             'outtmpl': f'{base_filename}.mp4',
             'quiet': True,
             'protocol': 'm3u8',
-            'ffmpeg_location': '/usr/bin/ffmpeg'  # 根據你的系統設置 ffmpeg 路徑
+            'ffmpeg_location': '/usr/bin/ffmpeg',
+            'progress_hooks': [my_hook],
+            'postprocessor_hooks': [postprocess_hook],
+            'logger': logger,
+            'verbose': True  # 啟用詳細日誌
         }
         yt_dlp.YoutubeDL(ydl_opts).download([info.source])
         download_count += 1
