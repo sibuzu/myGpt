@@ -6,6 +6,7 @@ WORKDIR /app
 
 # install ffmpeg
 RUN apt-get update && apt-get install -y ffmpeg
+RUN apt-get install -y procps
 
 # 複製 requirements.txt
 COPY requirements.txt .

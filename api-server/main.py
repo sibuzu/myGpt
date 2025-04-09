@@ -14,6 +14,7 @@ import json
 import asyncio
 from collections import deque
 from enum import Enum
+import re
 
 load_dotenv()
 app = FastAPI()
@@ -32,18 +33,23 @@ os.makedirs(MISSAV_PATH, exist_ok=True)
 # 配置日誌
 log_file = os.path.join(LOG_PATH, f"api_{datetime.now().strftime('%Y%m%d')}.log")
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO,  # 確保這裡是 INFO 級別
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         RotatingFileHandler(
             log_file,
             maxBytes=10*1024*1024,  # 10MB
-            backupCount=5
+            backupCount=5,
+            encoding='utf-8'  # 添加編碼設定
         ),
-        logging.StreamHandler()  # 同時輸出到控制台
+        logging.StreamHandler()
     ]
 )
 logger = logging.getLogger(__name__)
+
+# 在配置後立即添加測試日誌
+logger.info("Logging system initialized")
+logger.error("Test error message")
 
 # 添加 CORS 中間件
 app.add_middleware(
@@ -159,17 +165,22 @@ class MissavInfo(BaseModel):
     title: str
     url: str
 
+def get_percent(d):
+    per = d.get('_percent_str', '0%').replace('%', '')
+    per = re.sub(r'\x1b\[[0-9;]*m', '', per)
+    return float(per)
+
 def my_hook(d):
     if d['status'] == 'downloading':
         # 獲取當前進度百分比
-        current_percent = float(d.get('_percent_str', '0%').replace('%', ''))
+        current_percent = get_percent(d)
         
         # 使用靜態變數記錄上次記錄的進度
         if not hasattr(my_hook, 'last_percent'):
             my_hook.last_percent = 0
         
         # 只有當進度增加超過1%時才記錄
-        if current_percent - my_hook.last_percent >= 1:
+        if current_percent - my_hook.last_percent >= 1 or True:
             progress = (
                 f"下載進度: {d.get('_percent_str', '0%')} "
                 f"速度: {d.get('_speed_str', 'N/A')} "
@@ -290,7 +301,7 @@ async def perform_download(info: MissavInfo):
 
 def update_download_progress(video_id: str, d: dict):
     if video_id in download_tasks and d['status'] == 'downloading':
-        current_percent = float(d.get('_percent_str', '0%').replace('%', ''))
+        current_percent = get_percent(d)
         download_tasks[video_id].progress = 66 + (current_percent * 0.33)
         download_tasks[video_id].message = (
             f"下載進度: {d.get('_percent_str', '0%')} "
@@ -307,6 +318,7 @@ def update_postprocess_progress(video_id: str, d: dict):
 
 @app.post("/missav/download")
 async def download_missav(info: MissavInfo):
+    logger.info(f"Received download request for {info.title}")
     video_id = info.title.split()[0]
     base_filename = os.path.join(MISSAV_PATH, video_id)
     video_path = f"{base_filename}.mp4"
