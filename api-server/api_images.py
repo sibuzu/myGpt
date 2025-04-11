@@ -47,7 +47,15 @@ async def download_images(request: ImageDownloadRequest):
             logger.info(f"Processing Turn {turn.id}: {turn.url}")
             
             # 構建圖片文件名
-            image_filename = f"{request.pageId}-{int(turn.id):03d}.png"
+            # 檢查 turn.id 的格式並相應處理
+            base_id = ''.join(filter(str.isdigit, turn.id))  # 取得數字部分
+            suffix = turn.id[len(base_id):]  # 取得非數字後綴（如 'b', 'c' 等）
+            
+            # 根據是否有後綴決定格式
+            if suffix:
+                image_filename = f"{request.pageId}-{int(base_id):03d}{suffix}.png"  # 例如: xxx-002b.png
+            else:
+                image_filename = f"{request.pageId}-{int(base_id):03d}.png"  # 例如: xxx-002.png
             image_path = os.path.join(IMAGE_PATH, image_filename)
             
             # 檢查文件是否已存在
