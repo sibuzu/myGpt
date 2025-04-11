@@ -109,18 +109,21 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       console.log('[Contents] Turn:', turn);
       const turnId = turn.getAttribute('data-testid').replace('conversation-turn-', '');
       
-      // 查找圖片容器
-      const imageContainer = turn.querySelector('.group\\/imagegen-image');
-      if (imageContainer) {
+      // 查找所有圖片容器
+      const imageContainers = turn.querySelectorAll('.group\\/imagegen-image');
+      imageContainers.forEach((imageContainer, index) => {
+        // 決定後綴
+        const postfix = index === 0 ? '' : String.fromCharCode(97 + index); // '' for first, 'b', 'c', ... for others
+        
         // 查找第一個圖片元素
         const img = imageContainer.querySelector('img');
         if (img) {
           imageList.push({
-            turnId: turnId,
+            turnId: turnId + postfix,
             src: img.src
           });
         }
-      }
+      });
     });
     
     // 發送結果回 sidepanel
