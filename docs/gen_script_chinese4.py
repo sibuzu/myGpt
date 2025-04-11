@@ -7,29 +7,29 @@ from typing import List
 
 # 日文問候語列表
 GREETINGS = [
-    "真的嗎？", "不會吧？", "為什麼？", "竟然！", "是啊", 
-    "當然", "真棒！", "好啊！", "贊成！", "說得對！",
-    "就是這樣！", "不行！", "不可能！", "饒了我吧！", "別這樣！",
-    "加油！", "沒關係！", "了解", "明白了", "原來如此",
-    "我懂了", "對不起", "不好意思", "沒事", "沒問題",
-    "幫大忙", "大感謝", "哭哭", "太棒了！", "成功了！",
-    "耶！", "期待！", "好期待！", "想哭", "太感人了",
-    "好難受", "太痛苦了", "失望", "真失望", "不知道",
-    "不明白", "了解", "辛苦了", "就是說", "我也是",
-    "欸！", "什麼！", "哇！", "哎呀！", "好可怕！",
-    "衝擊！", "震撼！", "嚇！", "驚！", "真是的！",
-    "完全！", "知道了！", "無異議", "最高！", "太好了！",
-    "不愧是！", "果然！", "拒絕！", "困擾！", "傷腦筋！",
-    "可惜！", "真遺憾！", "莫名其妙！", "意義不明！", "混亂！",
-    "失禮了！", "謝謝！", "完美", "下次", "OK!",
-    "Thank you!", "Sorry!", "Don't Mind", "晚安", "早安",
-    "午安", "還好嗎？", "你好"
+    "Really?", "No way！", "Why?", "You're kidding!", "Surprised", "是啊", 
+    "Of Course", "真棒", "Sure!", "YES", "NO", "You're right",
+    "Great", "Good Job", "不行", "不可能", "好", "STOP!",
+    "加油", "No Problem", "了解", "Understand", "そうです",
+    "Excuse me", "對不起", "沒問題", "沒事", "Okey",
+    "Crying", "Perfect", "成功了",
+    "やった！", "耶", "期待", "拍拍", "想哭", "So touching",
+    "SAD", "I don't know", "tired", "累了", "不懂",
+    "辛苦了", "お疲れ様", "me too",
+    "Hey!", "什麼", "哇", "哎呀", "可怕",
+    "Shocked", "Terrible", "嚇", "驚", "真是的",
+    "THE BEST", "Got it", "No Comment", "最高", "太好了", "GREAT",
+    "果然", "Reject", "Confused", "傷腦筋", "Next Time",
+    "可惜", "太棒了", "痛", "Zzz...", "混亂", "認輸", "贏了",
+    "ありがとう", "謝謝", "完美", "OK",
+    "Thank you", "Sorry", "Don't Mind", "晚安", "早安",
+    "午安", "Okay?", "你好", "Hello", "Hi", "Bye", "See you",
+    "Thanks", "OK", "Good Job",
 ]
 
 # 圖片目錄
 IMAGE_DIR = os.path.expanduser("~/圖庫")
 IMAGE_FILES = [
-    "a10.png", "a10x.png"
 ]
 
 def get_greetings(idx: int, count: int) -> str:
@@ -65,7 +65,7 @@ def generate_script(num_prompts: int, number_stickers: int) -> dict:
     prompts = []
     images_dict = {}  # 用來存儲圖片的字典，避免重複編碼
     
-    for i in range(num_prompts):
+    for i in range(1, num_prompts):
         # 使用兩個固定的圖片檔案
         image_paths = [os.path.join(IMAGE_DIR, file) for file in IMAGE_FILES]
         
@@ -74,13 +74,11 @@ def generate_script(num_prompts: int, number_stickers: int) -> dict:
         
         # 建立提示
         prompt = {
-            "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。"
-                     "角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。"
-                     f"每张贴圖表現不同的情緒與手勢，搭配以下{number_stickers}句中文文字："
-                     f"{greetings}。"
-                     "風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與中文字效果文字。"
-                     "圖片需為正方形比例，背景需為透明色，方便製作LINE貼圖使用。",
-            "files": image_paths
+            "prompt": "用角色A，製作日系動漫風格的可愛Q版貼圖。每张贴圖表現不同的情緒與手勢，搭配以下4句文字："
+            f"{greetings}。"
+            "短髮、有髮飾、穿著深藍底花朵圖案旗袍。角色比例為Q版，風格可愛。"
+            "呈現誇張表情與文字效果，文字顏色為多樣性且活潑的顏色。"
+            "背景需為白色透明，可以製作LINE貼圖使用。圖形比例為正方型。",
         }
         prompts.append(prompt)
         
