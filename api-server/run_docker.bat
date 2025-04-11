@@ -1,3 +1,5 @@
+cd /d %~dp0
+
 docker run -d ^
   -p 12345:12345 ^
   -v D:\gtpImages:/app/images ^
