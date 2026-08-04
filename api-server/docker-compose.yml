@@ -4,6 +4,7 @@ services:
       context: .
     image: my-gpt-api
     container_name: my-gpt-api
+    user: "1000:1000"
     ports:
       - "12345:12345"
     environment:
