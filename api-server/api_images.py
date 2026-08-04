@@ -19,6 +19,7 @@ class Turn(BaseModel):
     id: str
     url: Optional[str] = None
     data: Optional[str] = None
+    prompt: Optional[str] = None
 
 class ImageDownloadRequest(BaseModel):
     pageId: str
@@ -49,6 +50,18 @@ def save_image_data(data_url: str, filepath: str) -> bool:
         logger.error(f"Error saving uploaded image data: {e}")
         return False
 
+def save_prompt(prompt: Optional[str], filepath: str) -> bool:
+    if not prompt or not prompt.strip():
+        logger.warning(f"No prompt available for {os.path.basename(filepath)}")
+        return False
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(prompt.strip() + '\n')
+        return True
+    except Exception as e:
+        logger.error(f"Error saving prompt {filepath}: {e}")
+        return False
+
 @router.post("/download")
 async def download_images(request: ImageDownloadRequest):
     logger.info(f"Received download request for PageID: {request.pageId}")
@@ -58,6 +71,7 @@ async def download_images(request: ImageDownloadRequest):
     download_count = 0
     skipped_count = 0
     failed_count = 0
+    prompt_count = 0
     list_count = len(request.turns)
     
     async with aiohttp.ClientSession() as session:
@@ -75,10 +89,13 @@ async def download_images(request: ImageDownloadRequest):
             else:
                 image_filename = f"{request.pageId}-{int(base_id):03d}.png"  # 例如: xxx-002.png
             image_path = os.path.join(IMAGE_PATH, image_filename)
+            prompt_path = os.path.splitext(image_path)[0] + '.txt'
             
             # 檢查文件是否已存在
             if os.path.exists(image_path):
                 logger.info(f"Image {image_filename} already exists, skipping...")
+                if not os.path.exists(prompt_path) and save_prompt(turn.prompt, prompt_path):
+                    prompt_count += 1
                 skipped_count += 1
                 continue
             
@@ -95,13 +112,15 @@ async def download_images(request: ImageDownloadRequest):
             if success:
                 download_count += 1
                 logger.info(f"Successfully downloaded {image_filename}")
+                if save_prompt(turn.prompt, prompt_path):
+                    prompt_count += 1
             else:
                 failed_count += 1
                 logger.error(f"Failed to download {image_filename}")
     
     result = (
         f"finish download {download_count}/{list_count} images "
-        f"(skipped: {skipped_count}, failed: {failed_count})"
+        f"(skipped: {skipped_count}, failed: {failed_count}, prompts: {prompt_count})"
     )
     logger.info(result)
     return result

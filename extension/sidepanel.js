@@ -561,7 +561,8 @@ document.addEventListener('DOMContentLoaded', function () {
           turns: list.map(item => ({
             id: item.turnId,
             url: item.src,
-            data: item.data || null
+            data: item.data || null,
+            prompt: item.prompt || null
           }))
         })
       });

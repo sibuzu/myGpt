@@ -272,11 +272,18 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === 'queryImageList') {
     console.log('[Contents] Querying image list...');
     const imageList = [];
+    let latestUserPrompt = '';
     
     // 查找所有對話回合
     const turns = document.querySelectorAll('[data-testid^="conversation-turn-"]');
     
     turns.forEach(turn => {
+      const userMessage = turn.querySelector('[data-message-author-role="user"]');
+      if (userMessage) {
+        const promptElement = userMessage.querySelector('.whitespace-pre-wrap') || userMessage;
+        latestUserPrompt = promptElement.innerText.trim();
+      }
+
       // 獲取 turnId
       console.log('[Contents] Turn:', turn);
       const turnId = turn.getAttribute('data-testid').replace('conversation-turn-', '');
@@ -292,7 +299,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (img) {
           imageList.push({
             turnId: turnId + postfix,
-            src: img.src
+            src: img.src,
+            prompt: latestUserPrompt
           });
         }
       });
