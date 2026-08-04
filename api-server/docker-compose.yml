@@ -1,0 +1,25 @@
+services:
+  api-server:
+    build:
+      context: .
+    image: my-gpt-api
+    container_name: my-gpt-api
+    ports:
+      - "12345:12345"
+    environment:
+      REDIS_HOST: localhost
+      REDIS_PORT: "6379"
+      TZ: Asia/Taipei
+      # TELEGRAM_BOT_TOKEN: ""
+      # TELEGRAM_CHAT_ID: ""
+    volumes:
+      - ./images:/app/images
+      - ./missav:/app/missav
+      - ./log:/app/log
+    restart: unless-stopped
+    networks:
+      - sibuzu-net
+
+networks:
+  sibuzu-net:
+    external: true
