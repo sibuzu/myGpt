@@ -299,6 +299,33 @@ document.addEventListener('DOMContentLoaded', function () {
   // 初始化輸入框
   initializeMessageInput();
 
+  function insertPlainText(textContainer, text) {
+    const normalizedText = text.replace(/\r\n?/g, '\n');
+    const selection = window.getSelection();
+    let range;
+
+    if (selection.rangeCount > 0 && textContainer.contains(selection.getRangeAt(0).commonAncestorContainer)) {
+      range = selection.getRangeAt(0);
+    } else {
+      range = document.createRange();
+      range.selectNodeContents(textContainer);
+      range.collapse(false);
+    }
+
+    range.deleteContents();
+    const textNode = document.createTextNode(normalizedText);
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    textContainer.dispatchEvent(new InputEvent('input', {
+      bubbles: true,
+      inputType: 'insertText',
+      data: normalizedText
+    }));
+  }
+
   // 處理貼上事件
   messageInput.addEventListener('paste', async (e) => {
     e.preventDefault();
@@ -322,23 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
       } else if (item.type === 'text/plain') {
         // 處理純文本
         const text = await new Promise(resolve => item.getAsString(resolve));
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-
-        // console.log('[Sidepanel] text:', text);
-        
-        // 確保文本插入到 textContainer 中
-        if (!textContainer.contains(range.commonAncestorContainer)) {
-          textContainer.focus();
-          selection.removeAllRanges();
-          range.selectNodeContents(textContainer);
-          range.collapse(false);
-          selection.addRange(range);
-        }
-
-        const text2 = text.replace(/\n/g, '\r').trim();
-        console.log('[Sidepanel] text2:', text2);
-        document.execCommand('insertText', false, text2);
+        insertPlainText(textContainer, text);
       }
     }
   });
@@ -347,8 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
   sendMsgButton.addEventListener('click', async function () {
     const textContainer = messageInput.querySelector('.text-container');
     const imagesContainer = messageInput.querySelector('.images-container');
-    // 使用 innerText 而不是 textContent 來保留換行，但不包含隱藏元素
-    const messageText = textContainer.innerText.trim();
+    const messageText = textContainer.textContent.replace(/\r\n?/g, '\n').trim();
     const images = Array.from(imagesContainer.querySelectorAll('img'));  // 轉換為陣列以保持順序
 
     // console.log('[Sidepanel] messageInput:', messageInput);

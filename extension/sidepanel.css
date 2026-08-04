@@ -129,6 +129,7 @@ body {
 
 .message-input .text-container {
   flex: 1;
+  white-space: pre-wrap;
 }
 
 .button-container {
@@ -256,4 +257,3 @@ input[type="checkbox"] {
 .prompt-item:last-child {
   border-bottom: none;
 }
-

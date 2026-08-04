@@ -1,9 +1,88 @@
-// 定義狀態和對應的選擇器
-const STATE_SELECTORS = {
-  'input-mode': 'button[data-testid="send-button"][disabled], button[data-testid="composer-speech-button"]',
-  'ready-to-send': 'button[data-testid="send-button"]:not([disabled])',
-  'running': 'button[data-testid="stop-button"]'
+// ChatGPT updates composer button ids/testids often. Prefer stable composer
+// structure and accessible labels, with data-testid as a fast path when present.
+const SELECTORS = {
+  composer: '[data-composer-surface="true"]',
+  prompt: '#prompt-textarea, textarea[name="prompt-textarea"]',
+  trailing: '[data-composer-surface="true"] [data-composer-transition-slot="trailing"]',
+  sendButton: [
+    'button#composer-submit-button',
+    'button[data-testid="send-button"]',
+    'button[aria-label*="Send"]',
+    'button[aria-label*="Submit"]',
+    'button[aria-label*="傳送"]',
+    'button[aria-label*="发送"]'
+  ].join(', '),
+  voiceButton: [
+    'button[data-testid="composer-speech-button"]',
+    'button[aria-label*="voice" i]',
+    'button[aria-label*="語音"]',
+    'button[aria-label*="语音"]',
+    'button[aria-label*="聽寫"]',
+    'button[aria-label*="听写"]'
+  ].join(', '),
+  stopButton: [
+    'button[data-testid="stop-button"]',
+    'button[aria-label*="Stop"]',
+    'button[aria-label*="停止"]'
+  ].join(', ')
 };
+
+function isVisible(element) {
+  if (!element) return false;
+  return Boolean(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+}
+
+function queryVisible(selector, root = document) {
+  return Array.from(root.querySelectorAll(selector)).find(isVisible);
+}
+
+function getComposerRoot() {
+  return document.querySelector(SELECTORS.composer) || document;
+}
+
+function getTrailingActionRoot() {
+  return document.querySelector(SELECTORS.trailing) || getComposerRoot();
+}
+
+function isEnabledButton(button) {
+  return isVisible(button) && !button.disabled && button.getAttribute('aria-disabled') !== 'true';
+}
+
+function isVoiceActionButton(button) {
+  const ariaLabel = button.getAttribute('aria-label') || '';
+  const iconHref = button.querySelector('use')?.getAttribute('href') || '';
+  return /voice|語音|语音|聽寫|听写/i.test(ariaLabel) || /#(?:voice|microphone)-/i.test(iconHref);
+}
+
+function getReadySendButton() {
+  const trailing = getTrailingActionRoot();
+  const labelledSendButton = Array.from(trailing.querySelectorAll(SELECTORS.sendButton))
+    .find(isEnabledButton);
+  if (labelledSendButton) return labelledSendButton;
+
+  // The current ChatGPT composer reuses its last circular action button and
+  // does not always add send-button/testid when it changes from voice to send.
+  return Array.from(trailing.querySelectorAll([
+    'button.composer-submit-button-color',
+    'button[type="submit"]',
+    'button[data-testid*="send"]'
+  ].join(', ')))
+    .reverse()
+    .find(button => isEnabledButton(button) && !isVoiceActionButton(button));
+}
+
+function hasPromptInput() {
+  return Boolean(queryVisible(SELECTORS.prompt));
+}
+
+function hasIdleVoiceButton() {
+  const trailing = getTrailingActionRoot();
+  return Boolean(queryVisible(SELECTORS.voiceButton, trailing));
+}
+
+function hasRunningStopButton() {
+  return Boolean(queryVisible(SELECTORS.stopButton));
+}
 
 // 列出所有 data-testid
 function logAllDataTestIds() {
@@ -19,24 +98,46 @@ function logAllDataTestIds() {
   });
 }
 
+function logComposerButtons() {
+  const composer = getComposerRoot();
+  const buttons = composer.querySelectorAll('button');
+  console.log('[Contents] Composer buttons found:');
+  buttons.forEach(button => {
+    console.log('[Contents] - button', {
+      testId: button.getAttribute('data-testid'),
+      ariaLabel: button.getAttribute('aria-label'),
+      disabled: button.disabled,
+      className: button.className
+    });
+  });
+}
+
 // 檢查當前狀態
 function checkState() {
   // console.log('[Contents] Checking state...');
 
-  for (const [state, selector] of Object.entries(STATE_SELECTORS)) {
-    if (document.querySelector(selector)) {
-      // console.log('[Contents] Current state:', state);
-      chrome.runtime.sendMessage({
-        type: 'stateChange',
-        state: state
-      });
-      return;
-    }
+  let state = null;
+
+  if (hasRunningStopButton()) {
+    state = 'running';
+  } else if (getReadySendButton()) {
+    state = 'ready-to-send';
+  } else if (hasPromptInput() && hasIdleVoiceButton()) {
+    state = 'input-mode';
+  }
+
+  if (state) {
+    chrome.runtime.sendMessage({
+      type: 'stateChange',
+      state: state
+    });
+    return;
   }
 
   // 如果都沒找到，則為 not-found
   console.log('[Contents] Current state: not-found');
   logAllDataTestIds();
+  logComposerButtons();
   chrome.runtime.sendMessage({
     type: 'stateChange',
     state: 'not-found'
@@ -92,6 +193,49 @@ async function DelayRandTime(minSec, maxSec, passRate) {
       if (k < passRate) {
           return;
       }
+  }
+}
+
+async function insertTextIntoPrompt(promptElement, text) {
+  const normalizedText = text.replace(/\r\n?/g, '\n').trim();
+  if (!normalizedText) return;
+
+  window.focus();
+  promptElement.focus();
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  const lines = normalizedText.split('\n');
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      const insertedBreak = document.execCommand('insertLineBreak') || document.execCommand('insertParagraph');
+      if (!insertedBreak) {
+        throw new Error(`Could not insert line break before line ${index + 1}`);
+      }
+    }
+    if (line) {
+      const insertedText = document.execCommand('insertText', false, line);
+      if (!insertedText) {
+        throw new Error(`Could not insert text on line ${index + 1}`);
+      }
+    }
+  });
+
+  await new Promise(resolve => setTimeout(resolve, 150));
+
+  const promptText = ('value' in promptElement ? promptElement.value : promptElement.innerText || '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/\u00a0/g, ' ');
+  const expectedLines = lines.map(line => line.trim()).filter(Boolean);
+  let searchFrom = 0;
+  const hasEveryLine = expectedLines.every(line => {
+    const lineIndex = promptText.indexOf(line, searchFrom);
+    if (lineIndex === -1) return false;
+    searchFrom = lineIndex + line.length;
+    return true;
+  });
+
+  if (!hasEveryLine) {
+    throw new Error('Prompt insertion was incomplete; message was not sent');
   }
 }
 
@@ -172,8 +316,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         
         // 處理文本內容
         if (textContent.trim()) {
-          promptTextarea.focus();
-          document.execCommand('insertText', false, textContent.trim());
+          await insertTextIntoPrompt(promptTextarea, textContent);
         }
         
         // 觸發 input 事件以激活發送按鈕
@@ -252,12 +395,18 @@ async function waitForAndClickSendButton(maxAttempts) {
     let attempts = 0;
     
     const checkButton = () => {
-      const sendButton = document.querySelector('button[data-testid="send-button"]:not([disabled])');
+      const sendButton = getReadySendButton();
       if (sendButton) {
-        console.log('[Contents] Send button is ready');
+        console.log('[Contents] Send button is ready:', {
+          testId: sendButton.getAttribute('data-testid'),
+          ariaLabel: sendButton.getAttribute('aria-label'),
+          className: sendButton.className
+        });
+        sendButton.focus();
         sendButton.click();
         resolve();
       } else if (attempts >= maxAttempts) {
+        logComposerButtons();
         reject(new Error(`Timeout waiting for send button after ${maxAttempts * 2000}ms`));
       } else {
         console.log('[Contents] Waiting for send button... attempt:', attempts + 1, 

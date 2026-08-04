@@ -5,23 +5,32 @@ import os
 import base64
 from typing import List
 
-# 日文問候語列表
+# 問候語列表
 GREETINGS = [
-    "意義不明！", "混亂！",
-    "失禮了！", "謝謝！", "完美", "下次", "OK!",
-    "Thank you!", "Sorry!", "Don't Mind", "晚安", "早安",
-    "午安", "還好嗎？", "你好"
+    "痛", "投降", "Yeah!", "Hi", "秀秀", "愛你", "早安", "你好", "晚安", 
+    "謝謝", "奸笑", "失望", "累", "努力", "大笑", "感謝", "期待", "讚", 
+    "喜", "怒", "哀", "樂", "真的嗎", "sure", "no problem", "where?", "失望", "期待", "大笑", 
+    "Let's go", "Wait", "Take break", "準備", "第一名", "第二名", "第三名", 
+    "最後一名", "怕", "不要", "要", "だめ", "恐惧", "可惡", "豈有此理", 
+    "慢吞吞", "謝謝", "幫大忙", "應該的", "不客氣", "不錯", "Good Job", 
+    "感動", "Please", "笑倒", "起床", "睡覺", "sorry", "失神", "忙", 
+    "在忙嗎", "加油", "Good idea", "no idea", "Holiday", "買東西", 
+    "計畫通り", "生氣", "吃飯", "買東西", "誰理你", "沒錢", "錢", "逛街", 
+    "早安", "你好", "晚安", "謝謝", "看清楚", "得獎", "wanted", "怎麼辦", 
+    "出國比賽", "煮東西", "下雨了", "好熱", "牙痛", "愛你", "你試試看", 
+    "喔", "坐車", "走路", "看電視", "好忙", "打電腦", "工作中", "正在忙", 
+    "休閑中", "我有空", "搞定"
 ]
 
 # 圖片目錄
 IMAGE_DIR = os.path.expanduser("~/圖庫")
 IMAGE_FILES = [
-    "a10.png", "a10x.png"
+    "Style-6.png"
 ]
 
 def get_greetings(idx: int, count: int) -> str:
     selected = GREETINGS[idx*count:(idx+1)*count]
-    return " ".join(f"{{{greeting}}}" for greeting in selected)
+    return " ".join(selected)
 
 def encode_image_to_base64(image_path: str) -> str:
     """將圖片轉換為 base64 編碼"""
@@ -53,20 +62,21 @@ def generate_script(num_prompts: int, number_stickers: int) -> dict:
     images_dict = {}  # 用來存儲圖片的字典，避免重複編碼
     
     for i in range(num_prompts):
-        # 使用兩個固定的圖片檔案
+        # 使用固定的圖片檔案
         image_paths = [os.path.join(IMAGE_DIR, file) for file in IMAGE_FILES]
         
         # 生成問候語
-        greetings = get_greetings(i, number_stickers)
+        selected_greetings = GREETINGS[i*number_stickers:(i+1)*number_stickers]
+        greetings = " ".join([f"{{{greeting}}}" for greeting in selected_greetings])
         
         # 建立提示
         prompt = {
-            "prompt": "請依據照片(圖一)中的女孩角色，製作日系動漫風格的可愛Q版貼圖。"
-                     "角色應保留長直髮、紅背包、白上衣與紅花圖案洋裝的特色。"
-                     f"每张贴圖表現不同的情緒與手勢，搭配以下{number_stickers}句中文文字："
-                     f"{greetings}。"
-                     "風格需參考參考圖（如附圖二）呈現Q版比例、大眼圓臉、誇張表情與中文字效果文字。"
-                     "圖片需為正方形比例，背景需為透明色，方便製作LINE貼圖使用。",
+            "prompt": f"表情包的圖貼 {greetings}\n\n"
+                     f"請根據我提供的主角圖片和{number_stickers}個文案生成一張九宮格 ( 3 × 3 ) 排列的 LINE 貼圖 總覽圖 , 並請遵守以下要點 : \n"
+                     "* 每张贴圖皆為尺寸相同的 1 : 1 正方形 , 主角需完整呈現於中心位置 , 避免發生被 裁切的情形 。 \n"
+                     "* 每张贴圖皆為同一個 主角的不同姿態或表情 , 且角色外觀必須與原圖一致 ( 包含 服裝 、 眼鏡 、 眼睛 、 髮型、 色調 、 畫風 等 )，黑短髮，但不要頭髮太少。 \n"
+                     "* 整張圖請使用透明背景 ( Alpha channel ) \n"
+                     "* 每张贴圖 「 不要 」 包含任何文字 、 標語 或 對話框 。",
             "files": image_paths
         }
         prompts.append(prompt)
