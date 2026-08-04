@@ -239,6 +239,34 @@ async function insertTextIntoPrompt(promptElement, text) {
   }
 }
 
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Could not read image data'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function loadImageData(item) {
+  try {
+    const response = await fetch(item.src, { credentials: 'include' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return {
+      ...item,
+      data: await blobToDataURL(await response.blob())
+    };
+  } catch (error) {
+    console.error(`[Contents] Could not load image for turn ${item.turnId}:`, error);
+    return {
+      ...item,
+      error: error.message
+    };
+  }
+}
+
 // 監聽來自 sidepanel 的消息
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.type === 'queryImageList') {
@@ -270,10 +298,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       });
     });
     
+    const imagesWithData = await Promise.all(imageList.map(loadImageData));
+
     // 發送結果回 sidepanel
     chrome.runtime.sendMessage({
       type: 'imageList',
-      list: imageList
+      list: imagesWithData
     });
   } else if (request.action === 'sendMsg') {
     console.log('[Contents] Sending GPT message:', request.text);

@@ -1,4 +1,4 @@
-const API_URL = 'http://solarsuna.com:32345';
+const API_URL = 'https://api-download.sibuzu.com';
 let startTime = null;
 let isPaused = false;
 let promptQueue = [];
@@ -560,7 +560,8 @@ document.addEventListener('DOMContentLoaded', function () {
           pageId: document.getElementById('pageId').textContent.replace('PageID: ', ''),
           turns: list.map(item => ({
             id: item.turnId,
-            url: item.src
+            url: item.src,
+            data: item.data || null
           }))
         })
       });
