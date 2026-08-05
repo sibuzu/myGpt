@@ -5,6 +5,7 @@ import aiohttp
 import base64
 import logging
 import os
+from datetime import datetime
 
 # 創建路由器
 router = APIRouter(prefix="/images", tags=["images"])
@@ -14,6 +15,30 @@ logger = logging.getLogger(__name__)
 
 # 設定目錄路徑
 IMAGE_PATH = os.path.join(os.path.dirname(__file__), "images")
+
+def get_page_directory(page_id: str, download_date: Optional[str] = None) -> str:
+    os.makedirs(IMAGE_PATH, exist_ok=True)
+
+    for date_name in sorted(os.listdir(IMAGE_PATH)):
+        date_path = os.path.join(IMAGE_PATH, date_name)
+        if not os.path.isdir(date_path):
+            continue
+
+        page_path = os.path.join(date_path, page_id)
+        if os.path.isdir(page_path):
+            return page_path
+
+    date_name = download_date or datetime.now().strftime("%Y%m%d")
+    page_path = os.path.join(IMAGE_PATH, date_name, page_id)
+    os.makedirs(page_path, exist_ok=True)
+    return page_path
+
+def build_turn_filename(page_id: str, turn_id: str, extension: str = ".png") -> str:
+    base_id = ''.join(filter(str.isdigit, turn_id))
+    suffix = turn_id[len(base_id):]
+    turn_number = int(base_id) if base_id else 0
+    page_suffix = page_id[-4:]
+    return f"{page_suffix}-{turn_number:03d}{suffix}{extension}"
 
 class Turn(BaseModel):
     id: str
@@ -78,17 +103,9 @@ async def download_images(request: ImageDownloadRequest):
         for turn in request.turns:
             logger.info(f"Processing Turn {turn.id}")
             
-            # 構建圖片文件名
-            # 檢查 turn.id 的格式並相應處理
-            base_id = ''.join(filter(str.isdigit, turn.id))  # 取得數字部分
-            suffix = turn.id[len(base_id):]  # 取得非數字後綴（如 'b', 'c' 等）
-            
-            # 根據是否有後綴決定格式
-            if suffix:
-                image_filename = f"{request.pageId}-{int(base_id):03d}{suffix}.png"  # 例如: xxx-002b.png
-            else:
-                image_filename = f"{request.pageId}-{int(base_id):03d}.png"  # 例如: xxx-002.png
-            image_path = os.path.join(IMAGE_PATH, image_filename)
+            page_dir = get_page_directory(request.pageId)
+            image_filename = build_turn_filename(request.pageId, turn.id)
+            image_path = os.path.join(page_dir, image_filename)
             prompt_path = os.path.splitext(image_path)[0] + '.txt'
             
             # 檢查文件是否已存在
