@@ -50,6 +50,44 @@ class ImageDownloadRequest(BaseModel):
     pageId: str
     turns: List[Turn]
 
+class ImageStatusRequest(BaseModel):
+    pageId: str
+    turns: List[str]
+
+def find_page_directory(page_id: str) -> Optional[str]:
+    if not os.path.isdir(IMAGE_PATH):
+        return None
+
+    for date_name in sorted(os.listdir(IMAGE_PATH)):
+        date_path = os.path.join(IMAGE_PATH, date_name)
+        if not os.path.isdir(date_path):
+            continue
+
+        page_path = os.path.join(date_path, page_id)
+        if os.path.isdir(page_path):
+            return page_path
+    return None
+
+@router.post("/status")
+async def get_image_status(request: ImageStatusRequest):
+    page_dir = find_page_directory(request.pageId)
+    pending_turn_ids = []
+
+    for turn_id in request.turns:
+        image_filename = build_turn_filename(request.pageId, turn_id)
+        image_path = os.path.join(page_dir, image_filename) if page_dir else None
+        if not image_path or not os.path.exists(image_path):
+            pending_turn_ids.append(turn_id)
+
+    downloaded_count = len(request.turns) - len(pending_turn_ids)
+    return {
+        "pageId": request.pageId,
+        "total": len(request.turns),
+        "downloaded": downloaded_count,
+        "pending": len(pending_turn_ids),
+        "pendingTurnIds": pending_turn_ids,
+    }
+
 async def download_image(session: aiohttp.ClientSession, url: str, filepath: str) -> bool:
     try:
         async with session.get(url) as response:
