@@ -1,3 +1,5 @@
+document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
+
 const API_URL = 'https://api-download.sibuzu.com';
 let startTime = null;
 let isPaused = false;
