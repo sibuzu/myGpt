@@ -33,8 +33,8 @@ export function createAnimeGenerator(common) {
   }
 
   function describeCharacterOutfit(character) {
-    if (character.wardrobeMode !== 'adult-fashion') return character.baseOutfit;
     const outfits = character.fashionOutfits;
+    if (!outfits?.length) return character.baseOutfit;
     const description = pick(outfits.filter(item => item !== previousCharacterOutfits.get(character)));
     previousCharacterOutfits.set(character, description);
     return description;
@@ -46,7 +46,7 @@ export function createAnimeGenerator(common) {
     previousAnimeCharacter = character;
     const outfitDescription = describeCharacterOutfit(character);
     const interaction = chooseGaze(naturalInteractions(character.features + '，' + outfitDescription, scene.description));
-    const lookDescription = `保留原角色的${character.features}，維持原作年齡感，身穿${outfitDescription}`;
+    const lookDescription = `保留原角色的${character.features}，身穿${outfitDescription}`;
     const sceneDescription = clothingSceneDescription(scene.description, outfitDescription)
       .replace(/大學校園/g, '校園').replace(/大學圖書館/g, '圖書館');
     let renderedInteraction = character.coversEyes
