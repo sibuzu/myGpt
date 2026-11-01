@@ -155,12 +155,33 @@ button:hover {
   background-color: #059669;
 }
 
-.pause-checkbox {
+.prompt-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 8px 10px;
   margin-left: 4px;
   margin-top: 15px;
+}
+
+.pause-checkbox, .style-select, .count-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.style-select select, .count-select input {
+  padding: 2px 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  color: #111827;
+  font: inherit;
+}
+
+.count-select input {
+  box-sizing: border-box;
+  width: 3.5rem;
 }
 
 .pause-checkbox input[type="checkbox"] {

@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>MyGPT 1.0.2</title>
+  <title>MyGPT 1.0.3</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 
@@ -49,12 +49,26 @@
         <div class="button-container">
           <button id="sendMsg">Send</button>
           <button id="clearQueue">Clear</button>
-          <button id="genPromptBtn" title="隨機產生生圖提示詞並填入輸入框">GenPrompt</button>
-          <button id="scriptBtn" title="Copy current page DOM to clipboard">Script</button>
+          <button id="genPromptBtn" title="產生提示詞：1 張填入輸入框，多張自動加入佇列">生提示詞</button>
+          <button id="scriptBtn" title="複製目前網頁的 DOM 到剪貼簿">複製網頁</button>
         </div>
         <div id="scriptStatus" role="status" aria-live="polite"></div>
-        <div class="pause-checkbox">
-          <input type="checkbox" id="pauseQueue"> Pause
+        <div class="prompt-controls">
+          <label class="pause-checkbox">
+            <input type="checkbox" id="pauseQueue"> Pause
+          </label>
+          <label class="style-select" for="promptStyle">
+            風格:
+            <select id="promptStyle">
+              <option value="natural" selected>自然清新</option>
+              <option value="beautiful-sexy-2">美麗性感</option>
+              <option value="anime-characters">動漫角色</option>
+            </select>
+          </label>
+          <label class="count-select" for="promptCount">
+            張數:
+            <input id="promptCount" type="number" min="1" max="100" step="1" value="1" required>
+          </label>
         </div>
         <div id="promptList" class="mt-2">
           <!-- Prompt list will be displayed here -->
@@ -79,8 +93,7 @@
       </div>
     </div>
   </div>
-  <script src="prompt-generator.js"></script>
-  <script src="sidepanel.js"></script>
+  <script type="module" src="sidepanel.js"></script>
 </body>
 
 </html>

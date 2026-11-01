@@ -1,3 +1,5 @@
+import { generateImagePrompt } from './prompt-generator.js';
+
 document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
 
 const API_URL = 'https://api-download.sibuzu.com';
@@ -403,9 +405,24 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   const genPromptBtn = document.getElementById('genPromptBtn');
+  const promptStyle = document.getElementById('promptStyle');
+  const promptCount = document.getElementById('promptCount');
   genPromptBtn.addEventListener('click', () => {
+    if (!promptCount.reportValidity()) return;
+
+    const count = promptCount.valueAsNumber;
+    if (count > 1) {
+      const prompts = Array.from({ length: count }, () => generateImagePrompt(promptStyle.value));
+      promptQueue.push(...prompts);
+      updatePromptList();
+      if (isInputState(currentState)) {
+        processPromptQueue();
+      }
+      return;
+    }
+
     const textContainer = messageInput.querySelector('.text-container');
-    textContainer.textContent = generateImagePrompt();
+    textContainer.textContent = generateImagePrompt(promptStyle.value);
     textContainer.focus();
     const range = document.createRange();
     range.selectNodeContents(textContainer);
