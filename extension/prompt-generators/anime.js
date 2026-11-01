@@ -59,7 +59,13 @@ export function createAnimeGenerator(common) {
         : '隨著手邊動作微微轉頭，以放鬆的肩線呈現留意周圍景物的自然姿態'
       : interaction;
     const characterFacing = nextAnimeFacing();
-    if (/鏡頭/.test(renderedInteraction)) {
+    // Face forward 40% of the time; each side angle has a 15% overall chance.
+    const facingAngle = Math.random() < 0.4 ? 0 : pick([10, 15, 20, 30]);
+    if (facingAngle === 0) {
+      renderedInteraction = character.coversEyes
+        ? '頭部保持正面朝向鏡頭，以放鬆的姿態與觀看者互動'
+        : '眼神自然直視鏡頭，目光朝向前方的觀看者，保持自然放鬆的姿態';
+    } else if (/鏡頭/.test(renderedInteraction)) {
       renderedInteraction = character.coversEyes
         ? '頭部保持自然微側，隨著手邊動作放鬆轉動'
         : '保持自然微側臉，僅眼神短暫望向鏡頭，隨後移回周圍景物';
@@ -70,9 +76,11 @@ export function createAnimeGenerator(common) {
       lookDescription,
       sceneDescription,
       expression: character.coversEyes ? '人物神情沉靜從容，姿態自然' : expression,
-      facing: `以觀看者畫面左右為準，人物頭部自然朝畫面${characterFacing.side}側微轉約30度，鼻尖指向畫面${characterFacing.side}方`,
+      facing: facingAngle === 0
+        ? '人物頭部正面朝向鏡頭，鼻尖朝向正前方'
+        : `以觀看者畫面左右為準，人物頭部自然朝畫面${characterFacing.side}側微轉約${facingAngle}度，鼻尖指向畫面${characterFacing.side}方`,
       interaction: renderedInteraction,
-      attention: animeAttentionPlacement(renderedInteraction, characterFacing, character.coversEyes),
+      attention: facingAngle === 0 ? null : animeAttentionPlacement(renderedInteraction, characterFacing, character.coversEyes),
       atmosphere: (scene.atmosphere || theme.atmosphere).replace(/成年大學生的/g, '清爽的')
     });
     const captionName = character.captionName ?? character.jaName;
