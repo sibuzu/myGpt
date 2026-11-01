@@ -102,8 +102,8 @@ const anime = createAnimeGenerator(common);
 
 export const ANIME_BATCH_SIZE = ANIME_BATCH_CHARACTER_IDS.length;
 
-export function generateAnimeCharacterBatch() {
-  return generateAnimeBatch(id => anime.generate(natural.nextContext(), id));
+export function generateAnimeCharacterBatch(count = ANIME_BATCH_SIZE) {
+  return generateAnimeBatch(id => anime.generate(natural.nextContext(), id), count);
 }
 
 export function generateImagePrompt(style = 'natural') {

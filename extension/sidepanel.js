@@ -1,4 +1,4 @@
-import { ANIME_BATCH_SIZE, generateAnimeCharacterBatch, generateImagePrompt } from './prompt-generator.js';
+import { generateAnimeCharacterBatch, generateImagePrompt } from './prompt-generator.js';
 
 document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
 
@@ -407,32 +407,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const genPromptBtn = document.getElementById('genPromptBtn');
   const promptStyle = document.getElementById('promptStyle');
   const promptCount = document.getElementById('promptCount');
-  let manualPromptCount = promptCount.value;
-  const defaultPromptTitle = genPromptBtn.title;
-  function updatePromptControls() {
-    const isAnimeBatch = promptStyle.value === 'anime-characters-2';
-    if (isAnimeBatch && !promptCount.disabled) {
-      manualPromptCount = promptCount.value;
-      promptCount.value = ANIME_BATCH_SIZE;
-    } else if (!isAnimeBatch && promptCount.disabled) {
-      promptCount.value = manualPromptCount;
-    }
-    promptCount.disabled = isAnimeBatch;
-    genPromptBtn.title = isAnimeBatch
-      ? `將指定的 ${ANIME_BATCH_SIZE} 位角色洗牌，各產生一則提示詞並加入佇列`
-      : defaultPromptTitle;
-  }
-  promptStyle.addEventListener('change', updatePromptControls);
-  updatePromptControls();
-
   genPromptBtn.addEventListener('click', () => {
-    const isAnimeBatch = promptStyle.value === 'anime-characters-2';
-    if (!isAnimeBatch && !promptCount.reportValidity()) return;
+    if (!promptCount.reportValidity()) return;
 
     const count = promptCount.valueAsNumber;
-    if (isAnimeBatch || count > 1) {
-      const prompts = isAnimeBatch
-        ? generateAnimeCharacterBatch()
+    if (count > 1) {
+      const prompts = promptStyle.value === 'anime-characters'
+        ? generateAnimeCharacterBatch(count)
         : Array.from({ length: count }, () => generateImagePrompt(promptStyle.value));
       promptQueue.push(...prompts);
       updatePromptList();

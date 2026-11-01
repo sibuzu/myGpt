@@ -1,17 +1,24 @@
-// Each click generates exactly one prompt per selected character in shuffled order.
-// export const ANIME_BATCH_CHARACTER_IDS = Object.freeze([
-//   4, 5, 7, 9, 10, 13, 14, 15, 16, 17, 20, 21, 22, 24, 25, 26,
-//   33, 37, 38, 41, 43, 44, 46, 52, 54, 55, 59, 60, 61, 62, 63
-// ]);
+import { ANIME_CHARACTERS } from '../anime-characters.js';
+
 export const ANIME_BATCH_CHARACTER_IDS = Object.freeze(
-  Array.from({ length: 63 }, (_, i) => i + 1)
+  ANIME_CHARACTERS.map(character => character.id)
 );
 
-export function generateAnimeBatch(generateCharacterPrompt) {
-  const ids = [...ANIME_BATCH_CHARACTER_IDS];
-  for (let i = ids.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [ids[i], ids[j]] = [ids[j], ids[i]];
+// Start a fresh shuffled round for each batch, then reshuffle only after all IDs are used.
+export function generateAnimeBatch(generateCharacterPrompt, count = ANIME_BATCH_CHARACTER_IDS.length) {
+  if (!Number.isInteger(count) || count < 1) {
+    throw new RangeError('Anime batch count must be a positive integer');
   }
-  return ids.map(id => generateCharacterPrompt(id));
+
+  const prompts = [];
+  while (prompts.length < count) {
+    const ids = [...ANIME_BATCH_CHARACTER_IDS];
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    const remaining = count - prompts.length;
+    prompts.push(...ids.slice(0, remaining).map(id => generateCharacterPrompt(id)));
+  }
+  return prompts;
 }
