@@ -1,9 +1,15 @@
 // ChatGPT updates composer button ids/testids often. Prefer stable composer
 // structure and accessible labels, with data-testid as a fast path when present.
 const SELECTORS = {
-  composer: '[data-composer-surface="true"]',
-  prompt: '#prompt-textarea, textarea[name="prompt-textarea"]',
-  trailing: '[data-composer-surface="true"] [data-composer-transition-slot="trailing"]',
+  composer: 'form[data-chatgpt-composer], [data-composer-surface="true"]',
+  prompt: [
+    '#prompt-textarea',
+    'textarea[name="prompt-textarea"]',
+    'form[data-chatgpt-composer] [data-composer-markdown][role="textbox"][contenteditable]',
+    '[data-composer-surface="true"] [data-composer-markdown][role="textbox"][contenteditable]'
+  ].join(', '),
+  editPrompt: '[data-composer-markdown][role="textbox"][contenteditable]',
+  trailing: '[data-composer-trailing-controls="true"], [data-composer-transition-slot="trailing"]',
   sendButton: [
     'button#composer-submit-button',
     'button[data-testid="send-button"]',
@@ -36,12 +42,44 @@ function queryVisible(selector, root = document) {
   return Array.from(root.querySelectorAll(selector)).find(isVisible);
 }
 
-function getComposerRoot() {
-  return document.querySelector(SELECTORS.composer) || document;
+function getComposerPrompt() {
+  return queryVisible(SELECTORS.prompt);
 }
 
-function getTrailingActionRoot() {
-  return document.querySelector(SELECTORS.trailing) || getComposerRoot();
+function getEditContext() {
+  for (const prompt of document.querySelectorAll(SELECTORS.editPrompt)) {
+    if (!isVisible(prompt) || prompt.closest(SELECTORS.composer)) continue;
+    const form = prompt.closest('form');
+    if (!form) continue;
+    const submit = queryVisible('button[type="submit"]', form);
+    const cancel = Array.from(form.querySelectorAll('button[type="button"]'))
+      .find(button => isVisible(button)
+        && /^(取消|取消編輯|Cancel|Cancel edit)$/i.test(
+          (button.getAttribute('aria-label') || button.textContent).trim()
+        ));
+    if (submit && cancel) return { prompt, root: form, editing: true };
+  }
+  return null;
+}
+
+function getComposerRoot() {
+  const prompt = getComposerPrompt();
+  return prompt?.closest(SELECTORS.composer)
+    || prompt?.closest('form')
+    || queryVisible(SELECTORS.composer)
+    || document;
+}
+
+function getSendContext() {
+  return getEditContext() || {
+    prompt: getComposerPrompt(),
+    root: getComposerRoot(),
+    editing: false
+  };
+}
+
+function getTrailingActionRoot(composer = getComposerRoot()) {
+  return queryVisible(SELECTORS.trailing, composer) || composer;
 }
 
 function isEnabledButton(button) {
@@ -54,10 +92,18 @@ function isVoiceActionButton(button) {
   return /voice|語音|语音|聽寫|听写/i.test(ariaLabel) || /#(?:voice|microphone)-/i.test(iconHref);
 }
 
-function getReadySendButton() {
-  const trailing = getTrailingActionRoot();
+function isReadySendButton(button) {
+  return isEnabledButton(button)
+    && !isVoiceActionButton(button)
+    && !button.matches(SELECTORS.stopButton);
+}
+
+function getReadySendButton(context = getSendContext()) {
+  if (!context.prompt?.isConnected || !isVisible(context.prompt)
+    || !isEditablePrompt(context.prompt)) return null;
+  const trailing = context.editing ? context.root : getTrailingActionRoot(context.root);
   const labelledSendButton = Array.from(trailing.querySelectorAll(SELECTORS.sendButton))
-    .find(isEnabledButton);
+    .find(isReadySendButton);
   if (labelledSendButton) return labelledSendButton;
 
   // The current ChatGPT composer reuses its last circular action button and
@@ -68,20 +114,29 @@ function getReadySendButton() {
     'button[data-testid*="send"]'
   ].join(', ')))
     .reverse()
-    .find(button => isEnabledButton(button) && !isVoiceActionButton(button));
+    .find(isReadySendButton);
 }
 
-function hasPromptInput() {
-  return Boolean(queryVisible(SELECTORS.prompt));
+function isEditablePrompt(prompt) {
+  return Boolean(prompt
+    && !prompt.disabled
+    && !prompt.readOnly
+    && prompt.getAttribute('contenteditable') !== 'false'
+    && prompt.getAttribute('aria-disabled') !== 'true');
 }
 
-function hasIdleVoiceButton() {
+function hasIdleComposerControls() {
   const trailing = getTrailingActionRoot();
-  return Boolean(queryVisible(SELECTORS.voiceButton, trailing));
+  // An empty composer may show a disabled send button instead of a voice button.
+  return Boolean(queryVisible([
+    SELECTORS.voiceButton,
+    SELECTORS.sendButton,
+    'button[type="submit"]'
+  ].join(', '), trailing));
 }
 
 function hasRunningStopButton() {
-  return Boolean(queryVisible(SELECTORS.stopButton));
+  return Boolean(queryVisible(SELECTORS.stopButton, getComposerRoot()));
 }
 
 // 列出所有 data-testid
@@ -117,12 +172,15 @@ function checkState() {
   // console.log('[Contents] Checking state...');
 
   let state = null;
+  const context = getSendContext();
 
   if (hasRunningStopButton()) {
     state = 'running';
-  } else if (getReadySendButton()) {
+  } else if (context.editing) {
+    if (isEditablePrompt(context.prompt)) state = 'edit-mode';
+  } else if (getReadySendButton(context)) {
     state = 'ready-to-send';
-  } else if (hasPromptInput() && hasIdleVoiceButton()) {
+  } else if (isEditablePrompt(getComposerPrompt()) && hasIdleComposerControls()) {
     state = 'input-mode';
   }
 
@@ -157,7 +215,10 @@ function startObserving() {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['class', 'disabled']
+    attributeFilter: [
+      'class', 'disabled', 'aria-disabled', 'aria-label', 'contenteditable',
+      'readonly', 'hidden', 'style', 'id', 'data-testid'
+    ]
   });
 
   // 初始檢查
@@ -239,6 +300,28 @@ async function insertTextIntoPrompt(promptElement, text) {
   }
 }
 
+function clearPromptForReplacement(promptElement) {
+  window.focus();
+  promptElement.focus();
+  if ('value' in promptElement) {
+    promptElement.select();
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(promptElement);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+  // Use the editor's normal input path so its internal document stays in sync.
+  if (!document.execCommand('delete')) {
+    throw new Error('Could not clear the message being edited');
+  }
+  const remainingText = 'value' in promptElement ? promptElement.value : promptElement.innerText;
+  if (remainingText.trim()) {
+    throw new Error('The original message was not fully cleared; message was not sent');
+  }
+}
+
 function blobToDataURL(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -317,10 +400,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     console.log('[Contents] Sending GPT message:', request.text);
     
     // 找到 ChatGPT 的輸入框
-    const promptTextarea = document.querySelector('[id="prompt-textarea"]');
+    const context = getSendContext();
+    const promptTextarea = context.prompt;
     
     if (promptTextarea) {
       try {
+        if (!isEditablePrompt(promptTextarea)) {
+          throw new Error('Message input is not editable');
+        }
+        if (context.editing) {
+          clearPromptForReplacement(promptTextarea);
+        }
         // 解析 markdown 格式的圖片
         const imageMatches = request.text.match(/!\[.*?\]\((.*?)\)\n/g);
         const textContent = request.text.replace(/!\[.*?\]\((.*?)\)\n/g, '');
@@ -364,7 +454,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         }));
         
         // 等待發送按鈕變為可用並點擊
-        await waitForAndClickSendButton(imageMatches ? 40 : 10);
+        await waitForAndClickSendButton(imageMatches ? 40 : 10, context);
         
         // 等待回應完成
         await waitForResponse();
@@ -428,12 +518,12 @@ async function insertImage(textarea, blob) {
   }
 }
 
-async function waitForAndClickSendButton(maxAttempts) {
+async function waitForAndClickSendButton(maxAttempts, context = getSendContext()) {
   return new Promise((resolve, reject) => {
     let attempts = 0;
     
     const checkButton = () => {
-      const sendButton = getReadySendButton();
+      const sendButton = getReadySendButton(context);
       if (sendButton) {
         console.log('[Contents] Send button is ready:', {
           testId: sendButton.getAttribute('data-testid'),

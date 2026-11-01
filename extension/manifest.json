@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "MyGPT 1.0.0",
-  "version": "1.0.0",
+  "name": "MyGPT 1.0.2",
+  "version": "1.0.2",
   "description": "Send selected text to ChatGPT",
   "permissions": [
     "contextMenus",
     "storage",
     "activeTab",
     "sidePanel",
-    "scripting"
+    "scripting",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "https://chat.openai.com/*",

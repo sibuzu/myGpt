@@ -134,6 +134,7 @@ body {
 
 .button-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
   align-items: center;
@@ -190,7 +191,7 @@ button:hover {
 }
 
 /* Status Elements */
-#state, #elapsedTime, #status, #pageId, #totalTurns {
+#state, #elapsedTime, #status, #pageId, #totalTurns, #scriptStatus {
   margin: 4px 0;
   font-size: 14px;
   color: #4b5563;

@@ -10,6 +10,10 @@ let isProcessingQueue = false;
 let currentState = null;     // 當前狀態
 let canSend = true;         // 控制是否可以發送訊息
 
+function isInputState(state) {
+  return state === 'input-mode' || state === 'edit-mode';
+}
+
 // 更新 promptList 顯示
 function updatePromptList() {
   const promptListElement = document.getElementById('promptList');
@@ -84,11 +88,11 @@ async function processPromptQueue() {
   // await sendTelegram("processPromptQueue");
   if (isProcessingQueue || promptQueue.length === 0 || isPaused || !canSend) return;
 
-  if (currentState !== 'input-mode') {
+  if (!isInputState(currentState)) {
     return;
   }
 
-  // 設 canSend=false，避免連續觸發，只有state changed後，canSend才會被重設為true。
+  // 避免連續觸發，離開可輸入狀態後才允許下一次發送。
   canSend = false;
 
   isProcessingQueue = true;
@@ -386,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 重新初始化輸入框
     initializeMessageInput();
 
-    if (currentState === 'input-mode') {
+    if (isInputState(currentState)) {
       processPromptQueue();
     }
   });
@@ -398,95 +402,54 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[Sidepanel] Queue cleared');
   });
 
-  // Upload button handler
-  const uploadBtn = document.getElementById('uploadBtn');
-  const fileInput = document.getElementById('fileInput');
-
-  uploadBtn.addEventListener('click', () => {
-    fileInput.click();
+  const genPromptBtn = document.getElementById('genPromptBtn');
+  genPromptBtn.addEventListener('click', () => {
+    const textContainer = messageInput.querySelector('.text-container');
+    textContainer.textContent = generateImagePrompt();
+    textContainer.focus();
+    const range = document.createRange();
+    range.selectNodeContents(textContainer);
+    range.collapse(false);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    textContainer.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertReplacementText' }));
   });
 
-  fileInput.addEventListener('change', async (e) => {
-    const files = e.target.files;
-    if (!files.length) return;
-
-    const imagesContainer = messageInput.querySelector('.images-container');
-
-    for (const file of files) {
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-          const img = document.createElement('img');
-          img.src = event.target.result;
-          imagesContainer.appendChild(img);
-        };
-
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // 清空 file input 的值，這樣相同的檔案可以再次上傳
-    fileInput.value = '';
-  });
-
-  // Script button handler
+  // Copy the live page DOM independently of content-script control detection.
   const scriptBtn = document.getElementById('scriptBtn');
-  const scriptInput = document.getElementById('scriptInput');
+  const scriptStatus = document.getElementById('scriptStatus');
 
-  scriptBtn.addEventListener('click', () => {
-    scriptInput.click();
-  });
-
-  scriptInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
+  scriptBtn.addEventListener('click', async () => {
+    scriptBtn.disabled = true;
+    scriptStatus.textContent = 'Copying DOM...';
     try {
-      const text = await file.text();
-      const scriptData = JSON.parse(text);
-
-      // 檢查是否為新格式（至少要有 prompt 陣列）
-      if (!scriptData.prompt || !Array.isArray(scriptData.prompt)) {
-        console.error('[Sidepanel] Invalid script format: missing prompt array');
-        return;
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.id) {
+        throw new Error('No active tab found');
       }
 
-      // 處理每個 prompt
-      for (const item of scriptData.prompt) {
-        let message = item.prompt;
-
-        // 如果有圖片檔案且 scriptData.images 存在，處理圖片
-        if (item.files && item.files.length > 0 && scriptData.images) {
-          // 從最後一張開始加入，這樣在最終顯示時會保持原始順序
-          for (let i = item.files.length - 1; i >= 0; i--) {
-            const filePath = item.files[i];
-            const base64Image = scriptData.images[filePath];
-            if (base64Image) {
-              message = `![Image ${i + 1}](${base64Image})\n` + message;
-            }
-          }
+      const [snapshot] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const doctype = document.doctype
+            ? new XMLSerializer().serializeToString(document.doctype) + '\n'
+            : '';
+          return doctype + document.documentElement.outerHTML;
         }
-
-        // 加入到 prompt queue
-        promptQueue.push(message);
+      });
+      if (typeof snapshot?.result !== 'string' || !snapshot.result) {
+        throw new Error('No page DOM returned');
       }
 
-      // 更新顯示
-      updatePromptList();
-
-      // 如果當前是 input-mode，開始處理佇列
-      if (currentState === 'input-mode') {
-        processPromptQueue();
-      }
-
-      console.log('[Sidepanel] Script loaded, prompts added:', scriptData.prompt.length);
+      await navigator.clipboard.writeText(snapshot.result);
+      scriptStatus.textContent = 'DOM copied to clipboard.';
     } catch (error) {
-      console.error('[Sidepanel] Error processing script file:', error);
+      console.error('[Sidepanel] Failed to copy page DOM:', error);
+      scriptStatus.textContent = `Failed to copy DOM: ${error.message}`;
+    } finally {
+      scriptBtn.disabled = false;
     }
-
-    // 清空 input 值以支援重複載入相同檔案
-    scriptInput.value = '';
   });
 
   // Message listeners
@@ -505,14 +468,14 @@ document.addEventListener('DOMContentLoaded', function () {
         currentState = request.state;
         stateElement.textContent = `State: ${currentState}`;
 
-        if (currentState != 'input-mode') {
-          // 當前不是 input-mode，表示已經開始執行，可以準備發送下一個(當再次變成 input-mode 時)
+        if (!isInputState(currentState)) {
+          // 已離開可輸入狀態，回到一般輸入或編輯模式時可發送下一個。
           canSend = true;
         }
 
         if (currentState === 'running') {
           startTimer();
-        } else if (currentState === 'input-mode') {
+        } else if (isInputState(currentState)) {
           if (startTime) {
             stopTimer();
             if (promptQueue.length === 0) {

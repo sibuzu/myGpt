@@ -2,7 +2,8 @@
 <html>
 
 <head>
-  <title>MyGPT 1.0.0</title>
+  <meta charset="UTF-8">
+  <title>MyGPT 1.0.2</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 
@@ -48,11 +49,10 @@
         <div class="button-container">
           <button id="sendMsg">Send</button>
           <button id="clearQueue">Clear</button>
-          <button id="uploadBtn">Upload</button>
-          <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-          <button id="scriptBtn">Script</button>
-          <input type="file" id="scriptInput" accept=".json" style="display: none;">
+          <button id="genPromptBtn" title="隨機產生生圖提示詞並填入輸入框">GenPrompt</button>
+          <button id="scriptBtn" title="Copy current page DOM to clipboard">Script</button>
         </div>
+        <div id="scriptStatus" role="status" aria-live="polite"></div>
         <div class="pause-checkbox">
           <input type="checkbox" id="pauseQueue"> Pause
         </div>
@@ -79,6 +79,7 @@
       </div>
     </div>
   </div>
+  <script src="prompt-generator.js"></script>
   <script src="sidepanel.js"></script>
 </body>
 
