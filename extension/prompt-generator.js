@@ -2,6 +2,7 @@
 import { createNaturalGenerator } from './prompt-generators/natural.js';
 import { createBeautifulGenerator } from './prompt-generators/beautiful.js';
 import { createAnimeGenerator } from './prompt-generators/anime.js';
+import { ANIME_BATCH_CHARACTER_IDS, generateAnimeBatch } from './prompt-generators/anime-batch.js';
 
 function createLook(text, clothingClauses = [0]) {
   return { text, details: text.split('，').filter((_, index) => !clothingClauses.includes(index)) };
@@ -98,6 +99,12 @@ const common = { createLook, pick, chooseGaze, naturalInteractions, clothingScen
 const natural = createNaturalGenerator(common);
 const beautiful = createBeautifulGenerator(common);
 const anime = createAnimeGenerator(common);
+
+export const ANIME_BATCH_SIZE = ANIME_BATCH_CHARACTER_IDS.length;
+
+export function generateAnimeCharacterBatch() {
+  return generateAnimeBatch(id => anime.generate(natural.nextContext(), id));
+}
 
 export function generateImagePrompt(style = 'natural') {
   // Keep the older programmatic style key compatible with its original generator.

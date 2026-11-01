@@ -159,9 +159,16 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 10px;
+  gap: 8px 6px;
   margin-left: 4px;
   margin-top: 15px;
+}
+
+.prompt-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 6px;
 }
 
 .pause-checkbox, .style-select, .count-select {

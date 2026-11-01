@@ -57,18 +57,21 @@
           <label class="pause-checkbox">
             <input type="checkbox" id="pauseQueue"> Pause
           </label>
-          <label class="style-select" for="promptStyle">
-            風格:
-            <select id="promptStyle">
-              <option value="natural" selected>自然清新</option>
-              <option value="beautiful-sexy-2">美麗性感</option>
-              <option value="anime-characters">動漫角色</option>
-            </select>
-          </label>
-          <label class="count-select" for="promptCount">
-            張數:
-            <input id="promptCount" type="number" min="1" max="100" step="1" value="1" required>
-          </label>
+          <div class="prompt-options">
+            <label class="style-select" for="promptStyle">
+              風格:
+              <select id="promptStyle">
+                <option value="natural" selected>自然清新</option>
+                <option value="beautiful-sexy-2">美麗性感</option>
+                <option value="anime-characters">動漫角色</option>
+                <option value="anime-characters-2">動漫角色2</option>
+              </select>
+            </label>
+            <label class="count-select" for="promptCount">
+              張數:
+              <input id="promptCount" type="number" min="1" max="100" step="1" value="1" required>
+            </label>
+          </div>
         </div>
         <div id="promptList" class="mt-2">
           <!-- Prompt list will be displayed here -->

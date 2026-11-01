@@ -35,14 +35,18 @@ export function createAnimeGenerator(common) {
   function describeCharacterOutfit(character) {
     const outfits = character.fashionOutfits;
     if (!outfits?.length) return character.baseOutfit;
-    const description = pick(outfits.filter(item => item !== previousCharacterOutfits.get(character)));
+    const candidates = outfits.filter(item => item !== previousCharacterOutfits.get(character));
+    const description = pick(candidates.length ? candidates : outfits);
     previousCharacterOutfits.set(character, description);
     return description;
   }
 
-  function generate(context) {
+  function generate(context, characterId) {
     const { theme, scene, expression } = context;
-    const character = pick(ANIME_CHARACTERS.filter(item => item !== previousAnimeCharacter));
+    const character = characterId === undefined
+      ? pick(ANIME_CHARACTERS.filter(item => item !== previousAnimeCharacter))
+      : ANIME_CHARACTERS.find(item => item.id === characterId);
+    if (!character) throw new RangeError(`Unknown anime character ID: ${characterId}`);
     previousAnimeCharacter = character;
     const outfitDescription = describeCharacterOutfit(character);
     const interaction = chooseGaze(naturalInteractions(character.features + '，' + outfitDescription, scene.description));
