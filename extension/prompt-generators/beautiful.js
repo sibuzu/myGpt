@@ -203,6 +203,14 @@ export function createBeautifulGenerator(common) {
     {
       palettes: contrastPalettes,
       describe: ([fabric, belt]) => `${fabric}V形領口腰側鏤空無袖連身裙+${belt}細腰帶`
+    },
+    {
+      palettes: [
+        ['米白色', '淡粉色', '紅棕色'],
+        ['象牙白色', '櫻花粉色', '酒紅色'],
+        ['香檳白色', '淡玫瑰色', '深棕色']
+      ],
+      describe: ([fabric, flowers, obi]) => `${fabric}絲綢改良和服，印有細緻${flowers}花卉圖案，${obi}腰帶，高開衩短裙襬`
     }
   ];
   const beautifulAngles = [
