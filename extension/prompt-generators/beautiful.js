@@ -211,6 +211,14 @@ export function createBeautifulGenerator(common) {
         ['香檳白色', '淡玫瑰色', '深棕色']
       ],
       describe: ([fabric, flowers, obi]) => `${fabric}絲綢改良和服，印有細緻${flowers}花卉圖案，${obi}腰帶，高開衩短裙襬`
+    },
+    {
+      palettes: [
+        ['象牙白色', '金色'],
+        ['淡香檳色', '玫瑰金色'],
+        ['霧藍色', '銀色']
+      ],
+      describe: ([fabric, ring]) => `${fabric}雪紡海灘短洋裝，超深V領，側邊高開衩以${ring}細緻金屬環固定，裙襬輕盈飄逸`
     }
   ];
   const beautifulAngles = [
