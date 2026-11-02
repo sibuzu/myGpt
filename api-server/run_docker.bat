@@ -7,4 +7,5 @@ docker run -d ^
   -v %cd%\log:/app/log ^
   --env-file .env ^
   --name my-gpt-api ^
+  --restart always ^
   my-gpt-api
