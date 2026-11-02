@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLifeStory = promptStyle.value === 'life-story';
     promptCount.disabled = isLifeStory;
     promptHelp.hidden = !isLifeStory;
-    genPromptBtn.title = isLifeStory ? '依訊息框的排序編號產生生活故事，直接加入佇列' : defaultPromptTitle;
+    genPromptBtn.title = isLifeStory ? '依訊息框的原始編號產生生活故事，直接加入佇列' : defaultPromptTitle;
     promptStatus.textContent = '';
     if (isLifeStory) {
       try {

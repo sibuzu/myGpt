@@ -2,7 +2,7 @@ import { LIFE_STORY_PROMPTS } from './life-story-prompts.js';
 
 export const LIFE_STORY_SIZE = LIFE_STORY_PROMPTS.length;
 
-// Selections refer to sorted positions, not the original outfit numbers.
+// Selections refer to the original numbers in 160_unsorted_prompts.txt.
 export function selectLifeStoryNumbers(selection = '') {
   const text = selection.trim();
   if (!text) return Array.from({ length: LIFE_STORY_SIZE }, (_, index) => index + 1);

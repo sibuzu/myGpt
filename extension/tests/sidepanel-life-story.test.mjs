@@ -76,7 +76,7 @@ test('life story previews the count and directly appends ordered batches to the 
   assert.equal(status.textContent, '將產生 1 個 prompt。');
   await getElement('genPromptBtn').trigger('click');
   assert.equal(queue.children.length, 1);
-  assert.match(queue.children[0].textContent, /^1\. 001 \/ 020｜香草餐館的小午休/);
+  assert.match(queue.children[0].textContent, /^1\. 001｜河畔花店的清晨/);
   assert.equal(status.textContent, '已產生 1 個 prompt，已加入 queue。');
   assert.equal(text().textContent, '1');
 
@@ -85,8 +85,8 @@ test('life story previews the count and directly appends ordered batches to the 
   assert.equal(status.textContent, '將產生 123 個 prompt。');
   await getElement('genPromptBtn').trigger('click');
   assert.equal(queue.children.length, 124);
-  assert.match(queue.children[2].textContent, /^3\. 010 \/ /);
-  assert.match(queue.children.at(-1).textContent, /^124\. 160 \/ 097｜/);
+  assert.match(queue.children[2].textContent, /^3\. 010｜竹影下的紙藝廊/);
+  assert.match(queue.children.at(-1).textContent, /^124\. 160｜港灣音樂露台的夕光/);
 
   text().textContent = '1, 161';
   await getElement('genPromptBtn').trigger('click');
