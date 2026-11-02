@@ -11,50 +11,62 @@ function createLook(text, clothingClauses = [0]) {
 const pick = items => items[Math.floor(Math.random() * items.length)];
 
 function chooseGaze(interactions) {
-  // A brief camera glance is occasional; most attention follows the activity.
-  return Math.random() < 0.2
-    ? '在動作間短暫望向鏡頭，隨後自然移開視線'
-    : pick(interactions);
+  // Weighted interactions include their own camera choice and bypass the default glance rate.
+  if (typeof interactions[0] === 'object') {
+    let roll = Math.random() * interactions.reduce((total, option) => total + option.weight, 0);
+    for (const option of interactions) {
+      if (roll < option.weight) return option.text;
+      roll -= option.weight;
+    }
+    return interactions[interactions.length - 1].text;
+  }
+  const roll = Math.random();
+  if (roll >= 0.6) return '在動作間自然看向鏡頭，保持自然放鬆的姿態';
+  return pick(interactions).replaceAll('{side}', roll < 0.3 ? '右' : '左');
 }
 
 function naturalInteractions(look, description) {
   if (/翻閱|文學書|書頁/.test(description)) {
-    return ['翻閱書頁時微微低頭，目光停留在文字上', '停在感興趣的段落，視線沿著書頁自然移動'];
+    return ['翻閱書頁時微微低頭，目光停留在{side}方的文字上', '停在感興趣的段落，視線沿著{side}方書頁自然移動'];
   }
   if (/植物圖鑑/.test(look)) {
-    return ['低頭查看植物圖鑑，再自然看向身旁綠葉', '目光在圖鑑與眼前植物之間移動，像在辨認葉片'];
+    return ['低頭查看植物圖鑑，再自然看向{side}方身旁綠葉', '目光在圖鑑與{side}方植物之間移動，像在辨認葉片'];
   }
   if (/畫筆|油畫/.test(description)) {
-    return ['手邊動作自然停頓，目光專注於畫作細節', '欣賞作品時微微側頭，視線停留在色彩與筆觸上'];
+    return ['手邊動作自然停頓，目光專注於{side}方畫作細節', '欣賞作品時微微側頭，視線停留在{side}方的色彩與筆觸上'];
   }
   if (/素描鉛筆|速寫/.test(description)) {
-    return ['低頭整理素描線條，視線專注於紙上作品', '手中鉛筆稍作停頓，像在思考下一筆的位置'];
+    return ['低頭整理素描線條，視線專注於{side}方紙上作品', '手中鉛筆稍作停頓，目光看向{side}方，像在思考下一筆的位置'];
   }
   if (/伸展|慢跑步道/.test(description)) {
-    return ['隨著呼吸自然調整姿態，目光放鬆看向前方', '運動間稍作停頓，視線沿著遠方步道延伸'];
+    return ['隨著呼吸自然調整姿態，目光放鬆看向{side}方', '運動間稍作停頓，視線沿著{side}方步道延伸'];
   }
   if (/舞蹈教室|輕盈轉身/.test(description)) {
-    return ['視線順著動作方向延伸，神情專注而流暢', '轉動肩線時自然側望，捕捉動作尚未停下的瞬間'];
+    return ['視線順著動作朝{side}方延伸，神情專注而流暢', '轉動肩線時自然望向{side}方，捕捉動作尚未停下的瞬間'];
   }
   if (/牽著.*狗/.test(description)) {
-    return ['散步時低頭留意小狗的步伐，神情自然親切', '視線隨著小狗與前方小徑移動，保留生活抓拍感'];
+    return ['散步時低頭留意{side}方小狗的步伐，神情自然親切', '視線隨著小狗與{side}方小徑移動，保留生活抓拍感'];
   }
   if (/橘貓/.test(description)) {
-    return ['自然低頭看向身旁橘貓，嘴角帶著淡淡笑意', '視線隨著橘貓的動作輕移，像被捕捉到互動片刻'];
+    return ['自然低頭看向{side}方身旁橘貓，嘴角帶著淡淡笑意', '視線隨著{side}方橘貓的動作輕移，像被捕捉到互動片刻'];
   }
   if (/陶瓷.*杯|拿鐵|熱茶杯|花茶/.test(description)) {
-    return ['微微低頭欣賞杯中飲品，目光自然停留在杯緣', '目光從桌上飲品移向周圍景色，保留悠閒生活感'];
+    return ['微微低頭欣賞杯中飲品，目光自然停留在{side}方杯緣', '目光從桌上飲品移向{side}方周圍景色，保留悠閒生活感'];
   }
   if (/星空|星座|水晶球/.test(description)) {
-    return ['抬眼觀察遠方星光，視線順著發光星座延伸', '微微側頭觀察漂浮光點，像在專注感受周圍景象'];
+    return ['抬眼觀察遠方星光，視線順著{side}方發光星座延伸', '微微側頭觀察{side}方漂浮光點，像在專注感受周圍景象'];
   }
   if (/花|植物|綠葉|草地/.test(description + look)) {
-    return ['稍微停下動作欣賞身旁花草，視線自然下移', '隨微風輕輕側頭，目光停留在身旁植物與花朵'];
+    return ['稍微停下動作欣賞身旁花草，視線自然移向{side}方', '隨微風輕輕側頭，目光停留在{side}方身旁植物與花朵'];
   }
   if (/漫步|走在|旅行地圖/.test(description)) {
-    return ['步伐自然延續，視線落在前方路線，像被捕捉到行走中的瞬間', '隨行進方向輕輕轉頭，望向路旁景物'];
+    return [
+      { text: '步伐自然延續，視線落在右前方路線，像被捕捉到行走中的瞬間', weight: 3 },
+      { text: '步伐自然延續，視線落在左前方路線，像被捕捉到行走中的瞬間', weight: 3 },
+      { text: '步伐自然延續，眼神自然看向鏡頭，像被捕捉到行走中的瞬間', weight: 4 }
+    ];
   }
-  return ['輕輕側頭欣賞周圍景物，目光自然落在畫面外', '手邊動作自然延續，視線放鬆看向側前方'];
+  return ['輕輕側頭欣賞周圍景物，目光自然落在畫面{side}方外', '手邊動作自然延續，視線放鬆看向{side}方'];
 }
 
 function clothingSceneDescription(description, outfitDescription) {

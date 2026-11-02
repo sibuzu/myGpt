@@ -32,7 +32,40 @@ export function createBeautifulGenerator(common) {
     '藝術畫室、花卉油畫和木質畫架、整齊畫具與明亮落地窗、溫暖細膩的自然側光',
     '復古爵士酒吧、深色木牆和小型鋼琴舞台、天鵝絨座椅與開闊走道、柔和金色與靛藍色燈光',
     '時尚攝影棚、奶油色無縫背景和簡約展示台、乾淨地面與細緻布景、大面積柔光與淡淡輪廓光',
-    '夜間燈海步道、樹梢燈串和星形光飾、平整小徑與兩側花叢、溫暖柔亮的節慶燈光'
+    '夜間燈海步道、樹梢燈串和星形光飾、平整小徑與兩側花叢、溫暖柔亮的節慶燈光',
+    '銀杏林蔭大道、金黃色樹冠和落葉地毯、復古長椅與整齊矮籬、穿過枝葉的柔和秋日陽光',
+    '楓紅溪谷步道、緋紅楓葉和清澈溪流、青苔岩石與木質小橋、雨後通透的柔和晨光',
+    '白樺林間步道、銀白樹幹和嫩綠枝葉、細碎野花與平整木棧道、清晨薄霧中的柔和散射光',
+    '山間梯田茶園、層層翠綠茶樹和蜿蜒石階、竹編茶亭與遠方山嵐、日出後清透的金色晨光',
+    '高山草甸觀景台、低矮野花和綿延山稜、木質欄杆與遠方白雲、明亮清新的夏日自然光',
+    '向日葵花田、金黃色花盤和鄉村風車、田間小徑與白色木籬笆、溫暖飽滿的午後陽光',
+    '鬱金香花園、粉紅與奶油色花帶、石質噴泉與拱形花門、柔和明亮的春日晨光',
+    '波斯菊花田、輕盈粉白花海和遠方小山、平整土徑與木質休息亭、夕陽前清透的暖色側光',
+    '桃花果園、粉色花枝和古樸農舍、青石小徑與矮木柵欄、薄雲透出的柔和春日陽光',
+    '荷塘庭園、碧綠荷葉和淡粉荷花、曲折木橋與臨水涼亭、夏日清晨的柔和水面反光',
+    '海岸燈塔步道、白色燈塔和開闊海灣、低矮野草與石質欄杆、落日前溫暖的金色海風光影',
+    '運河小鎮河畔、彩色窗框和拱形石橋、繫泊小船與沿岸花箱、清透柔和的午後日光',
+    '復古電車街道、奶油色車站和沿街小店、整齊人行道與懷舊站牌、明亮溫暖的上午陽光',
+    '紅磚倉庫藝術區、工業風窗框和戶外雕塑、寬闊石板廣場與創意招牌、傍晚柔和的橙金側光',
+    '歐式車站大廳、高聳拱窗和復古大鐘、石質地板與木質候車長椅、屋頂玻璃灑下的均勻自然光',
+    '拱廊商店街、連續石柱和精緻櫥窗、馬賽克地磚與街角花盆、拱廊內柔和明亮的漫射日光',
+    '雨後城市廣場、映著天空的石板地面、現代噴泉與整齊街樹、雲層散開後的清透柔光',
+    '山間湖景飯店露台、寧靜湖灣和層疊山色、玻璃欄杆與柔軟戶外座椅、藍調清晨的淡金日光',
+    '海景餐廳室內、弧形落地窗和遼闊海面、亞麻桌布與玻璃花瓶、映入窗邊的柔和海面反光',
+    '手作麵包店、木質展示櫃和新鮮出爐的麵包、奶油色磁磚與窗邊座椅、清晨溫暖的自然窗光',
+    '花藝工作室、層疊花束和透明玻璃花器、木質工作桌與整齊緞帶架、柔和細膩的午後窗光',
+    '陶藝工坊室內、素色陶瓶和木質展示架、乾淨工作台與米色亞麻簾、帶有暖意的自然側光',
+    '音樂練習室、黑色三角鋼琴和木質譜架、淺色地板與高挑窗戶、午後安靜柔和的窗邊日光',
+    '古典劇院門廳、水晶吊燈和酒紅色絨布、弧形樓梯與黃銅扶手、細膩柔和的香檳金色燈光',
+    '精品旅館中庭、圓形天井和水磨石地面、低矮綠植與弧形沙發、天窗灑下的均勻柔和日光',
+    '歷史博物館長廊、古典雕像和高聳石柱、寬闊走道與拱形窗戶、溫暖細膩的午後斜光',
+    '海洋水族館觀景廊、湛藍水景和悠游魚群、寬闊玻璃窗與深色石質地面、柔和水波光影與暖色補光',
+    '天文館星空展廳、深藍穹頂和細緻星座光點、圓弧步道與簡約展示台、柔和靛藍環境光與淡金輪廓光',
+    '復古旋轉木馬樂園、彩繪木馬和奶油色棚頂、整齊石板廣場與小巧花壇、傍晚暖色燈串與柔和夕光',
+    '河岸花燈步道、映在水面的紙燈與石橋、平整小徑和沿岸柳樹、柔和月光交織溫暖燈籠光'
+  ];
+  const beautifulBottoms = [
+    '高腰A字短裙', '牛仔迷你裙', '百褶短裙', '高腰迷你裙', '高腰短裙', '迷你裙'
   ];
   const beautifulOutfits = [
     {
@@ -40,56 +73,56 @@ export function createBeautifulGenerator(common) {
         ['櫻花粉色', '奶油白色'], ['天空藍色', '霧灰色'], ['奶油白色', '藏青色'],
         ['薰衣草紫色', '米白色'], ['薄荷綠色', '淺卡其色']
       ],
-      describe: ([top, skirt]) => `${top}細肩帶上衣搭配${skirt}高腰A字短裙，裙長至大腿中段`
+      top: '細肩帶上衣'
     },
     {
       palettes: [
         ['米白色', '淺藍色'], ['淡粉色', '靛藍色'], ['淺灰色', '黑色'],
         ['薄荷綠色', '米白色'], ['奶茶色', '水洗藍色']
       ],
-      describe: ([top, shorts]) => `${top}合身短袖上衣搭配${shorts}高腰牛仔短褲，褲管剪裁俐落`
+      top: '短袖上衣'
     },
     {
       palettes: [
         ['淺藍色', '米白色'], ['奶油白色', '深灰色'], ['淡紫色', '霧灰色'],
         ['蜜桃粉色', '奶茶色'], ['黑色', '象牙白色']
       ],
-      describe: ([top, skirt]) => `${top}削肩上衣搭配${skirt}高腰百褶短裙，裙襬輕盈自然`
+      top: '削肩上衣'
     },
     {
       palettes: [
         ['淡紫色', '米白色'], ['奶茶色', '深咖啡色'], ['米白色', '炭灰色'],
         ['煙粉色', '深藍色'], ['淺灰色', '黑色']
       ],
-      describe: ([top, shorts]) => `${top}露肩針織上衣搭配${shorts}高腰西裝短褲，腰線清楚俐落`
+      top: '露肩上衣'
     },
     {
       palettes: [
         ['黑色', '象牙白色'], ['霧灰色', '黑色'], ['淺卡其色', '奶油白色'],
         ['深藍色', '白色'], ['煙粉色', '淺灰色']
       ],
-      describe: ([suit, vest]) => `${suit}短版西裝外套、${vest}背心搭配${suit}高腰短裙，呈現都會套裝風格`
+      top: '掛脖上衣'
     },
     {
       palettes: [
         ['淡青綠色', '米白色'], ['酒紅色', '淡金色'], ['寶藍色', '銀白色'],
         ['象牙白色', '淺粉色'], ['墨綠色', '香檳金色']
       ],
-      describe: ([fabric, embroidery]) => `${fabric}修身短版旗袍，裙長至大腿中段，衣襟點綴${embroidery}花卉刺繡`
+      describe: ([fabric, embroidery]) => `${fabric}短版旗袍，衣襟點綴${embroidery}花卉刺繡`
     },
     {
       palettes: [
         ['奶油白色', '淺棕色'], ['霧藍色', '米白色'], ['淺卡其色', '深咖啡色'],
         ['珊瑚粉色', '奶油白色'], ['黑色', '香檳金色']
       ],
-      describe: ([fabric, belt]) => `${fabric}無袖短版連身褲，搭配${belt}細腰帶，腰線俐落，褲管自然舒展`
+      describe: ([fabric, belt]) => `${fabric}無袖短版連身裙+${belt}細腰帶`
     },
     {
       palettes: [
         ['酒紅色', '黑色'], ['黑色', '香檳金色'], ['霧藍色', '銀灰色'],
         ['玫瑰粉色', '奶油白色'], ['奶油白色', '淺灰色']
       ],
-      describe: ([fabric, belt]) => `${fabric}細肩帶合身短洋裝，搭配${belt}細腰帶，裙長至大腿中段，衣料帶有柔和光澤`
+      describe: ([fabric, belt]) => `${fabric}細肩帶短洋裝+${belt}細腰帶`
     },
     {
       palettes: [
@@ -97,14 +130,14 @@ export function createBeautifulGenerator(common) {
         ['淡紫色', '奶油白色', '淡金色'], ['墨藍色', '香檳金色', '淡粉色'],
         ['薄荷綠色', '米白色', '淺粉色']
       ],
-      describe: ([fabric, belt, embroidery]) => `${fabric}改良式短版和服，搭配${belt}高腰絲綢腰帶與寬袖設計，裙襬至大腿中段，點綴${embroidery}櫻花刺繡`
+      describe: ([fabric, belt, embroidery]) => `${fabric}短版和服+${belt}絲綢腰帶，點綴${embroidery}櫻花刺繡`
     },
     {
       palettes: [
         ['象牙白色', '深藍色'], ['煙粉色', '炭灰色'], ['霧藍色', '奶油白色'],
         ['淡紫色', '黑色'], ['香檳色', '深咖啡色']
       ],
-      describe: ([blouse, skirt]) => `${blouse}薄紗襯衫，衣身搭配同色內襯，袖部呈現輕盈薄紗質感，下身搭配${skirt}高腰迷你裙，裙長至大腿中段`
+      top: '薄紗襯衫'
     }
   ];
   const contrastPalettes = [
@@ -115,69 +148,72 @@ export function createBeautifulGenerator(common) {
     ['奶油白色', '玫瑰粉色'], ['霧藍色', '米白色'], ['淡紫色', '霧灰色'],
     ['蜜桃粉色', '深咖啡色'], ['淺卡其色', '象牙白色']
   ];
+  const beautiful2Bottoms = [
+    ...beautifulBottoms,
+    '比基尼泳褲', '側開衩短裙', '不對稱迷你裙',
+    '高腰短裙，腰側點綴細緻繫帶與小巧金屬環',
+    '百褶迷你裙', '皮質迷你裙', '側綁帶迷你裙'
+  ];
   const beautiful2Outfits = [
     ...beautifulOutfits,
     {
       palettes: contrastPalettes,
-      describe: ([top, skirt]) => `${top}平口短版上衣搭配${skirt}高腰包臀迷你裙，線條俐落，裙長至大腿中段`
+      top: '短版上衣'
     },
     {
       palettes: softPalettes,
-      describe: ([top, skirt]) => `${top}掛脖短上衣搭配${skirt}高腰側開衩短裙，腰間點綴細緻金屬扣環`
+      top: '掛脖上衣'
     },
     {
       palettes: contrastPalettes,
-      describe: ([top, shorts]) => `${top}深V領長袖短上衣搭配${shorts}高腰修身短褲，衣料呈現細膩垂墜感`
+      top: '深V短上衣'
     },
     {
       palettes: softPalettes,
-      describe: ([top, skirt]) => `${top}露背繫帶上衣搭配${skirt}高腰皮質A字迷你裙，背部飾有交叉細帶`
+      top: '胸罩式上衣'
     },
     {
       palettes: contrastPalettes,
-      describe: ([top, skirt]) => `${top}單肩斜領短上衣搭配${skirt}不對稱迷你裙，裙襬帶有俐落斜切線條`
+      top: '單肩上衣'
     },
     {
       palettes: softPalettes,
-      describe: ([top, skirt]) => `${top}交叉繫帶短上衣搭配${skirt}高腰短裙，腰側點綴細緻繫帶與小巧金屬環`
+      top: '交叉繫帶短上衣'
     },
     {
       palettes: contrastPalettes,
-      describe: ([fabric, trim]) => `${fabric}側腰鏤空合身短洋裝，領口與腰側飾有${trim}細邊，裙長至大腿中段`
+      describe: ([fabric, trim]) => `${fabric}側腰鏤空短洋裝，領口與腰側飾有${trim}細邊`
     },
     {
       palettes: softPalettes,
-      describe: ([top, skirt]) => `${top}馬甲式短上衣搭配${skirt}高腰百褶迷你裙，衣身帶有精緻結構線與花邊領口`
+      top: '馬甲式短上衣'
     },
     {
       palettes: contrastPalettes,
-      describe: ([top, shorts]) => `${top}緞面細肩帶短上衣搭配${shorts}高腰皮質短褲，布料光澤與柔霧皮革形成層次`
+      top: '肩帶短上衣'
     },
     {
       palettes: softPalettes,
-      describe: ([top, skirt]) => `${top}露肩短上衣搭配${skirt}側綁帶迷你裙，袖口微微蓬起，裙身剪裁貼合自然曲線`
+      top: '露肩短上衣'
+    },
+    {
+      palettes: softPalettes,
+      top: '細肩帶背心'
     },
     {
       palettes: contrastPalettes,
-      describe: ([fabric, belt]) => `${fabric}腰側鏤空無袖連身短褲，搭配${belt}細腰帶與俐落V形領口，褲管呈現自然線條`
+      describe: ([fabric, belt]) => `${fabric}V形領口腰側鏤空無袖連身裙+${belt}細腰帶`
     }
   ];
   const beautifulAngles = [
-    ['正面平視全身拍攝', '臉部自然朝向前方，視線輕落在畫面側方'],
-    ['左前方45度全身拍攝', '身體微微側轉，望向側前方景物'],
-    ['右前方45度全身拍攝', '臉部自然側轉，視線落在畫面外'],
-    ['三分之二側面全身拍攝', '身體自然回頭，望向身後景色'],
-    ['側面平視全身拍攝', '側臉順著身體方向，視線落在前方'],
-    ['背後斜側全身拍攝', '上半身自然轉回，目光回望身後景物'],
-    ['輕微仰角全身拍攝', '臉部自然朝向前方，目光略看向遠處'],
-    ['約30度俯視全身拍攝', '微微低頭，視線自然落在側前方']
-  ];
-  const beautifulHandPoses = [
-    '一手輕撥長髮，另一手自然垂放',
-    '一手輕扶髮側，另一手自然放在腰側',
-    '一手提著小巧手袋，另一手自然垂放',
-    '雙手輕鬆交疊於身前',
-    '一手輕扶肩邊長髮，另一手放在身側'
+    ['正面平視全身拍攝', '臉部自然朝向前方，視線輕落在畫面{side}方'],
+    ['左前方45度全身拍攝', '身體微微側轉，望向{side}前方景物'],
+    ['右前方45度全身拍攝', '臉部自然側轉，視線落在畫面{side}方外'],
+    ['三分之二側面全身拍攝', '身體自然回頭，望向{side}方身後景色'],
+    ['側面平視全身拍攝', '側臉順著身體方向，視線落在{side}方'],
+    ['背後斜側全身拍攝', '上半身自然轉回，目光回望{side}方身後景物'],
+    ['輕微仰角全身拍攝', '臉部自然朝向前方，目光略看向{side}方遠處'],
+    ['約30度俯視全身拍攝', '微微低頭，視線自然落在{side}前方']
   ];
   const beautifulPoses = [
     { name: '跨步站姿', description: '單腿向前跨步呈現動態姿勢' },
@@ -188,7 +224,7 @@ export function createBeautifulGenerator(common) {
     {
       name: '行走回眸', description: '向前緩步行走，自然回頭留意身後景物',
       anglePattern: /45度|三分之二|背後/,
-      gaze: '回頭時視線順著身後景物延伸，保留行走中的自然瞬間'
+      gaze: '回頭時視線順著{side}方身後景物延伸，保留行走中的自然瞬間'
     },
     { name: '輕盈轉身', description: '自然轉動身體，一腳向外輕點，捕捉動態瞬間' },
     {
@@ -215,50 +251,47 @@ export function createBeautifulGenerator(common) {
       name: '花旁低蹲', description: '在花叢旁自然蹲下，雙膝靠攏',
       scenePattern: /庭園|庭院|花園|花田|公園|草地|湖畔|河畔|溫室|花廊|繡球花/,
       setting: '人物身旁有一片低矮花叢',
-      hands: '一手輕扶花葉，另一手自然放在膝側',
       anglePattern: /正面|45度|側面平視|俯視/,
-      gaze: '目光停留在手邊花葉，像在觀察花瓣細節'
+      gaze: '目光停留在{side}方手邊花葉，像在觀察花瓣細節'
     },
     {
       name: '草地側坐', description: '坐在草地上，雙腿向同側收攏',
       scenePattern: /公園|草地|庭園|花園|花田|湖畔|河畔/,
       setting: '場景一側是平整柔軟的草地',
-      hands: '一手輕撐身旁草地，另一手自然放在膝上',
       anglePattern: /正面|45度|側面平視|俯視/,
-      gaze: '自然看向身旁草地，神情放鬆'
+      gaze: '自然看向{side}方身旁草地，神情放鬆'
     },
     {
       name: '野餐墊側躺', description: '側躺於野餐墊，雙腿自然伸展',
       scenePattern: /公園|草地|庭園|花園|花田|湖畔|河畔/,
       setting: '平整草地上鋪著一張野餐墊',
-      hands: '一手支頭，另一手輕放在身側',
       anglePattern: /正面|45度|側面平視|俯視/,
-      gaze: '目光看向畫面外的景色，神情寧靜'
+      gaze: '目光看向畫面{side}方外的景色，神情寧靜'
     },
     {
       name: '躺椅斜靠', description: '放鬆斜靠躺椅，雙腿向前延伸',
       scenePattern: /泳池畔|露台|室內|庭院|花園|海邊|攝影棚/,
       setting: '場景一側擺放一張設有扶手的躺椅',
-      hands: '一手搭在扶手上，另一手輕放在身側',
       anglePattern: /正面|45度|側面平視|俯視/,
-      gaze: '放鬆斜靠時，目光落在畫面側方'
+      gaze: '放鬆斜靠時，目光落在畫面{side}方'
     }
   ];
   let previousBeautifulScene = null;
   let previousBeautifulPose = null;
   const previousOutfitPalettes = new Map();
 
-  function describeOutfit(outfits) {
+  function describeOutfit(outfits, bottoms) {
     const outfit = pick(outfits);
     const palette = pick(outfit.palettes.filter(item => item !== previousOutfitPalettes.get(outfit)));
     previousOutfitPalettes.set(outfit, palette);
+    if (outfit.top) return `${palette[0]}${outfit.top}+${palette[1]}${pick(bottoms)}`;
     return outfit.describe(palette);
   }
 
   function generate(context) {
     const { scene, look } = context;
     const interaction = chooseGaze(naturalInteractions(look.text, scene.description));
-    const outfitDescription = describeOutfit(beautiful2Outfits);
+    const outfitDescription = describeOutfit(beautiful2Outfits, beautiful2Bottoms);
     return renderNarrative(context, {
       lookDescription: [`身穿${outfitDescription}`, ...look.details].join('，'),
       sceneDescription: clothingSceneDescription(scene.description, outfitDescription),
@@ -272,33 +305,18 @@ export function createBeautifulGenerator(common) {
       && (!pose.scenePattern || pose.scenePattern.test(item))));
     previousBeautifulScene = scene;
     previousBeautifulPose = pose;
-    const outfitDescription = describeOutfit(beautifulOutfits);
+    const outfitDescription = describeOutfit(beautifulOutfits, beautifulBottoms);
     const angleOptions = beautifulAngles.filter(([angle]) => !pose.anglePattern || pose.anglePattern.test(angle));
     const [angle, gaze] = pick(angleOptions);
     const baseGaze = pose.gaze !== undefined ? pose.gaze : gaze;
-    const isLookingBack = /回頭|回眸|背後|轉回/.test(angle + gaze + pose.description);
-    const handOptions = pose.hands ? [pose.hands] : beautifulHandPoses;
-    // Keep arms away from the hair and shoulders during over-the-shoulder poses.
-    const compatibleHands = isLookingBack
-      ? ['雙手自然垂放於身側', ...handOptions.filter(hand => !/髮/.test(hand))]
-      : handOptions;
-    const handPose = pick(compatibleHands);
-    const gazeDescription = chooseGaze(pose.gaze || isLookingBack
-      ? [baseGaze]
-      : /髮/.test(handPose)
-        ? ['自然整理髮絲，視線微微垂向側下方', '輕撥髮絲時看向身旁景物，保留不經意的瞬間']
-        : /手袋/.test(handPose)
-          ? ['自然提著手袋，目光放鬆看向側前方', '輕輕調整手袋位置，視線落在手邊動作上']
-          : [baseGaze]);
+    const gazeDescription = chooseGaze([baseGaze]);
     const details = [
       scene,
       pose.setting,
       outfitDescription,
       angle,
       gazeDescription,
-      handPose,
       pose.description,
-      '雙腿與鞋履完整入鏡，呈現自然修長的腿部線條',
       '直式 9:16'
     ].filter(Boolean).join('、') + '。';
     return beautifulPrefix + '\n\n' + details;

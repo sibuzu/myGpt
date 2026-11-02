@@ -58,9 +58,12 @@ export function createAnimeGenerator(common) {
         ? '頭部在動作間短暫朝向鏡頭，隨後自然轉開'
         : '隨著手邊動作微微轉頭，以放鬆的肩線呈現留意周圍景物的自然姿態'
       : interaction;
-    const characterFacing = nextAnimeFacing();
+    const gazeDirection = interaction.match(/([右左])(?:前)?方/)?.[1];
+    const characterFacing = { ...nextAnimeFacing() };
+    if (gazeDirection) characterFacing.side = gazeDirection;
     // Face forward 40% of the time; each side angle has a 15% overall chance.
-    const facingAngle = Math.random() < 0.4 ? 0 : pick([10, 15, 20, 30]);
+    const faceCamera = /鏡頭/.test(interaction);
+    const facingAngle = faceCamera ? 0 : pick([10, 15, 20, 30]);
     if (facingAngle === 0) {
       renderedInteraction = character.coversEyes
         ? '頭部保持正面朝向鏡頭，以放鬆的姿態與觀看者互動'
