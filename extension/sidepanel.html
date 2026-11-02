@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>MyGPT 1.0.5</title>
+  <title>MyGPT 1.0.6</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 
@@ -64,6 +64,7 @@
                 <option value="natural" selected>自然清新</option>
                 <option value="beautiful-sexy-2">美麗性感</option>
                 <option value="anime-characters">動漫角色</option>
+                <option value="life-story">生活故事</option>
               </select>
             </label>
             <label class="count-select" for="promptCount">
@@ -72,6 +73,8 @@
             </label>
           </div>
         </div>
+        <div id="promptHelp" class="mt-2" hidden>訊息框留空產生全部 160 個；或輸入排序編號，例如 1, 10-15, 45-。</div>
+        <div id="promptStatus" class="mt-2" role="status" aria-live="polite"></div>
         <div id="promptList" class="mt-2">
           <!-- Prompt list will be displayed here -->
         </div>

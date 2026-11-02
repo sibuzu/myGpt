@@ -1,0 +1,336 @@
+{
+  "version": 2,
+  "generator": "built-in imagegen",
+  "source": "dress1.txt",
+  "selectionSource": "selection.json",
+  "selectionCount": 160,
+  "range": "1-10",
+  "policy": "真人優先，只有該款真人生成失敗才改用人台",
+  "humanCount": 8,
+  "mannequinCount": 2,
+  "looks": [
+    {
+      "number": 1,
+      "title": "圓領掛脖上衣+雪紡中腰側開衩百褶短裙",
+      "selection": {
+        "top": {
+          "type": "上衣",
+          "cut": "掛脖",
+          "neckline": "圓領",
+          "length": "",
+          "fabric": ""
+        },
+        "bottom": {
+          "type": "百褶短裙",
+          "rise": "中腰",
+          "detail": "",
+          "slit": "側開衩",
+          "fabric": "雪紡"
+        }
+      },
+      "palette": [
+        "ivory top",
+        "pale blue skirt"
+      ],
+      "image": "runway/v2-look-01-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 圓領掛脖上衣+雪紡中腰側開衩百褶短裙. Structured design attributes: {\"top\":{\"type\":\"上衣\",\"cut\":\"掛脖\",\"neckline\":\"圓領\",\"length\":\"\",\"fabric\":\"\"},\"bottom\":{\"type\":\"百褶短裙\",\"rise\":\"中腰\",\"detail\":\"\",\"slit\":\"側開衩\",\"fabric\":\"雪紡\"}}. Coordinated colors: ivory top; pale blue skirt.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "方領短袖垂墜高開衩長版洋裝",
+      "selection": {
+        "dress": {
+          "type": "洋裝",
+          "cut": "短袖",
+          "neckline": "方領",
+          "length": "長版",
+          "waist": "",
+          "detail": "垂墜",
+          "slit": "高開衩",
+          "fabric": ""
+        }
+      },
+      "palette": [
+        "wine-red dress"
+      ],
+      "image": "runway/v2-look-02-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 方領短袖垂墜高開衩長版洋裝. Structured design attributes: {\"dress\":{\"type\":\"洋裝\",\"cut\":\"短袖\",\"neckline\":\"方領\",\"length\":\"長版\",\"waist\":\"\",\"detail\":\"垂墜\",\"slit\":\"高開衩\",\"fabric\":\"\"}}. Coordinated colors: wine-red dress.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "天鵝絨短版不對稱襯衫+絲綢低腰垂墜鬱金香短裙",
+      "selection": {
+        "top": {
+          "type": "襯衫",
+          "cut": "不對稱",
+          "neckline": "",
+          "length": "短版",
+          "fabric": "天鵝絨"
+        },
+        "bottom": {
+          "type": "鬱金香短裙",
+          "rise": "低腰",
+          "detail": "垂墜",
+          "slit": "",
+          "fabric": "絲綢"
+        }
+      },
+      "palette": [
+        "deep green top",
+        "dusty rose skirt"
+      ],
+      "image": "runway/v2-look-03-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 天鵝絨短版不對稱襯衫+絲綢低腰垂墜鬱金香短裙. Structured design attributes: {\"top\":{\"type\":\"襯衫\",\"cut\":\"不對稱\",\"neckline\":\"\",\"length\":\"短版\",\"fabric\":\"天鵝絨\"},\"bottom\":{\"type\":\"鬱金香短裙\",\"rise\":\"低腰\",\"detail\":\"垂墜\",\"slit\":\"\",\"fabric\":\"絲綢\"}}. Coordinated colors: deep green top; dusty rose skirt.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "雪紡一字領長袖寬鬆襯衫洋裝",
+      "selection": {
+        "dress": {
+          "type": "襯衫洋裝",
+          "cut": "長袖",
+          "neckline": "一字領",
+          "length": "",
+          "waist": "寬鬆",
+          "detail": "",
+          "slit": "",
+          "fabric": "雪紡"
+        }
+      },
+      "palette": [
+        "soft lavender dress"
+      ],
+      "image": "runway/v2-look-04-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 雪紡一字領長袖寬鬆襯衫洋裝. Structured design attributes: {\"dress\":{\"type\":\"襯衫洋裝\",\"cut\":\"長袖\",\"neckline\":\"一字領\",\"length\":\"\",\"waist\":\"寬鬆\",\"detail\":\"\",\"slit\":\"\",\"fabric\":\"雪紡\"}}. Coordinated colors: soft lavender dress.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "絲綢長版高領背心+天鵝絨金屬環高開衩迷你裙",
+      "selection": {
+        "top": {
+          "type": "背心",
+          "cut": "",
+          "neckline": "高領",
+          "length": "長版",
+          "fabric": "絲綢"
+        },
+        "bottom": {
+          "type": "迷你裙",
+          "rise": "",
+          "detail": "金屬環",
+          "slit": "高開衩",
+          "fabric": "天鵝絨"
+        }
+      },
+      "palette": [
+        "champagne top",
+        "charcoal skirt"
+      ],
+      "image": "runway/v2-look-05-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 絲綢長版高領背心+天鵝絨金屬環高開衩迷你裙. Structured design attributes: {\"top\":{\"type\":\"背心\",\"cut\":\"\",\"neckline\":\"高領\",\"length\":\"長版\",\"fabric\":\"絲綢\"},\"bottom\":{\"type\":\"迷你裙\",\"rise\":\"\",\"detail\":\"金屬環\",\"slit\":\"高開衩\",\"fabric\":\"天鵝絨\"}}. Coordinated colors: champagne top; charcoal skirt.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "title": "天鵝絨深V領細肩帶高腰胸前扭結及膝裹身洋裝",
+      "selection": {
+        "dress": {
+          "type": "裹身洋裝",
+          "cut": "細肩帶",
+          "neckline": "深V領",
+          "length": "及膝",
+          "waist": "高腰",
+          "detail": "胸前扭結",
+          "slit": "",
+          "fabric": "天鵝絨"
+        }
+      },
+      "palette": [
+        "deep teal dress"
+      ],
+      "image": "runway/v2-look-06-mannequin.png",
+      "presentation": "mannequin",
+      "prompt": "Use case: product-mockup. Create ONE vertical 2:3 professional clothing catalog photograph. Show the entire specified outfit on a visibly manufactured headless and armless neutral tailor's dress form with a simple stand, NO human model. Warm light-gray seamless studio, soft even light, crisp textile construction. Keep garments opaque and appropriately lined. No real person, face, hair, skin, text, numbers, logos, watermarks, collage or added accessories. Preserve all clothing design attributes in this Chinese description and structured specification: Original clothing description: 天鵝絨深V領細肩帶高腰胸前扭結及膝裹身洋裝. Structured design attributes: {\"dress\":{\"type\":\"裹身洋裝\",\"cut\":\"細肩帶\",\"neckline\":\"深V領\",\"length\":\"及膝\",\"waist\":\"高腰\",\"detail\":\"胸前扭結\",\"slit\":\"\",\"fabric\":\"天鵝絨\"}}. Coordinated colors: deep teal dress.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "failed",
+          "reason": "moderation_blocked",
+          "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 天鵝絨深V領細肩帶高腰胸前扭結及膝裹身洋裝. Structured design attributes: {\"dress\":{\"type\":\"裹身洋裝\",\"cut\":\"細肩帶\",\"neckline\":\"深V領\",\"length\":\"及膝\",\"waist\":\"高腰\",\"detail\":\"胸前扭結\",\"slit\":\"\",\"fabric\":\"天鵝絨\"}}. Coordinated colors: deep teal dress."
+        },
+        {
+          "presentation": "mannequin",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "title": "一字領露肩T恤+雪紡不對稱高開衩包臀短裙",
+      "selection": {
+        "top": {
+          "type": "T恤",
+          "cut": "露肩",
+          "neckline": "一字領",
+          "length": "",
+          "fabric": ""
+        },
+        "bottom": {
+          "type": "包臀短裙",
+          "rise": "",
+          "detail": "不對稱",
+          "slit": "高開衩",
+          "fabric": "雪紡"
+        }
+      },
+      "palette": [
+        "cream top",
+        "terracotta skirt"
+      ],
+      "image": "runway/v2-look-07-mannequin-corrected.png",
+      "presentation": "mannequin",
+      "prompt": "Use case: product-mockup. Create ONE vertical 2:3 professional clothing catalog photograph. Show the entire specified outfit on a visibly manufactured headless and armless neutral tailor's dress form with a simple stand, NO human model. Warm light-gray seamless studio, soft even light, crisp textile construction. Keep garments opaque and appropriately lined. No real person, face, hair, skin, text, numbers, logos, watermarks, collage or added accessories. Preserve all clothing design attributes in this Chinese description and structured specification: Original clothing description: 一字領露肩T恤+雪紡不對稱高開衩包臀短裙. Structured design attributes: {\"top\":{\"type\":\"T恤\",\"cut\":\"露肩\",\"neckline\":\"一字領\",\"length\":\"\",\"fabric\":\"\"},\"bottom\":{\"type\":\"包臀短裙\",\"rise\":\"\",\"detail\":\"不對稱\",\"slit\":\"高開衩\",\"fabric\":\"雪紡\"}}. Coordinated colors: cream top; terracotta skirt.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "failed",
+          "reason": "moderation_blocked",
+          "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 一字領露肩T恤+雪紡不對稱高開衩包臀短裙. Structured design attributes: {\"top\":{\"type\":\"T恤\",\"cut\":\"露肩\",\"neckline\":\"一字領\",\"length\":\"\",\"fabric\":\"\"},\"bottom\":{\"type\":\"包臀短裙\",\"rise\":\"\",\"detail\":\"不對稱\",\"slit\":\"高開衩\",\"fabric\":\"雪紡\"}}. Coordinated colors: cream top; terracotta skirt."
+        },
+        {
+          "presentation": "mannequin",
+          "status": "success"
+        }
+      ],
+      "edits": [
+        {
+          "prompt": "Edit this clothing product photograph. Change ONLY the terracotta chiffon skirt: make it a fitted, asymmetric SHORT bodycon skirt whose entire hem remains clearly above the knee, with a restrained diagonal hem and a visible high side slit. Remove the excessively long triangular hanging panel. Preserve the cream straight-across off-shoulder T-shirt exactly, the headless manufactured mannequin and stand, colors, chiffon texture, appropriate opaque lining, studio background, lighting and framing. No real person, text, numbers, logos, added accessories or other alterations.",
+          "reason": "Shorten the asymmetric skirt hem to match the short-skirt description."
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "title": "絲綢寬鬆荷葉邊側開衩短版旗袍",
+      "selection": {
+        "dress": {
+          "type": "旗袍",
+          "cut": "",
+          "neckline": "",
+          "length": "短版",
+          "waist": "寬鬆",
+          "detail": "荷葉邊",
+          "slit": "側開衩",
+          "fabric": "絲綢"
+        }
+      },
+      "palette": [
+        "pale jade dress"
+      ],
+      "image": "runway/v2-look-08-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 絲綢寬鬆荷葉邊側開衩短版旗袍. Structured design attributes: {\"dress\":{\"type\":\"旗袍\",\"cut\":\"\",\"neckline\":\"\",\"length\":\"短版\",\"waist\":\"寬鬆\",\"detail\":\"荷葉邊\",\"slit\":\"側開衩\",\"fabric\":\"絲綢\"}}. Coordinated colors: pale jade dress.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "title": "雪紡V領扭結上衣+高腰抓褶A字短裙",
+      "selection": {
+        "top": {
+          "type": "上衣",
+          "cut": "扭結",
+          "neckline": "V領",
+          "length": "",
+          "fabric": "雪紡"
+        },
+        "bottom": {
+          "type": "A字短裙",
+          "rise": "高腰",
+          "detail": "抓褶",
+          "slit": "",
+          "fabric": ""
+        }
+      },
+      "palette": [
+        "blush top",
+        "navy skirt"
+      ],
+      "image": "runway/v2-look-09-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 雪紡V領扭結上衣+高腰抓褶A字短裙. Structured design attributes: {\"top\":{\"type\":\"上衣\",\"cut\":\"扭結\",\"neckline\":\"V領\",\"length\":\"\",\"fabric\":\"雪紡\"},\"bottom\":{\"type\":\"A字短裙\",\"rise\":\"高腰\",\"detail\":\"抓褶\",\"slit\":\"\",\"fabric\":\"\"}}. Coordinated colors: blush top; navy skirt.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "title": "雪紡交領不對稱收腰百褶迷你改良和服",
+      "selection": {
+        "dress": {
+          "type": "改良和服",
+          "cut": "不對稱",
+          "neckline": "交領",
+          "length": "迷你",
+          "waist": "收腰",
+          "detail": "百褶",
+          "slit": "",
+          "fabric": "雪紡"
+        }
+      },
+      "palette": [
+        "ivory with pale pink trim"
+      ],
+      "image": "runway/v2-look-10-human.png",
+      "presentation": "human",
+      "prompt": "Use case: photorealistic-natural. Create ONE full-body commercial fashion catalog photograph of one clearly adult woman, age 30, wearing the specified finished clothing. Natural adult proportions, dark hair tied neatly back, neutral calm expression, standing upright front-facing with arms relaxed slightly away from the outfit so its silhouette is visible. Clean warm light-gray seamless studio, soft even professional lighting. Entire head, outfit, legs and plain shoes in frame, portrait 2:3 composition. Garments are opaque and appropriately lined while their specified material, texture and drape remain visible. Clothing design comparison is the purpose. No text, numbering, logos, watermark, collage, outer jackets, bags or extra accessories. Faithfully preserve the garment types and design attributes in the Chinese description and structured specification below. Empty fields mean no additional prescribed feature; do not turn unspecified fabric into an extra named material. Original clothing description: 雪紡交領不對稱收腰百褶迷你改良和服. Structured design attributes: {\"dress\":{\"type\":\"改良和服\",\"cut\":\"不對稱\",\"neckline\":\"交領\",\"length\":\"迷你\",\"waist\":\"收腰\",\"detail\":\"百褶\",\"slit\":\"\",\"fabric\":\"雪紡\"}}. Coordinated colors: ivory with pale pink trim.",
+      "attempts": [
+        {
+          "presentation": "human",
+          "status": "success"
+        }
+      ]
+    }
+  ]
+}

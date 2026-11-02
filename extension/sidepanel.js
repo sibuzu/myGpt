@@ -1,4 +1,4 @@
-import { generateAnimeCharacterBatch, generateImagePrompt } from './prompt-generator.js';
+import { generateAnimeCharacterBatch, generateImagePrompt, generateLifeStoryBatch, selectLifeStoryNumbers } from './prompt-generator.js';
 
 document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
 
@@ -391,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 重新初始化輸入框
     initializeMessageInput();
+    updatePromptOptions();
 
     if (isInputState(currentState)) {
       processPromptQueue();
@@ -407,7 +408,50 @@ document.addEventListener('DOMContentLoaded', function () {
   const genPromptBtn = document.getElementById('genPromptBtn');
   const promptStyle = document.getElementById('promptStyle');
   const promptCount = document.getElementById('promptCount');
+  const promptHelp = document.getElementById('promptHelp');
+  const promptStatus = document.getElementById('promptStatus');
+  const defaultPromptTitle = genPromptBtn.title;
+
+  function lifeStorySelection() {
+    const textContainer = messageInput.querySelector('.text-container');
+    return textContainer.innerText ?? textContainer.textContent;
+  }
+
+  function updatePromptOptions() {
+    const isLifeStory = promptStyle.value === 'life-story';
+    promptCount.disabled = isLifeStory;
+    promptHelp.hidden = !isLifeStory;
+    genPromptBtn.title = isLifeStory ? '依訊息框的排序編號產生生活故事，直接加入佇列' : defaultPromptTitle;
+    promptStatus.textContent = '';
+    if (isLifeStory) {
+      try {
+        promptStatus.textContent = `將產生 ${selectLifeStoryNumbers(lifeStorySelection()).length} 個 prompt。`;
+      } catch (error) {
+        promptStatus.textContent = error.message;
+      }
+    }
+  }
+
+  promptStyle.addEventListener('change', updatePromptOptions);
+  messageInput.addEventListener('input', updatePromptOptions);
+  updatePromptOptions();
+
   genPromptBtn.addEventListener('click', () => {
+    if (promptStyle.value === 'life-story') {
+      try {
+        const prompts = generateLifeStoryBatch(lifeStorySelection());
+        promptQueue.push(...prompts);
+        updatePromptList();
+        promptStatus.textContent = `已產生 ${prompts.length} 個 prompt，已加入 queue。`;
+        if (isInputState(currentState)) {
+          processPromptQueue();
+        }
+      } catch (error) {
+        promptStatus.textContent = error.message;
+      }
+      return;
+    }
+
     if (!promptCount.reportValidity()) return;
 
     const count = promptCount.valueAsNumber;

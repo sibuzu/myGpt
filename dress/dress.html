@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="拆解材質、領口、剪裁與配色，自由組合服裝描述詞。">
+  <title>DRESS — 服裝描述詞組合器</title>
+  <style>
+    :root {
+      --paper: #f7f6f2;
+      --white: #fff;
+      --ink: #242d29;
+      --muted: #737a72;
+      --line: #e5e7df;
+      --green: #345c48;
+      --green-light: #eef3ec;
+      --sand: #f7eee4;
+      --sand-ink: #8b6346;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button, select, input, textarea { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid #769f81; outline-offset: 3px; }
+    button:disabled { cursor: not-allowed; }
+    [hidden] { display: none !important; }
+    .page { max-width: 1280px; padding: 0 40px 40px; margin: auto; }
+    .masthead { min-height: 89px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark { width: 37px; height: 37px; display: grid; place-items: center; background: var(--green); color: white; border-radius: 10px; }
+    .brand-name { font-size: 20px; letter-spacing: .12em; font-weight: 750; }
+    .brand-note { font-size: 12px; color: var(--muted); border-left: 1px solid #cdd2c7; padding-left: 14px; margin-left: 3px; }
+    .masthead-note { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+    .dot { width: 6px; height: 6px; border-radius: 100%; background: #6b8b64; }
+    .hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 43px 0 31px; }
+    .eyebrow { color: var(--green); font-size: 11px; font-weight: 650; letter-spacing: .16em; margin: 0 0 11px; }
+    h1 { font-size: clamp(28px, 3.4vw, 41px); letter-spacing: -.04em; line-height: 1.3; margin: 0; font-weight: 650; }
+    .intro { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 12px 0 0; }
+    .actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; border-radius: 8px; border: 1px solid var(--line); background: white; padding: 10px 16px; font-size: 13px; font-weight: 550; color: var(--ink); transition: background .15s, border-color .15s; }
+    .button:hover { border-color: #a9b7a5; background: #f1f4ed; }
+    .button.primary { color: white; background: var(--green); border-color: var(--green); }
+    .button.primary:hover { background: #264735; }
+    svg { flex-shrink: 0; }
+    .preset-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 27px; flex-wrap: wrap; }
+    .small-label { font-size: 12px; color: var(--muted); }
+    .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+    .preset { border: 1px solid var(--line); background: transparent; color: #697267; padding: 8px 12px; border-radius: 6px; font-size: 12px; line-height: 1.4; }
+    .preset:hover { background: #ecefe7; }
+    .preset[aria-pressed="true"] { background: var(--green-light); color: var(--green); border-color: #c5d5c1; }
+    .mode-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 0 0 20px; }
+    .mode-switch { display: inline-flex; padding: 4px; gap: 4px; background: #e9ede3; border-radius: 9px; }
+    .mode-button { padding: 10px 17px; border: 0; border-radius: 6px; background: transparent; color: #687462; font-size: 13px; }
+    .mode-button[aria-pressed="true"] { background: white; color: var(--green); box-shadow: 0 1px 4px #243b2510; font-weight: 600; }
+    .examples-link { color: var(--green); text-underline-offset: 4px; font-size: 12px; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 356px; gap: 24px; align-items: start; }
+    .controls { min-width: 0; display: grid; gap: 20px; }
+    .garment-card { background: white; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 22px 24px 19px; border-bottom: 1px solid #f0f1ec; }
+    .card-title { display: flex; align-items: center; gap: 12px; }
+    .step { font-size: 11px; letter-spacing: .05em; color: var(--green); border: 1px solid #dce5d7; background: #f5f8f1; border-radius: 6px; padding: 6px; }
+    h2 { font-size: 17px; font-weight: 650; margin: 0; }
+    .card-subtitle { font-size: 11px; font-weight: 400; color: #969c91; margin-left: 8px; letter-spacing: .06em; }
+    .card-hint { font-size: 11px; color: var(--muted); }
+    .fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 21px 16px; padding: 23px 24px 25px; }
+    .field { min-width: 0; }
+    .field label { display: block; color: #656f62; font-size: 12px; font-weight: 550; margin-bottom: 9px; }
+    .select-wrap { position: relative; }
+    select { appearance: none; display: block; width: 100%; height: 44px; padding: 0 32px 0 12px; border: 1px solid #dfe3d9; border-radius: 7px; color: var(--ink); background-color: #fcfcfa; cursor: pointer; text-overflow: ellipsis; font-size: 13px; }
+    select:hover { border-color: #a6b6a0; }
+    select:disabled { background: #f3f3ef; color: #9b9f95; cursor: not-allowed; }
+    .select-wrap::after { content: ""; position: absolute; width: 6px; height: 6px; border-right: 1.5px solid #85907e; border-bottom: 1.5px solid #85907e; transform: rotate(45deg); top: 17px; right: 15px; pointer-events: none; }
+    .color-field select { padding-left: 35px; }
+    .color-dot { position: absolute; width: 14px; height: 14px; border: 1px solid #b7bdaf; border-radius: 50%; left: 12px; top: 15px; z-index: 1; pointer-events: none; }
+    .custom-input { width: 100%; min-height: 40px; border: 1px solid #b8cbb1; border-radius: 6px; padding: 9px 11px; margin-top: 8px; font-size: 13px; color: var(--ink); background: #f9fbf6; }
+    .controls-note { margin: -2px 2px 0; font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .controls-note svg { vertical-align: -3px; margin-right: 4px; }
+    .preview { position: sticky; top: 24px; background: #f0f3e9; border: 1px solid #dce3d3; border-radius: 13px; overflow: hidden; }
+    .preview-head { display: flex; justify-content: space-between; align-items: center; padding: 23px 23px 0; }
+    .preview-eyebrow { color: var(--green); font-size: 10px; letter-spacing: .15em; margin: 0 0 8px; }
+    .live { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: #6e7e65; }
+    .preview-body { padding: 24px 23px 21px; }
+    .result-label { display: flex; align-items: center; justify-content: space-between; color: #65775c; font-size: 11px; margin-bottom: 11px; }
+    .result { display: block; width: 100%; resize: none; overflow: hidden; border: 0; border-radius: 0; padding: 0; background: transparent; color: #284b35; font-size: 25px; font-weight: 600; line-height: 1.75; letter-spacing: -.025em; min-height: 132px; }
+    .prefix-option { display: flex; gap: 8px; align-items: center; font-size: 12px; color: #69795f; margin: 16px 0 20px; cursor: pointer; }
+    .prefix-option input { accent-color: var(--green); width: 14px; height: 14px; margin: 0; }
+    .copy-button { width: 100%; min-height: 46px; }
+    .copy-status { margin: 10px 0 0; font-size: 11px; color: #607451; min-height: 17px; text-align: center; line-height: 1.5; }
+    .breakdown { padding: 20px 23px 23px; background: rgba(255,255,255,.55); border-top: 1px solid #dce3d3; }
+    .breakdown-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 19px; }
+    .breakdown-header h3 { font-size: 12px; font-weight: 600; margin: 0; }
+    .breakdown-header span { color: #86917b; font-size: 10px; }
+    .token-group + .token-group { margin-top: 16px; }
+    .token-label { display: block; font-size: 10px; color: #8a9482; margin-bottom: 9px; }
+    .tokens { display: flex; flex-wrap: wrap; gap: 6px; }
+    .token { padding: 6px 9px; border: 1px solid #d8e1ce; border-radius: 5px; background: #e7eedf; color: #47613b; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; max-width: 100%; }
+    .token:hover { border-color: #769765; }
+    .token.bottom { background: var(--sand); color: var(--sand-ink); border-color: #ebdccb; }
+    .token.bottom:hover { border-color: #b99270; }
+    .join-mark { color: #9ba58e; font-size: 15px; margin: 10px 0 -5px; }
+    footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 33px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 11px; color: #969c90; line-height: 1.7; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @media (max-width: 1040px) {
+      .page { padding-inline: 25px; }
+      .workspace { grid-template-columns: minmax(0, 1fr) 310px; gap: 18px; }
+      .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero { align-items: flex-start; }
+      .card-hint { display: none; }
+    }
+    @media (max-width: 760px) {
+      .page { padding: 0 19px 25px; }
+      .masthead { min-height: 74px; }
+      .brand-note { display: none; }
+      .hero { padding-top: 29px; display: block; }
+      .intro { max-width: 310px; }
+      .actions { margin-top: 21px; }
+      .workspace { grid-template-columns: 1fr; }
+      .preview { position: static; }
+      .result { min-height: 88px; }
+      .preset-bar { gap: 9px; }
+      .small-label { width: 100%; }
+      .card-header { padding-inline: 20px; }
+      .fields { padding-inline: 20px; }
+      footer { display: block; }
+      footer span { display: block; margin-top: 4px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6a2 2 0 1 1 2 2v3L3 16a1.5 1.5 0 0 0 .8 2.8h16.4A1.5 1.5 0 0 0 21 16l-9-5"/></svg></span>
+        <span class="brand-name">DRESS</span>
+        <span class="brand-note">服裝描述詞組合器</span>
+      </div>
+      <span class="masthead-note"><span class="dot"></span>自由組合・即時產生</span>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">BUILD YOUR OUTFIT</p>
+        <h1 id="page-title">一件一件選，一句話完成。</h1>
+        <p class="intro">拆開材質、領口與剪裁，組成你的服裝描述詞。</p>
+      </div>
+      <div class="actions">
+        <button class="button" id="reset-button" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 1 7M3 4v6h6"/></svg>重設</button>
+        <button class="button primary" id="random-button" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h3c5 0 7 10 12 10h3M17 13l4 4-4 4M3 17h3c2 0 3-2 4-4m4-2c1-2 2-4 4-4h3m-4-4 4 4-4 4"/></svg>隨機搭配</button>
+      </div>
+    </section>
+
+    <nav class="preset-bar" aria-label="範例搭配">
+      <span class="small-label">從一組搭配開始</span>
+      <div class="presets" id="presets"></div>
+    </nav>
+
+    <div class="mode-bar">
+      <div class="mode-switch" role="group" aria-label="服裝模式">
+        <button class="mode-button" type="button" data-mode="separates" aria-pressed="true">上衣＋下身</button>
+        <button class="mode-button" type="button" data-mode="dress" aria-pressed="false">連身服裝</button>
+      </div>
+      <a class="examples-link" href="dress1.txt" download>下載 160 條無配色範例 ↗</a>
+    </div>
+
+    <main class="workspace">
+      <div class="controls">
+        <section class="garment-card" id="top-card" aria-labelledby="top-heading">
+          <div class="card-header">
+            <div class="card-title"><span class="step">01</span><h2 id="top-heading">上衣<span class="card-subtitle">TOP</span></h2></div>
+            <span class="card-hint">材質、領口、剪裁各自選</span>
+          </div>
+          <div class="fields" id="top-fields"></div>
+        </section>
+        <section class="garment-card" id="bottom-card" aria-labelledby="bottom-heading">
+          <div class="card-header">
+            <div class="card-title"><span class="step">02</span><h2 id="bottom-heading">下身<span class="card-subtitle">BOTTOM</span></h2></div>
+            <span class="card-hint">和上衣獨立配色、自由搭配</span>
+          </div>
+          <div class="fields" id="bottom-fields"></div>
+        </section>
+        <section class="garment-card" id="dress-card" aria-labelledby="dress-heading" hidden>
+          <div class="card-header">
+            <div class="card-title"><span class="step">01</span><h2 id="dress-heading">連身服裝<span class="card-subtitle">DRESS</span></h2></div>
+            <span class="card-hint">從款式開始，再選剪裁與領口</span>
+          </div>
+          <div class="fields" id="dress-fields"></div>
+        </section>
+        <p class="controls-note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10v6m0-9v1"/></svg>材質僅有雪紡、絲綢、天鵝絨、無；選「無」會省略材質。其他欄位可選「不指定」或「自訂…」。下身提供裙裝，剪裁與領口依款式篩選。</p>
+      </div>
+
+      <aside class="preview" aria-labelledby="preview-heading">
+        <div class="preview-head">
+          <div><p class="preview-eyebrow">YOUR OUTFIT</p><h2 id="preview-heading">你的服裝描述</h2></div>
+          <span class="live"><span class="dot"></span>即時</span>
+        </div>
+        <div class="preview-body">
+          <div class="result-label"><span>完整描述詞</span><span id="character-count"></span></div>
+          <textarea class="result" id="result" readonly rows="3" aria-label="完整服裝描述詞" spellcheck="false"></textarea>
+          <label class="prefix-option"><input type="checkbox" id="prefix">加上「身穿」</label>
+          <button class="button primary copy-button" id="copy-button" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span id="copy-label">複製描述詞</span></button>
+          <p class="copy-status" id="copy-status" role="status">可直接貼進你的生圖 prompt</p>
+        </div>
+        <div class="breakdown">
+          <div class="breakdown-header"><h3>描述詞拆解</h3><span>點詞彙回到選項</span></div>
+          <div class="token-group" id="top-token-group"><span class="token-label">上衣</span><div class="tokens" id="top-tokens"></div></div>
+          <div class="join-mark" id="join-mark" aria-hidden="true">+</div>
+          <div class="token-group" id="bottom-token-group"><span class="token-label">下身</span><div class="tokens" id="bottom-tokens"></div></div>
+          <div class="token-group" id="dress-token-group" hidden><span class="token-label">連身服裝</span><div class="tokens" id="dress-tokens"></div></div>
+        </div>
+      </aside>
+    </main>
+    <footer><span>DRESS / 讓每個服裝詞彙，都有自己的選擇。</span><span>選擇自動儲存在這個瀏覽器</span></footer>
+    <p class="sr-only" id="live-output" role="status" aria-live="polite"></p>
+    <noscript>請啟用 JavaScript，才能使用服裝描述詞組合器。</noscript>
+  </div>
+
+  <script>
+    'use strict';
+    const STORAGE_KEY = 'dress-builder-v1';
+    const CUSTOM = '__custom__';
+    const colors = {
+      '': 'transparent', '白色': '#ffffff', '象牙白色': '#f4f0df', '珍珠白色': '#eeece6',
+      '奶油白色': '#f5edce', '香檳色': '#e2ccaa', '奶茶色': '#c7ac8d', '淡粉色': '#f0c9cc',
+      '櫻花粉色': '#ecc2cc', '酒紅色': '#80334b', '淡綠色': '#bed5b5', '薄荷綠色': '#b8dbc9',
+      '墨綠色': '#325d4d', '霧藍色': '#adc4d0', '天空藍色': '#a2cde6', '深藍色': '#344967',
+      '淡紫色': '#cdc1df', '銀灰色': '#bbc0c2', '炭灰色': '#636765', '黑色': '#2e3031', '深黑色': '#141718'
+    };
+    const fabrics = ['雪紡', '絲綢', '天鵝絨', ''];
+    const sectionNames = { top: '上衣', bottom: '下身', dress: '連身服裝' };
+    const fields = {
+      top: [
+        { key: 'type', label: '款式', options: ['上衣', '襯衫', '背心', 'T恤'] },
+        { key: 'cut', label: '剪裁', options: ['', '掛脖', '細肩帶', '單肩', '露肩', '無肩帶', '不對稱', '交叉繫帶', '扭結', '馬甲式', '削肩'] },
+        { key: 'neckline', label: '領口', options: ['', '深V領', 'V領', 'U領', '方領', '圓領', '一字領', '斜領', '高領'] },
+        { key: 'color', label: '配色', options: Object.keys(colors) },
+        { key: 'fabric', label: '材質', options: fabrics },
+        { key: 'length', label: '衣長', options: ['', '短版', '長版'] }
+      ],
+      bottom: [
+        { key: 'type', label: '款式', options: ['迷你裙', '短裙', 'A字短裙', '百褶短裙', '鬱金香短裙', '包臀短裙'] },
+        { key: 'color', label: '配色', options: Object.keys(colors) },
+        { key: 'fabric', label: '材質', options: fabrics },
+        { key: 'rise', label: '腰線', options: ['', '高腰', '中腰', '低腰'] },
+        { key: 'detail', label: '細節', options: ['', '側綁帶', '交叉繫帶', '不對稱', '抓褶', '垂墜', '蝴蝶結', '金屬環'] },
+        { key: 'slit', label: '開衩', options: ['', '側開衩', '高開衩'] }
+      ],
+      dress: [
+        { key: 'type', label: '款式', options: ['洋裝', '襯衫洋裝', '裹身洋裝', '旗袍', '改良和服'] },
+        { key: 'cut', label: '剪裁', options: ['', '掛脖', '細肩帶', '單肩', '露肩', '無肩帶', '不對稱', '削肩', '無袖', '短袖', '長袖'] },
+        { key: 'neckline', label: '領口', options: ['', '深V領', 'V領', 'U領', '方領', '圓領', '一字領', '斜領', '高領', '立領', '交領'] },
+        { key: 'color', label: '配色', options: Object.keys(colors) },
+        { key: 'fabric', label: '材質', options: fabrics },
+        { key: 'length', label: '裙長', options: ['', '迷你', '短版', '及膝', '中長版', '長版'] },
+        { key: 'waist', label: '腰線', options: ['', '高腰', '收腰', '寬鬆'] },
+        { key: 'detail', label: '細節', options: ['', '腰側鏤空', '腰側綁帶', '胸前扭結', '抓褶', '垂墜', '荷葉邊', '百褶', '蝴蝶結'] },
+        { key: 'slit', label: '開衩', options: ['', '側開衩', '高開衩'] }
+      ]
+    };
+    const necklineRules = {
+      '掛脖': ['', '深V領', 'V領', 'U領', '圓領', '高領'],
+      '細肩帶': ['', '深V領', 'V領', 'U領', '方領'],
+      '單肩': ['', '斜領'], '露肩': ['', '一字領', 'V領'], '無肩帶': ['', '一字領'],
+      '削肩': ['', '圓領', '高領', '立領'], '馬甲式': ['', '深V領', 'V領', '方領']
+    };
+    const typeRules = {
+      top: {
+        '襯衫': { cuts: ['', '露肩', '不對稱', '扭結', '交叉繫帶', '削肩'] },
+        '背心': { cuts: ['', '掛脖', '細肩帶', '單肩', '無肩帶', '不對稱', '交叉繫帶', '扭結', '馬甲式', '削肩'] },
+        'T恤': { cuts: ['', '露肩', '不對稱', '扭結', '削肩'], necklines: ['', 'V領', 'U領', '圓領', '高領', '一字領', '斜領'], fabrics: [''] }
+      },
+      dress: {
+        '襯衫洋裝': { cuts: ['', '無袖', '短袖', '長袖', '露肩', '不對稱'] },
+        '裹身洋裝': { cuts: ['', '無袖', '短袖', '長袖', '細肩帶'], necklines: ['', '深V領', 'V領'] },
+        '旗袍': { cuts: ['', '無袖', '短袖', '長袖', '削肩'], necklines: ['', '高領', '立領'] },
+        '改良和服': { cuts: ['', '露肩', '不對稱', '短袖', '長袖'], necklines: ['', '深V領', 'V領', '交領'] }
+      }
+    };
+    const defaults = {
+      mode: 'separates',
+      top: { color: '', fabric: '雪紡', neckline: '深V領', cut: '掛脖', length: '', type: '上衣' },
+      bottom: { color: '', fabric: '', rise: '', detail: '側綁帶', slit: '', type: '迷你裙' },
+      dress: { color: '', fabric: '雪紡', neckline: '深V領', cut: '掛脖', length: '短版', waist: '', detail: '', slit: '側開衩', type: '洋裝' },
+      prefix: false
+    };
+    const clone = value => JSON.parse(JSON.stringify(value));
+    const presets = [
+      { name: '雪紡掛脖', state: defaults },
+      { name: '深V襯衫', state: {
+        top: { color: '白色', fabric: '', neckline: '深V領', cut: '', length: '', type: '襯衫' },
+        bottom: { color: '深黑色', fabric: '', rise: '', detail: '', slit: '高開衩', type: '迷你裙' }, prefix: false
+      } },
+      { name: '不對稱短版', state: {
+        top: { color: '象牙白色', fabric: '', neckline: '', cut: '不對稱', length: '短版', type: '上衣' },
+        bottom: { color: '香檳色', fabric: '', rise: '高腰', detail: '', slit: '', type: '鬱金香短裙' }, prefix: false
+      } },
+      { name: '夏日淡綠', state: {
+        top: { color: '淡綠色', fabric: '雪紡', neckline: '方領', cut: '細肩帶', length: '短版', type: '上衣' },
+        bottom: { color: '奶油白色', fabric: '', rise: '高腰', detail: '', slit: '', type: 'A字短裙' }, prefix: false
+      } },
+      { name: '雪紡短洋裝', state: { mode: 'dress' } },
+      { name: '絲綢裹身洋裝', state: {
+        mode: 'dress',
+        dress: { color: '', fabric: '絲綢', neckline: 'V領', cut: '無袖', length: '及膝', waist: '收腰', detail: '腰側綁帶', slit: '', type: '裹身洋裝' }
+      } }
+    ];
+    const order = {
+      top: ['color', 'fabric', 'length', 'neckline', 'cut', 'type'],
+      bottom: ['color', 'fabric', 'rise', 'detail', 'slit', 'type'],
+      dress: ['color', 'fabric', 'neckline', 'cut', 'waist', 'detail', 'slit', 'length', 'type']
+    };
+    let state = clone(defaults);
+    const customFields = new Set();
+    let copyVersion = 0;
+
+    function load() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!saved || typeof saved !== 'object') return;
+        for (const section of Object.keys(fields)) {
+          for (const field of fields[section]) {
+            const value = saved[section]?.[field.key];
+            if (typeof value === 'string' && value.length <= 40 && (value || field.key !== 'type')) {
+              state[section][field.key] = value;
+              if (!field.options.includes(value)) customFields.add(`${section}-${field.key}`);
+            }
+          }
+        }
+        state.mode = saved.mode === 'dress' ? 'dress' : 'separates';
+        state.prefix = saved.prefix === true;
+      } catch { /* The builder also works when browser storage is unavailable. */ }
+    }
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* Optional storage. */ }
+    }
+
+    function createFields() {
+      for (const section of Object.keys(fields)) {
+        const container = document.getElementById(`${section}-fields`);
+        for (const field of fields[section]) {
+          const id = `${section}-${field.key}`;
+          const wrapper = document.createElement('div');
+          wrapper.className = 'field';
+          const label = document.createElement('label');
+          label.htmlFor = id;
+          label.textContent = field.label;
+          const selectWrap = document.createElement('div');
+          selectWrap.className = `select-wrap${field.key === 'color' ? ' color-field' : ''}`;
+          const select = document.createElement('select');
+          select.id = id;
+          select.setAttribute('aria-label', `${sectionNames[section]}${field.label}`);
+          for (const value of field.key === 'fabric' ? field.options : [...field.options, CUSTOM]) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value === CUSTOM ? '自訂…' : value || (field.key === 'fabric' ? '無' : '不指定');
+            select.append(option);
+          }
+          const customInput = document.createElement('input');
+          customInput.id = `${id}-custom`;
+          customInput.className = 'custom-input';
+          customInput.type = 'text';
+          customInput.maxLength = 40;
+          customInput.placeholder = `輸入${field.label}`;
+          customInput.setAttribute('aria-label', `自訂${sectionNames[section]}${field.label}`);
+          customInput.hidden = true;
+          select.addEventListener('change', () => {
+            if (select.value === CUSTOM) {
+              customFields.add(id);
+              state[section][field.key] = '';
+              customInput.value = '';
+            } else {
+              customFields.delete(id);
+              state[section][field.key] = select.value;
+            }
+            update();
+            if (select.value === CUSTOM) customInput.focus();
+          });
+          customInput.addEventListener('input', () => {
+            state[section][field.key] = customInput.value.trim();
+            update();
+          });
+          selectWrap.append(select);
+          if (field.key === 'color') {
+            const dot = document.createElement('span');
+            dot.className = 'color-dot';
+            dot.id = `${id}-dot`;
+            dot.setAttribute('aria-hidden', 'true');
+            selectWrap.append(dot);
+          }
+          wrapper.append(label, selectWrap, customInput);
+          container.append(wrapper);
+        }
+      }
+    }
+
+    function allowedOptions(section, key, outfit = state[section]) {
+      const field = fields[section].find(item => item.key === key);
+      const rules = typeRules[section];
+      const rule = rules && Object.hasOwn(rules, outfit.type) ? rules[outfit.type] : undefined;
+      return field.options.filter(value => {
+        if (key === 'cut' && rule?.cuts && !rule.cuts.includes(value)) return false;
+        if (key === 'fabric' && rule?.fabrics && !rule.fabrics.includes(value)) return false;
+        if (key === 'neckline') {
+          if (rule?.necklines && !rule.necklines.includes(value)) return false;
+          const allowed = Object.hasOwn(necklineRules, outfit.cut) ? necklineRules[outfit.cut] : undefined;
+          if (allowed && !allowed.includes(value)) return false;
+          if (section === 'dress' && outfit.type !== '改良和服' && value === '交領') return false;
+        }
+        if (key === 'detail' && section === 'dress' && outfit.waist === '寬鬆' && value === '腰側鏤空') return false;
+        if (key === 'detail' && section === 'bottom' && outfit.type === '百褶短裙' && value === '抓褶') return false;
+        return true;
+      });
+    }
+
+    function normalize() {
+      for (const section of Object.keys(fields)) {
+        if (!allowedOptions(section, 'fabric').includes(state[section].fabric)) state[section].fabric = '';
+        customFields.delete(`${section}-fabric`);
+        if (section !== 'top' && !customFields.has(`${section}-detail`) && !allowedOptions(section, 'detail').includes(state[section].detail)) state[section].detail = '';
+      }
+      for (const section of ['top', 'dress']) {
+        for (const key of ['cut', 'neckline']) {
+          if (!customFields.has(`${section}-${key}`) && !allowedOptions(section, key).includes(state[section][key])) {
+            state[section][key] = '';
+          }
+        }
+      }
+      if (/褲/.test(state.bottom.type)) {
+        state.bottom.type = defaults.bottom.type;
+        customFields.delete('bottom-type');
+      }
+    }
+
+    function syncControls() {
+      const isDress = state.mode === 'dress';
+      for (const section of Object.keys(fields)) {
+        const visible = section === 'dress' ? isDress : !isDress;
+        document.getElementById(`${section}-card`).hidden = !visible;
+        document.getElementById(`${section}-token-group`).hidden = !visible;
+        for (const field of fields[section]) {
+          const id = `${section}-${field.key}`;
+          const select = document.getElementById(id);
+          const input = document.getElementById(`${id}-custom`);
+          const isCustom = customFields.has(id);
+          select.value = isCustom ? CUSTOM : state[section][field.key];
+          input.hidden = !isCustom;
+          if (document.activeElement !== input) input.value = state[section][field.key];
+          const allowed = allowedOptions(section, field.key);
+          for (const option of select.options) {
+            option.disabled = option.value !== CUSTOM && !allowed.includes(option.value);
+          }
+          if (field.key === 'color') {
+            document.getElementById(`${id}-dot`).style.background = colors[state[section].color] || '#d4c7e0';
+          }
+        }
+      }
+      document.getElementById('join-mark').hidden = isDress;
+      document.querySelectorAll('[data-mode]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.mode === state.mode));
+      });
+      document.getElementById('prefix').checked = state.prefix;
+    }
+
+    function buildDescription() {
+      const describe = section => order[section].map(key => state[section][key]).filter(Boolean).join('');
+      const outfit = state.mode === 'dress' ? describe('dress') : [describe('top'), describe('bottom')].filter(Boolean).join('+');
+      return outfit ? `${state.prefix ? '身穿' : ''}${outfit}` : '';
+    }
+
+    function renderTokens(section) {
+      const container = document.getElementById(`${section}-tokens`);
+      container.replaceChildren();
+      for (const key of order[section]) {
+        const value = state[section][key];
+        if (!value) continue;
+        const token = document.createElement('button');
+        token.type = 'button';
+        token.className = `token${section === 'bottom' ? ' bottom' : ''}`;
+        token.textContent = value;
+        const field = fields[section].find(item => item.key === key);
+        token.setAttribute('aria-label', `修改${sectionNames[section]}${field.label}：${value}`);
+        token.addEventListener('click', () => {
+          const id = `${section}-${key}`;
+          const target = document.getElementById(customFields.has(id) ? `${id}-custom` : id);
+          target.scrollIntoView({ block: 'center', behavior: 'auto' });
+          target.focus({ preventScroll: true });
+        });
+        container.append(token);
+      }
+    }
+
+    function update() {
+      normalize();
+      syncControls();
+      const result = document.getElementById('result');
+      result.value = buildDescription();
+      result.style.height = 'auto';
+      result.style.height = `${result.scrollHeight}px`;
+      document.getElementById('character-count').textContent = `${Array.from(result.value).length} 字`;
+      document.getElementById('live-output').textContent = result.value;
+      document.getElementById('copy-button').disabled = !result.value;
+      document.getElementById('copy-label').textContent = '複製描述詞';
+      document.getElementById('copy-status').textContent = '可直接貼進你的生圖 prompt';
+      copyVersion++;
+      for (const section of Object.keys(fields)) renderTokens(section);
+      document.querySelectorAll('[data-preset]').forEach(button => {
+        const preset = completeState(presets[Number(button.dataset.preset)].state);
+        const sections = state.mode === 'dress' ? ['dress'] : ['top', 'bottom'];
+        const matches = state.mode === preset.mode && sections.every(section => order[section].every(key => state[section][key] === preset[section][key]));
+        button.setAttribute('aria-pressed', String(matches));
+      });
+      save();
+    }
+
+    function completeState(next) {
+      const complete = { ...clone(defaults), ...clone(next) };
+      for (const section of Object.keys(fields)) complete[section] = { ...defaults[section], ...next[section] };
+      return complete;
+    }
+
+    function applyState(next) {
+      state = completeState(next);
+      customFields.clear();
+      for (const section of Object.keys(fields)) {
+        for (const field of fields[section]) {
+          if (!field.options.includes(state[section][field.key])) customFields.add(`${section}-${field.key}`);
+        }
+      }
+      update();
+    }
+
+    const pick = values => values[Math.floor(Math.random() * values.length)];
+    function randomize() {
+      const next = clone(state);
+      const sections = state.mode === 'dress' ? ['dress'] : ['top', 'bottom'];
+      for (const section of sections) {
+        for (const field of fields[section]) {
+          const allowed = allowedOptions(section, field.key, next[section]);
+          const nonEmpty = allowed.filter(Boolean);
+          next[section][field.key] = !nonEmpty.length || (allowed.includes('') && Math.random() < .4) ? '' : pick(nonEmpty);
+        }
+      }
+      applyState(next);
+    }
+
+    async function copyDescription() {
+      const result = document.getElementById('result');
+      const text = result.value;
+      const version = copyVersion;
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch { /* Try the local-file-compatible selection fallback below. */ }
+      if (version !== copyVersion) return;
+      if (!copied) {
+        const focused = document.activeElement;
+        const scrollPosition = { top: window.scrollY, left: window.scrollX };
+        result.focus({ preventScroll: true });
+        result.select();
+        try { copied = document.execCommand('copy'); } catch { copied = false; }
+        if (copied) {
+          focused?.focus({ preventScroll: true });
+          window.scrollTo(scrollPosition);
+        }
+      }
+      document.getElementById('copy-label').textContent = copied ? '已複製' : '文字已選取';
+      document.getElementById('copy-status').textContent = copied ? '已複製，可以貼到你的 prompt 了' : '請按 Ctrl+C 或 ⌘C 複製選取的文字';
+    }
+
+    load();
+    createFields();
+    presets.forEach((preset, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'preset';
+      button.textContent = preset.name;
+      button.dataset.preset = index;
+      button.addEventListener('click', () => applyState(preset.state));
+      document.getElementById('presets').append(button);
+    });
+    document.querySelectorAll('[data-mode]').forEach(button => {
+      button.addEventListener('click', () => {
+        state.mode = button.dataset.mode;
+        update();
+      });
+    });
+    document.getElementById('reset-button').addEventListener('click', () => applyState({ mode: state.mode }));
+    document.getElementById('random-button').addEventListener('click', randomize);
+    document.getElementById('copy-button').addEventListener('click', copyDescription);
+    document.getElementById('prefix').addEventListener('change', event => {
+      state.prefix = event.target.checked;
+      update();
+    });
+    window.addEventListener('resize', () => {
+      const result = document.getElementById('result');
+      result.style.height = 'auto';
+      result.style.height = `${result.scrollHeight}px`;
+    });
+    update();
+  </script>
+</body>
+</html>

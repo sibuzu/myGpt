@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="第 1–10 套服裝樣式預覽，可放大圖片與複製服裝描述。">
+  <title>RUNWAY — 服裝樣式預覽 01–10</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif; color: #29322c; background: #f7f6f2; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; cursor: pointer; }
+    a { color: inherit; text-underline-offset: 4px; }
+    :focus-visible { outline: 3px solid #678b70; outline-offset: 4px; }
+    .page { max-width: 1480px; margin: auto; padding: 0 40px 35px; }
+    .masthead { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid #e1e4dc; }
+    .brand { display: flex; align-items: baseline; gap: 14px; text-decoration: none; }
+    .brand strong { font-size: 21px; letter-spacing: .16em; font-weight: 700; }
+    .brand span { font-size: 12px; color: #8a9286; }
+    .nav { display: flex; gap: 22px; font-size: 12px; color: #6d7869; }
+    .nav a { text-decoration: none; }
+    .nav a:hover { color: #2e5a3d; text-decoration: underline; }
+    .hero { padding: 42px 0 28px; display: flex; justify-content: space-between; gap: 24px; align-items: end; }
+    .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .18em; color: #597553; margin: 0 0 12px; }
+    h1 { font-size: clamp(28px, 3vw, 40px); line-height: 1.3; font-weight: 600; margin: 0; letter-spacing: -.04em; }
+    .intro { font-size: 13px; line-height: 1.9; color: #7a8374; margin: 12px 0 0; }
+    .collection { color: #71836a; text-align: right; white-space: nowrap; }
+    .collection strong { display: block; font: 45px/1.1 Georgia, serif; color: #4c6641; letter-spacing: -.06em; }
+    .collection span { display: block; margin-top: 9px; font-size: 10px; letter-spacing: .16em; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid #e3e5df; font-size: 11px; color: #8a9384; }
+    .toolbar strong { color: #5a7151; font-size: 12px; font-weight: 550; }
+    .gallery { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 25px 18px; }
+    .look { min-width: 0; background: #fff; border: 1px solid #e1e4db; border-radius: 10px; overflow: hidden; }
+    .look-preview { display: block; position: relative; border: 0; background: #ebe8e3; width: 100%; padding: 0; aspect-ratio: 2/3; color: #fff; overflow: hidden; }
+    .look-preview img { display: block; width: 100%; height: 100%; object-fit: contain; transition: transform .25s ease; }
+    .look-preview:hover img { transform: scale(1.025); }
+    .zoom-hint { position: absolute; bottom: 12px; right: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; background: #26372bc9; border: 1px solid #ffffff45; padding: 7px 9px; border-radius: 5px; opacity: 0; transition: opacity .15s; pointer-events: none; }
+    .look-preview:hover .zoom-hint, .look-preview:focus-visible .zoom-hint { opacity: 1; }
+    .image-error { display: block; color: #6a7567; padding: 25px; font-size: 12px; }
+    .look-info { padding: 17px 15px 14px; }
+    .look-number { color: #69805f; font-size: 10px; letter-spacing: .1em; display: block; margin-bottom: 8px; }
+    h2 { margin: 0; font-size: 13px; font-weight: 550; line-height: 1.85; min-height: 49px; overflow-wrap: anywhere; }
+    .copy-button { margin-top: 14px; padding: 8px 0 0; width: 100%; border: 0; border-top: 1px solid #eeefe9; display: flex; align-items: center; gap: 6px; background: transparent; color: #8b9485; font-size: 10px; text-align: left; }
+    .copy-button:hover { color: #345c48; }
+    .status { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); border-radius: 7px; background: #304b38; box-shadow: 0 4px 20px #1d382a22; color: #fff; padding: 12px 18px; font-size: 12px; max-width: calc(100% - 32px); text-align: center; z-index: 5; }
+    .status:empty { display: none; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 37px; padding-top: 19px; border-top: 1px solid #e1e4dc; color: #929a8b; font-size: 10px; line-height: 1.8; }
+    dialog { width: min(1050px, calc(100vw - 36px)); max-height: 94vh; padding: 0; overflow: auto; background: #f7f6f2; color: #29322c; border: 1px solid #dce0d5; border-radius: 12px; box-shadow: 0 20px 80px #17231b30; }
+    dialog::backdrop { background: #142019ba; backdrop-filter: blur(5px); }
+    .dialog-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(250px, 1fr); }
+    .dialog-picture { background: #eae7e1; display: grid; place-items: center; min-width: 0; }
+    .dialog-picture img { display: block; width: 100%; height: min(85vh, 920px); object-fit: contain; }
+    .dialog-details { padding: 65px 30px 28px; display: flex; flex-direction: column; min-width: 0; }
+    .dialog-number { font: 48px/1 Georgia, serif; color: #53704b; margin: 0 0 25px; }
+    .dialog-title { font-size: 20px; font-weight: 550; line-height: 1.8; overflow-wrap: anywhere; margin: 0 0 25px; min-height: 0; }
+    .dialog-note { color: #87917f; line-height: 1.9; font-size: 12px; margin: 0 0 24px; }
+    .dialog-controls { margin-top: auto; }
+    .button { width: 100%; border: 1px solid #d4dece; border-radius: 6px; min-height: 41px; background: #eaf0e5; color: #42613a; padding: 10px 12px; font-size: 12px; text-align: center; text-decoration: none; display: block; }
+    .button:hover { background: #dde8d6; }
+    .download { font-size: 11px; color: #7e8e75; display: block; text-align: center; margin: 14px 0 23px; }
+    .pagination { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 15px; border-top: 1px solid #dfe4d7; font-size: 10px; color: #87947e; }
+    .page-button { width: 35px; height: 35px; border: 1px solid #d8dfd0; border-radius: 6px; background: white; color: #4f6a45; font-size: 20px; }
+    .close-button { position: absolute; top: 13px; right: 13px; width: 34px; height: 34px; border: 1px solid #d9dfd2; border-radius: 50%; background: #fffffff0; color: #53694a; font-size: 23px; line-height: 1; z-index: 1; }
+    @media (max-width: 1150px) { .gallery { grid-template-columns: repeat(4, minmax(0,1fr)); } .page { padding-inline: 28px; } }
+    @media (max-width: 900px) { .gallery { grid-template-columns: repeat(3, minmax(0,1fr)); } .dialog-layout { grid-template-columns: minmax(0,1.3fr) minmax(230px,1fr); } .dialog-details { padding-inline: 22px; } }
+    @media (max-width: 640px) {
+      .page { padding-inline: 18px; } .masthead { min-height: 73px; } .brand span { display: none; } .nav { gap: 13px; font-size: 11px; }
+      .hero { padding-top: 30px; gap: 14px; } .collection strong { font-size: 34px; } .intro { font-size: 12px; }
+      .gallery { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px 12px; } .look-info { padding: 13px 11px 12px; } h2 { font-size: 12px; min-height: 68px; }
+      .toolbar { font-size: 10px; gap: 20px; } .toolbar span { text-align: right; } .zoom-hint { opacity: 1; font-size: 9px; padding: 5px 7px; }
+      .dialog-layout { display: block; } .dialog-picture img { height: 58vh; } .dialog-details { padding: 25px 23px; }
+      .dialog-number { font-size: 32px; margin-bottom: 13px; } .dialog-title { font-size: 18px; margin-bottom: 12px; } .dialog-note { margin-bottom: 17px; }
+    }
+    @media (max-width: 360px) { .gallery { grid-template-columns: 1fr; } h2 { min-height: auto; } .collection { display: none; } }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <a class="brand" href="runway.html" aria-label="RUNWAY 服裝樣式預覽"><strong>RUNWAY</strong><span>服裝樣式預覽</span></a>
+      <nav class="nav" aria-label="服裝工具"><a href="dress.html">服裝組合器 ↗</a><a href="dress1.txt">160 款詞庫 ↗</a></nav>
+    </header>
+    <section class="hero" aria-labelledby="page-title">
+      <div><p class="eyebrow">THE FIRST TEN / STYLE STUDY</p><h1 id="page-title">先看樣式，再挑搭配。</h1><p class="intro">從 160 款中選出的 10 款代表樣式；真人穿搭優先，個別款式使用人台。</p></div>
+      <div class="collection" aria-label="第 1 至第 10 款"><strong>01—10</strong><span>OUTFIT COLLECTION</span></div>
+    </section>
+    <div class="toolbar"><strong>10 套服裝・8 張真人／2 張人台</strong><span>點圖片放大查看，左右鍵切換款式</span></div>
+    <main class="gallery" id="gallery" aria-label="第 1 至第 10 套服裝"></main>
+    <footer><span>RUNWAY / 依 dress1.txt 的原始編號展示</span><span>圖片為樣式示意，配色僅作展示；衣服名稱省略顏色。</span></footer>
+  </div>
+  <dialog id="look-dialog" aria-labelledby="dialog-title">
+    <form method="dialog"><button class="close-button" aria-label="關閉放大圖片" autofocus>×</button></form>
+    <div class="dialog-layout">
+      <div class="dialog-picture"><img id="dialog-image" alt="" width="1024" height="1536"></div>
+      <div class="dialog-details">
+        <p class="dialog-number" id="dialog-number"></p>
+        <h2 class="dialog-title" id="dialog-title"></h2>
+        <p class="dialog-note">比對領口、剪裁與裙型。<br>服裝名稱保留原始描述，不含配色。</p>
+        <div class="dialog-controls">
+          <button class="button" type="button" id="dialog-copy">複製服裝描述詞</button>
+          <a class="download" id="dialog-download" download>下載這張樣式圖 ↗</a>
+          <div class="pagination"><button class="page-button" id="previous" type="button" aria-label="上一套服裝">‹</button><span id="dialog-position"></span><button class="page-button" id="next" type="button" aria-label="下一套服裝">›</button></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <noscript>請啟用 JavaScript，以查看 10 套服裝圖片與名稱。</noscript>
+  <script id="look-data" type="application/json">
+[
+  {
+    "number": 1,
+    "title": "圓領掛脖上衣+雪紡中腰側開衩百褶短裙",
+    "image": "runway/v2-look-01-human.png"
+  },
+  {
+    "number": 2,
+    "title": "方領短袖垂墜高開衩長版洋裝",
+    "image": "runway/v2-look-02-human.png"
+  },
+  {
+    "number": 3,
+    "title": "天鵝絨短版不對稱襯衫+絲綢低腰垂墜鬱金香短裙",
+    "image": "runway/v2-look-03-human.png"
+  },
+  {
+    "number": 4,
+    "title": "雪紡一字領長袖寬鬆襯衫洋裝",
+    "image": "runway/v2-look-04-human.png"
+  },
+  {
+    "number": 5,
+    "title": "絲綢長版高領背心+天鵝絨金屬環高開衩迷你裙",
+    "image": "runway/v2-look-05-human.png"
+  },
+  {
+    "number": 6,
+    "title": "天鵝絨深V領細肩帶高腰胸前扭結及膝裹身洋裝",
+    "image": "runway/v2-look-06-mannequin.png"
+  },
+  {
+    "number": 7,
+    "title": "一字領露肩T恤+雪紡不對稱高開衩包臀短裙",
+    "image": "runway/v2-look-07-mannequin-corrected.png"
+  },
+  {
+    "number": 8,
+    "title": "絲綢寬鬆荷葉邊側開衩短版旗袍",
+    "image": "runway/v2-look-08-human.png"
+  },
+  {
+    "number": 9,
+    "title": "雪紡V領扭結上衣+高腰抓褶A字短裙",
+    "image": "runway/v2-look-09-human.png"
+  },
+  {
+    "number": 10,
+    "title": "雪紡交領不對稱收腰百褶迷你改良和服",
+    "image": "runway/v2-look-10-human.png"
+  }
+]
+  </script>
+  <script>
+    'use strict';
+    const looks = JSON.parse(document.getElementById('look-data').textContent);
+    const dialog = document.getElementById('look-dialog');
+    let current = 0;
+    let opener = null;
+    let statusTimer;
+
+    function showStatus(message) {
+      clearTimeout(statusTimer);
+      document.getElementById('status').textContent = message;
+      statusTimer = setTimeout(() => { document.getElementById('status').textContent = ''; }, 3500);
+    }
+
+    async function copyLook(look) {
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(look.title);
+          copied = true;
+        }
+      } catch { /* Use the selection fallback for local files. */ }
+      if (!copied) {
+        const field = document.createElement('textarea');
+        field.value = look.title;
+        field.setAttribute('readonly', '');
+        field.style.cssText = 'position:fixed;left:0;top:0;opacity:0;width:1px;height:1px';
+        // A modal dialog makes the rest of the document inert.
+        (dialog.open ? dialog : document.body).append(field);
+        const focused = document.activeElement;
+        field.focus({ preventScroll: true });
+        field.select();
+        try { copied = document.execCommand('copy'); } catch { copied = false; }
+        field.remove();
+        focused?.focus({ preventScroll: true });
+      }
+      showStatus(copied ? '已複製第 ' + look.number + ' 款服裝描述' : '請選取服裝名稱，按 ⌘C 或 Ctrl+C 複製');
+      document.getElementById('dialog-copy').textContent = copied ? '已複製服裝描述詞' : '複製服裝描述詞';
+    }
+
+    function renderDialog() {
+      const look = looks[current];
+      document.getElementById('dialog-image').src = look.image;
+      document.getElementById('dialog-image').alt = '第 ' + look.number + ' 款：' + look.title;
+      document.getElementById('dialog-number').textContent = String(look.number).padStart(2, '0');
+      document.getElementById('dialog-title').textContent = look.title;
+      document.getElementById('dialog-position').textContent = (current + 1) + ' / ' + looks.length;
+      document.getElementById('dialog-download').href = look.image;
+      document.getElementById('dialog-copy').textContent = '複製服裝描述詞';
+    }
+
+    function openLook(index, trigger) {
+      current = index;
+      opener = trigger;
+      renderDialog();
+      dialog.showModal();
+    }
+
+    function step(direction) {
+      current = (current + direction + looks.length) % looks.length;
+      renderDialog();
+    }
+
+    for (const [index, look] of looks.entries()) {
+      const card = document.createElement('article');
+      card.className = 'look';
+      const preview = document.createElement('button');
+      preview.type = 'button';
+      preview.className = 'look-preview';
+      preview.setAttribute('aria-label', '放大第 ' + look.number + ' 款：' + look.title);
+      const image = document.createElement('img');
+      image.src = look.image;
+      image.alt = look.title;
+      image.width = 1024;
+      image.height = 1536;
+      image.loading = index < 5 ? 'eager' : 'lazy';
+      image.decoding = 'async';
+      image.addEventListener('error', () => {
+        image.hidden = true;
+        const error = document.createElement('span');
+        error.className = 'image-error';
+        error.textContent = '圖片無法讀取，請確認 runway 圖片資料夾在相同位置。';
+        preview.append(error);
+      }, { once: true });
+      const hint = document.createElement('span');
+      hint.className = 'zoom-hint';
+      hint.textContent = '↗ 放大';
+      hint.setAttribute('aria-hidden', 'true');
+      preview.append(image, hint);
+      preview.addEventListener('click', () => openLook(index, preview));
+      const info = document.createElement('div');
+      info.className = 'look-info';
+      const number = document.createElement('span');
+      number.className = 'look-number';
+      number.textContent = 'LOOK ' + String(look.number).padStart(2, '0');
+      const title = document.createElement('h2');
+      title.textContent = look.title;
+      const copy = document.createElement('button');
+      copy.type = 'button';
+      copy.className = 'copy-button';
+      copy.textContent = '⧉ 複製服裝描述';
+      copy.setAttribute('aria-label', '複製第 ' + look.number + ' 款服裝描述');
+      copy.addEventListener('click', () => copyLook(look));
+      info.append(number, title, copy);
+      card.append(preview, info);
+      document.getElementById('gallery').append(card);
+    }
+
+    document.getElementById('previous').addEventListener('click', () => step(-1));
+    document.getElementById('next').addEventListener('click', () => step(1));
+    document.getElementById('dialog-copy').addEventListener('click', () => copyLook(looks[current]));
+    dialog.addEventListener('keydown', event => {
+      if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1); }
+      if (event.key === 'ArrowRight') { event.preventDefault(); step(1); }
+    });
+    dialog.addEventListener('click', event => {
+      const box = dialog.getBoundingClientRect();
+      if (event.target === dialog && (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom)) dialog.close();
+    });
+    dialog.addEventListener('close', () => { opener?.focus({ preventScroll: true }); });
+  </script>
+</body>
+</html>
+
