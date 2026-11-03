@@ -19,7 +19,9 @@ export function createAnimeOutfitBatch(sourcePrompts, transform = prompt => prom
     if (!text) return Array.from({ length: size }, (_, index) => index + 1);
 
     const numbers = new Set();
-    for (const part of text.split(/[,，、\n]/)) {
+    // Treat whitespace around punctuation as part of the separator so that
+    // comma-separated lists can wrap across lines without creating empty items.
+    for (const part of text.split(/\s*[,，、]\s*|[\r\n]+/)) {
       const token = part.trim();
       const match = token.match(/^(\d+)#(\d+)(?:\s*-\s*(?:(\d+)#(\d+))?)?$/);
       if (!match) {

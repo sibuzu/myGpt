@@ -23,6 +23,17 @@ test('selects eight inclusive outfits across characters and deduplicates mixed s
   assert.equal(generateAnimeDressBatch('63#4', keepOrderAndText).length, 1);
 });
 
+test('accepts comma-separated selections wrapped across lines', () => {
+  const expected = selectAnimeDressNumbers('01#1,01#2,01#4-03#3,04#1-05#4,06#2-07#3,08#2,09#1');
+  for (const separator of [',\n', ',\r\n', '，\n', '、\n', ', \n  ']) {
+    assert.deepEqual(selectAnimeDressNumbers([
+      '01#1,01#2,01#4-03#3',
+      '04#1-05#4,06#2-07#3',
+      '08#2,09#1',
+    ].join(separator)), expected);
+  }
+});
+
 test('shuffles the complete selection before drawing appearance variations, without losing outfits', () => {
   let draws = 0;
   const prompts = generateAnimeDressBatch('56#1 - 57#4', () => ++draws <= 7 ? 0 : 0.5);
