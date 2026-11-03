@@ -26,7 +26,7 @@ class Element {
   }
 }
 
-test('life story previews the count and directly appends ordered batches to the queue', async t => {
+test('message-selected styles preview counts and directly append their batches to the queue', async t => {
   const previousDocument = globalThis.document;
   const previousChrome = globalThis.chrome;
   t.after(() => {
@@ -97,6 +97,48 @@ test('life story previews the count and directly appends ordered batches to the 
   await getElement('genPromptBtn').trigger('click');
   assert.equal(queue.children.length, 284);
   assert.equal(status.textContent, '已產生 160 個 prompt，已加入 queue。');
+
+  await getElement('clearQueue').trigger('click');
+  t.mock.method(Math, 'random', () => 0.999);
+  style.value = 'anime-dress';
+  await style.trigger('change');
+  assert.equal(count.disabled, true);
+  assert.equal(getElement('promptHelp').hidden, false);
+  assert.match(getElement('promptHelp').textContent, /56#1 - 57#4/);
+  assert.equal(status.textContent, '將產生 252 個 prompt。');
+
+  text().textContent = '63#4';
+  await input.trigger('input');
+  assert.equal(status.textContent, '將產生 1 個 prompt。');
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 1);
+  assert.match(queue.children[0].textContent, /^1\. 63#4｜山城鐘樓的暮色/);
+  assert.equal(status.textContent, '已產生 1 個 prompt，已加入 queue。');
+
+  text().textContent = '56#1 - 57#4';
+  await input.trigger('input');
+  assert.equal(status.textContent, '將產生 8 個 prompt。');
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 9);
+  assert.match(queue.children[1].textContent, /^2\. 56#1｜/);
+  assert.match(queue.children.at(-1).textContent, /^9\. 57#4｜/);
+  assert.equal(status.textContent, '已產生 8 個 prompt，已加入 queue。');
+  assert.equal(text().textContent, '56#1 - 57#4');
+
+  text().textContent = '64#1';
+  await getElement('genPromptBtn').trigger('click');
+  assert.match(status.textContent, /角色編號須介於/);
+  assert.equal(queue.children.length, 9);
+
+  text().textContent = '';
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 261);
+  assert.equal(status.textContent, '已產生 252 個 prompt，已加入 queue。');
+
+  style.value = 'life-story';
+  await style.trigger('change');
+  assert.equal(status.textContent, '將產生 160 個 prompt。');
+  assert.match(getElement('promptHelp').textContent, /原始編號/);
 
   style.value = 'natural';
   await style.trigger('change');

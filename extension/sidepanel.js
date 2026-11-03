@@ -1,4 +1,8 @@
-import { generateAnimeCharacterBatch, generateImagePrompt, generateLifeStoryBatch, selectLifeStoryNumbers } from './prompt-generator.js';
+import {
+  generateAnimeCharacterBatch, generateImagePrompt,
+  LIFE_STORY_SIZE, generateLifeStoryBatch, selectLifeStoryNumbers,
+  ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers
+} from './prompt-generator.js';
 
 document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
 
@@ -411,21 +415,36 @@ document.addEventListener('DOMContentLoaded', function () {
   const promptHelp = document.getElementById('promptHelp');
   const promptStatus = document.getElementById('promptStatus');
   const defaultPromptTitle = genPromptBtn.title;
+  const messageBatchStyles = {
+    'life-story': {
+      select: selectLifeStoryNumbers,
+      generate: generateLifeStoryBatch,
+      title: '依訊息框的原始編號產生生活故事，直接加入佇列',
+      help: `訊息框留空產生全部 ${LIFE_STORY_SIZE} 個；或輸入原始編號，例如 1, 10-15, 45-。`
+    },
+    'anime-dress': {
+      select: selectAnimeDressNumbers,
+      generate: generateAnimeDressBatch,
+      title: '依訊息框的角色與套裝編號產生動漫衣服，打亂順序後直接加入佇列',
+      help: `訊息框留空產生全部 ${ANIME_DRESS_SIZE} 個；例如 56#1 - 57#4 為 8 個，可用逗號分隔。產生時先打亂順序，每則有 10% 機率加上「、胸部圓潤」。`
+    }
+  };
 
-  function lifeStorySelection() {
+  function messageSelection() {
     const textContainer = messageInput.querySelector('.text-container');
     return textContainer.innerText ?? textContainer.textContent;
   }
 
   function updatePromptOptions() {
-    const isLifeStory = promptStyle.value === 'life-story';
-    promptCount.disabled = isLifeStory;
-    promptHelp.hidden = !isLifeStory;
-    genPromptBtn.title = isLifeStory ? '依訊息框的原始編號產生生活故事，直接加入佇列' : defaultPromptTitle;
+    const batchStyle = messageBatchStyles[promptStyle.value];
+    promptCount.disabled = Boolean(batchStyle);
+    promptHelp.hidden = !batchStyle;
+    promptHelp.textContent = batchStyle?.help ?? '';
+    genPromptBtn.title = batchStyle?.title ?? defaultPromptTitle;
     promptStatus.textContent = '';
-    if (isLifeStory) {
+    if (batchStyle) {
       try {
-        promptStatus.textContent = `將產生 ${selectLifeStoryNumbers(lifeStorySelection()).length} 個 prompt。`;
+        promptStatus.textContent = `將產生 ${batchStyle.select(messageSelection()).length} 個 prompt。`;
       } catch (error) {
         promptStatus.textContent = error.message;
       }
@@ -437,9 +456,10 @@ document.addEventListener('DOMContentLoaded', function () {
   updatePromptOptions();
 
   genPromptBtn.addEventListener('click', () => {
-    if (promptStyle.value === 'life-story') {
+    const batchStyle = messageBatchStyles[promptStyle.value];
+    if (batchStyle) {
       try {
-        const prompts = generateLifeStoryBatch(lifeStorySelection());
+        const prompts = batchStyle.generate(messageSelection());
         promptQueue.push(...prompts);
         updatePromptList();
         promptStatus.textContent = `已產生 ${prompts.length} 個 prompt，已加入 queue。`;
