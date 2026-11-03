@@ -5,6 +5,7 @@ import { createAnimeGenerator } from './prompt-generators/anime.js';
 import { ANIME_BATCH_CHARACTER_IDS, generateAnimeBatch } from './prompt-generators/anime-batch.js';
 export { LIFE_STORY_SIZE, generateLifeStoryBatch, selectLifeStoryNumbers } from './prompt-generators/life-story.js';
 export { ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers } from './prompt-generators/anime-dress.js';
+export { ANIME_COMPLETE_SIZE, generateAnimeCompleteBatch, selectAnimeCompleteNumbers } from './prompt-generators/anime-complete.js';
 
 function createLook(text, clothingClauses = [0]) {
   return { text, details: text.split('，').filter((_, index) => !clothingClauses.includes(index)) };

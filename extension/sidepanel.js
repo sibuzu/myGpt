@@ -1,7 +1,8 @@
 import {
   generateAnimeCharacterBatch, generateImagePrompt,
   LIFE_STORY_SIZE, generateLifeStoryBatch, selectLifeStoryNumbers,
-  ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers
+  ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers,
+  ANIME_COMPLETE_SIZE, generateAnimeCompleteBatch, selectAnimeCompleteNumbers
 } from './prompt-generator.js';
 
 document.title = `MyGPT ${chrome.runtime.getManifest().version}`;
@@ -427,6 +428,12 @@ document.addEventListener('DOMContentLoaded', function () {
       generate: generateAnimeDressBatch,
       title: '依訊息框的角色與套裝編號產生動漫衣服，打亂順序後直接加入佇列',
       help: `訊息框留空產生全部 ${ANIME_DRESS_SIZE} 個；例如 56#1 - 57#4 為 8 個，可用逗號分隔。產生時先打亂順序，每則有 10% 機率加上「、胸部圓潤」。`
+    },
+    'anime-complete': {
+      select: selectAnimeCompleteNumbers,
+      generate: generateAnimeCompleteBatch,
+      title: '依訊息框的角色與套裝編號產生動漫全集，打亂順序後直接加入佇列',
+      help: `訊息框留空產生全部 ${ANIME_COMPLETE_SIZE} 個；例如 56#1 - 57#4 為 8 個，可用逗號分隔。使用含角色名稱與標題的完整提示詞，打亂順序後加入佇列。`
     }
   };
 
