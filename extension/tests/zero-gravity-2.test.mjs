@@ -9,7 +9,7 @@ test('zero-gravity-2 uses the requested two-paragraph format through the public 
   assert.equal(paragraphs.length, 2);
   assert.match(paragraphs[0], /^獨立生圖： 9:16，一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
   assert.match(paragraphs[0], /呈現自然光影與柔和的日系美感。$/);
-  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+，與上張圖不同\n視角:[^\n]+，與上張圖不同$/);
+  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+\n視角:[^\n]+$/);
   assert.doesNotMatch(prompt, /主色：|視覺特效：|表情：|視角：|\{[^}]+\}/);
 });
 
@@ -63,21 +63,21 @@ test('samples floating poses and camera angles independently without consecutive
   assert.ok(angles.length >= 15);
   assert.equal(new Set(poses).size, poses.length);
   assert.equal(new Set(angles).size, angles.length);
-  assert.ok(first.endsWith(`姿勢:${poses[0]}，與上張圖不同\n視角:${angles[0]}，與上張圖不同`));
+  assert.ok(first.endsWith(`姿勢:${poses[0]}\n視角:${angles[0]}`));
 
   const second = generator.generate();
   const [nextPoses, nextAngles] = selections.slice(-2);
   assert.deepEqual(nextPoses, poses.slice(1));
   assert.deepEqual(nextAngles, angles.slice(1));
-  assert.ok(second.endsWith(`姿勢:${poses[1]}，與上張圖不同\n視角:${angles[1]}，與上張圖不同`));
+  assert.ok(second.endsWith(`姿勢:${poses[1]}\n視角:${angles[1]}`));
 
   const choose = (poseIndex, angleIndex) => createZeroGravity2Generator({ pick: options => {
     if (options.includes(poses[1])) return options[poseIndex];
     if (options.includes(angles[1])) return options[angleIndex];
     return options[0];
   } }).generate().split('\n').slice(-2);
-  assert.deepEqual(choose(1, 0), [`姿勢:${poses[1]}，與上張圖不同`, `視角:${angles[0]}，與上張圖不同`]);
-  assert.deepEqual(choose(0, 1), [`姿勢:${poses[0]}，與上張圖不同`, `視角:${angles[1]}，與上張圖不同`]);
+  assert.deepEqual(choose(1, 0), [`姿勢:${poses[1]}`, `視角:${angles[0]}`]);
+  assert.deepEqual(choose(0, 1), [`姿勢:${poses[0]}`, `視角:${angles[1]}`]);
 });
 
 test('supports every direction and camera combination plus the random option', () => {
@@ -93,6 +93,6 @@ test('supports every direction and camera combination plus the random option', (
       }
       return options[0];
     } });
-    assert.ok(generator.generate().endsWith(`視角:${angle}，與上張圖不同`));
+    assert.ok(generator.generate().endsWith(`視角:${angle}`));
   }
 });

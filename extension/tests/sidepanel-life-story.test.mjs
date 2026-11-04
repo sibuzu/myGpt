@@ -222,6 +222,6 @@ test('message-selected styles preview counts and directly append their batches t
   count.valueAsNumber = 1;
   await getElement('genPromptBtn').trigger('click');
   assert.equal(text().textContent.split('\n\n').length, 2);
-  assert.match(text().textContent, /＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+，與上張圖不同\n視角:[^\n]+，與上張圖不同$/);
+  assert.match(text().textContent, /＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+\n視角:[^\n]+$/);
   assert.equal(queue.children.length, 3);
 });
