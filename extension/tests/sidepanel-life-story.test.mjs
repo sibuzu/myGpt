@@ -209,4 +209,19 @@ test('message-selected styles preview counts and directly append their batches t
   assert.match(text().textContent, /地點： 無重力空間/);
   assert.ok(text().textContent.endsWith('\n畫面比例： 9:16'));
   assert.equal(queue.children.length, 3);
+
+  await getElement('clearQueue').trigger('click');
+  style.value = 'zero-gravity-2';
+  await style.trigger('change');
+  assert.equal(count.disabled, false);
+  assert.equal(getElement('promptHelp').hidden, true);
+  count.valueAsNumber = 3;
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 3);
+  for (const item of queue.children) assert.match(item.textContent, /獨立生圖： 9:16，/);
+  count.valueAsNumber = 1;
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(text().textContent.split('\n\n').length, 2);
+  assert.match(text().textContent, /＋.+迷你裙（.+），無重力空間，天空。$/);
+  assert.equal(queue.children.length, 3);
 });
