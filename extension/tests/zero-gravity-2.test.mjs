@@ -79,3 +79,20 @@ test('samples floating poses and camera angles independently without consecutive
   assert.deepEqual(choose(1, 0), [`姿勢:${poses[1]}，與上張圖不同`, `視角:${angles[0]}，與上張圖不同`]);
   assert.deepEqual(choose(0, 1), [`姿勢:${poses[0]}，與上張圖不同`, `視角:${angles[1]}，與上張圖不同`]);
 });
+
+test('supports every direction and camera combination plus the random option', () => {
+  const directions = ['正面', '左前方30度', '左前方45度', '右前方30度', '右前方45度', '左後方四分之三視角', '右後方四分之三視角'];
+  const cameras = ['平視', '高角度俯拍', '略高角度俯拍', '低機位仰拍', '略低機位仰拍', '鳥瞰', '傾斜15度'];
+  const expected = ['隨機視角', ...directions.flatMap(direction => cameras.map(camera => direction + camera))];
+  for (const angle of expected) {
+    const generator = createZeroGravity2Generator({ pick: options => {
+      if (options.includes('正面平視')) {
+        assert.deepEqual(new Set(options), new Set(expected));
+        assert.equal(options.length, 50);
+        return angle;
+      }
+      return options[0];
+    } });
+    assert.ok(generator.generate().endsWith(`視角:${angle}，與上張圖不同`));
+  }
+});
