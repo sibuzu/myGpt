@@ -207,6 +207,6 @@ test('message-selected styles preview counts and directly append their batches t
   count.valueAsNumber = 1;
   await getElement('genPromptBtn').trigger('click');
   assert.match(text().textContent, /地點： 無重力空間/);
-  assert.ok(text().textContent.endsWith('\n畫面比例： 16:9'));
+  assert.ok(text().textContent.endsWith('\n畫面比例： 9:16'));
   assert.equal(queue.children.length, 3);
 });

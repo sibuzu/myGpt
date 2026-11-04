@@ -7,18 +7,17 @@ export function createZeroGravityGenerator({ pick }) {
     '掛脖上衣', '削肩上衣', '平口抹胸', '方領上衣', '深V領上衣',
     '裹身式上衣', '交叉綁帶上衣', '繞頸露背上衣', '不對稱剪裁上衣', '抽繩抓皺上衣',
     '泡泡袖上衣', '燈籠袖上衣', '荷葉邊上衣', '蝴蝶結上衣',
-    '針織開襟衫', '薄紗罩衫', '短版飛行外套', '短版騎士皮衣', '短版丹寧外套',
-    '短版西裝背心'
+    '開襟衫', '罩衫', '短版外套','短版背心','改良式短版和服','改良式短版旗袍','改良式短版洋裝'
   ];
   const skirtOptions = [
     ['一般迷你', '短版迷你', '超迷你'],
-    ['低腰', '中腰', '高腰', '超高腰'],
-    ['平口裙襬', '斜口裙襬', '波浪裙襬', '花瓣裙襬', '鋸齒裙襬'],
-    ['無開衩', '側開衩', '前開衩', '雙側開衩'],
-    ['高級純棉', '復古丹寧', '柔軟皮革', '絲緞', '精緻蕾絲', '透明薄紗', '雪紡', '歐根紗'],
-    ['單層', '雙層', '多層', '異材質拼接', '可拆卸裝飾結構'],
-    ['蝴蝶結', '金屬扣', '隱形拉鍊', '手工刺繡', '水晶', '珍珠', '立體花朵', '金屬鍊飾'],
-    ['修身', '直筒', 'A字', '傘狀', '蓬鬆']
+    ['低腰', '中腰', '高腰', '超高腰', ''],
+    ['平口裙襬', '斜口裙襬', '波浪裙襬', '花瓣裙襬', '鋸齒裙襬', ''],
+    ['無開衩', '側開衩', '前開衩', '雙側開衩', ''],
+    ['純棉', '復古丹寧', '絲緞', '精緻蕾絲', '雪紡', ''],
+    ['單層', '雙層', '多層', '異材質拼接', '可拆卸裝飾結構', ''],
+    ['蝴蝶結', '金屬扣', '隱形拉鍊', '手工刺繡', '水晶', '珍珠', '立體花朵', '金屬鍊飾', ''],
+    ['修身', '直筒', 'A字', '傘狀', '蓬鬆', '']
   ];
   const palettes = [
     ['曜石黑', '香檳金', '象牙白'],
@@ -59,10 +58,11 @@ export function createZeroGravityGenerator({ pick }) {
   function generate() {
     const palette = pick(palettes.filter(option => option !== previousPalette));
     previousPalette = palette;
-    const design = skirtOptions.map(options => pick(options));
+    const design = skirtOptions.map(options => options.length ? pick(options) : '');
     // Mixed-material construction needs a second, distinct fabric.
-    if (design[5] === '異材質拼接') {
-      design[4] += `與${pick(skirtOptions[4].filter(material => material !== design[4]))}`;
+    if (design[5] === '異材質拼接' && design[4]) {
+      const otherMaterials = skirtOptions[4].filter(material => material && material !== design[4]);
+      if (otherMaterials.length) design[4] += `與${pick(otherMaterials)}`;
     }
     const top = pick(topOptions);
     const [primary, secondary, accent] = palette;
@@ -70,12 +70,12 @@ export function createZeroGravityGenerator({ pick }) {
       subject,
       `地點： 無重力空間，天空。`,
       `主色： ${primary}｜輔色： ${secondary}｜點綴： ${accent}`,
-      `迷你裙： ${design.join('、')}`,
+      `迷你裙： ${design.filter(Boolean).join('、')}`,
       `上衣: ${top}。`,
       `視覺特效： ${pick(effects)}｜光線： ${pick(lights)}。特效需與服裝主題、角色氣質、環境光線自然融合。`,
       `表情：${pick(expressions)}`,
       `視角：${pick(angles)}`,
-      '畫面比例： 16:9'
+      '畫面比例： 9:16'
     ].join('\n');
   }
 
