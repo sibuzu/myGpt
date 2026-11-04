@@ -60,7 +60,7 @@ export function createZeroGravity2Generator({ pick }) {
     }
     const details = design.filter(Boolean).join('、');
     const skirt = `迷你裙${details ? `（${details}）` : ''}`;
-    return `獨立生圖： 9:16，**姿勢和視角要和上張圖不同**，一位氣質${pick(outlookOptions)}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。`;
+    return `獨立生圖： 9:16，一位氣質${pick(outlookOptions)}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。\n姿勢:AI決定，與上張圖不同\n視角:AI決定，與上張圖不同`;
   }
 
   return { generate };

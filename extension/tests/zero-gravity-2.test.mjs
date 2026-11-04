@@ -7,19 +7,19 @@ test('zero-gravity-2 uses the requested two-paragraph format through the public 
   const prompt = generateImagePrompt('zero-gravity-2');
   const paragraphs = prompt.split('\n\n');
   assert.equal(paragraphs.length, 2);
-  assert.match(paragraphs[0], /^獨立生圖： 9:16，\*\*姿勢和視角要和上張圖不同\*\*，一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
+  assert.match(paragraphs[0], /^獨立生圖： 9:16，一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
   assert.match(paragraphs[0], /呈現自然光影與柔和的日系美感。$/);
-  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。$/);
+  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。\n姿勢:AI決定，與上張圖不同\n視角:AI決定，與上張圖不同$/);
   assert.doesNotMatch(prompt, /主色：|視覺特效：|表情：|視角：|\{[^}]+\}/);
 });
 
 test('varies temperament, palette, top and skirt independently', () => {
   const first = createZeroGravity2Generator({ pick: options => options[0] }).generate();
   assert.match(first, /一位氣質清新自然、/);
-  assert.equal(first.split('\n\n')[1], '曜石黑修身襯衫＋香檳金迷你裙（迷你、低腰、平口裙襬、無開衩、純棉、單層、蝴蝶結、修身），無重力空間，天空。');
+  assert.equal(first.split('\n\n')[1].split('\n')[0], '曜石黑修身襯衫＋香檳金迷你裙（迷你、低腰、平口裙襬、無開衩、純棉、單層、蝴蝶結、修身），無重力空間，天空。');
   const last = createZeroGravity2Generator({ pick: options => options.at(-1) }).generate();
   assert.match(last, /一位氣質陽光開朗、/);
-  assert.equal(last.split('\n\n')[1], '覆盆莓紅改良式短版洋裝＋深紫迷你裙（超迷你），無重力空間，天空。');
+  assert.equal(last.split('\n\n')[1].split('\n')[0], '覆盆莓紅改良式短版洋裝＋深紫迷你裙（超迷你），無重力空間，天空。');
 
   let paletteCount;
   const generate = (paletteIndex, topIndex, skirtIndex) => createZeroGravity2Generator({ pick: options => {
@@ -31,7 +31,7 @@ test('varies temperament, palette, top and skirt independently', () => {
     if (options.includes('迷你')) return options[skirtIndex];
     if (options.includes('')) return '';
     return options[0];
-  } }).generate().split('\n\n')[1];
+  } }).generate().split('\n\n')[1].split('\n')[0];
   assert.equal(generate(1, 0, 0), '冰川藍修身襯衫＋月光銀迷你裙（迷你），無重力空間，天空。');
   assert.equal(generate(0, 1, 0), '曜石黑精緻針織衫＋香檳金迷你裙（迷你），無重力空間，天空。');
   assert.equal(generate(0, 0, 1), '曜石黑修身襯衫＋香檳金迷你裙（短版迷你），無重力空間，天空。');
