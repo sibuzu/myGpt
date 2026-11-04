@@ -211,6 +211,22 @@ test('message-selected styles preview counts and directly append their batches t
   assert.equal(queue.children.length, 3);
 
   await getElement('clearQueue').trigger('click');
+  style.value = 'zero-gravity-3';
+  await style.trigger('change');
+  assert.equal(count.disabled, false);
+  assert.equal(getElement('promptHelp').hidden, true);
+  count.valueAsNumber = 3;
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 3);
+  for (const item of queue.children) assert.match(item.textContent, /獨立生圖：一位氣質/);
+  count.valueAsNumber = 1;
+  await getElement('genPromptBtn').trigger('click');
+  assert.match(text().textContent, /^獨立生圖：一位氣質[^，]+的成年日本年輕女性，身穿/);
+  assert.ok(text().textContent.endsWith('，在無重力空間的天空，細膩寫實，細節豐富，4K，高品質畫面，直式 9:16 。'));
+  assert.doesNotMatch(text().textContent, /\n/);
+  assert.equal(queue.children.length, 3);
+
+  await getElement('clearQueue').trigger('click');
   style.value = 'zero-gravity-2';
   await style.trigger('change');
   assert.equal(count.disabled, false);
@@ -222,6 +238,6 @@ test('message-selected styles preview counts and directly append their batches t
   count.valueAsNumber = 1;
   await getElement('genPromptBtn').trigger('click');
   assert.equal(text().textContent.split('\n\n').length, 2);
-  assert.match(text().textContent, /＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+\n視角:[^\n]+$/);
+  assert.match(text().textContent, /＋.+迷你裙（.+），無重力空間，天空。$/);
   assert.equal(queue.children.length, 3);
 });

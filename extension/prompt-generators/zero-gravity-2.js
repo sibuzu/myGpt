@@ -100,7 +100,8 @@ export function createZeroGravity2Generator({ pick }) {
     const angle = pick(angleOptions.filter(option => option !== previousAngle));
     previousPose = pose;
     previousAngle = angle;
-    return `獨立生圖： 9:16，一位氣質${outlook}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。\n姿勢:${pose}\n視角:${angle}`;
+    return `獨立生圖： 9:16，一位氣質${outlook}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。`;
+    // \n姿勢:${pose}\n視角:${angle}`;
   }
 
   return { generate };

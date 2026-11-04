@@ -9,7 +9,7 @@ test('zero-gravity-2 uses the requested two-paragraph format through the public 
   assert.equal(paragraphs.length, 2);
   assert.match(paragraphs[0], /^獨立生圖： 9:16，一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
   assert.match(paragraphs[0], /呈現自然光影與柔和的日系美感。$/);
-  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。\n姿勢:[^\n]+\n視角:[^\n]+$/);
+  assert.match(paragraphs[1], /^.+＋.+迷你裙（.+），無重力空間，天空。$/);
   assert.doesNotMatch(prompt, /主色：|視覺特效：|表情：|視角：|\{[^}]+\}/);
 });
 
@@ -51,48 +51,12 @@ test('skips empty skirt parameters and combines distinct nonempty fabrics', () =
   assert.doesNotMatch(mixed, /、、|、）|undefined/);
 });
 
-test('samples floating poses and camera angles independently without consecutive repeats', () => {
-  const selections = [];
-  const generator = createZeroGravity2Generator({ pick: options => {
-    selections.push(options);
-    return options[0];
-  } });
-  const first = generator.generate();
-  const [poses, angles] = selections.slice(-2);
-  assert.ok(poses.length >= 15);
-  assert.ok(angles.length >= 15);
-  assert.equal(new Set(poses).size, poses.length);
-  assert.equal(new Set(angles).size, angles.length);
-  assert.ok(first.endsWith(`姿勢:${poses[0]}\n視角:${angles[0]}`));
-
-  const second = generator.generate();
-  const [nextPoses, nextAngles] = selections.slice(-2);
-  assert.deepEqual(nextPoses, poses.slice(1));
-  assert.deepEqual(nextAngles, angles.slice(1));
-  assert.ok(second.endsWith(`姿勢:${poses[1]}\n視角:${angles[1]}`));
-
-  const choose = (poseIndex, angleIndex) => createZeroGravity2Generator({ pick: options => {
-    if (options.includes(poses[1])) return options[poseIndex];
-    if (options.includes(angles[1])) return options[angleIndex];
-    return options[0];
-  } }).generate().split('\n').slice(-2);
-  assert.deepEqual(choose(1, 0), [`姿勢:${poses[1]}`, `視角:${angles[0]}`]);
-  assert.deepEqual(choose(0, 1), [`姿勢:${poses[0]}`, `視角:${angles[1]}`]);
-});
-
-test('supports every direction and camera combination plus the random option', () => {
-  const directions = ['正面', '左前方30度', '左前方45度', '右前方30度', '右前方45度', '左後方四分之三視角', '右後方四分之三視角'];
-  const cameras = ['平視', '高角度俯拍', '略高角度俯拍', '低機位仰拍', '略低機位仰拍', '鳥瞰', '傾斜15度'];
-  const expected = ['隨機視角', ...directions.flatMap(direction => cameras.map(camera => direction + camera))];
-  for (const angle of expected) {
-    const generator = createZeroGravity2Generator({ pick: options => {
-      if (options.includes('正面平視')) {
-        assert.deepEqual(new Set(options), new Set(expected));
-        assert.equal(options.length, 50);
-        return angle;
-      }
-      return options[0];
-    } });
-    assert.ok(generator.generate().endsWith(`視角:${angle}`));
+test('keeps the output to two paragraphs without pose or camera lines', () => {
+  const generator = createZeroGravity2Generator({ pick: options => options[0] });
+  for (let i = 0; i < 2; i++) {
+    const prompt = generator.generate();
+    assert.equal(prompt.split('\n').length, 3);
+    assert.ok(prompt.endsWith('，無重力空間，天空。'));
+    assert.doesNotMatch(prompt, /姿勢:|視角:/);
   }
 });

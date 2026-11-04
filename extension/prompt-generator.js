@@ -4,6 +4,7 @@ import { createBeautifulGenerator } from './prompt-generators/beautiful.js';
 import { createAnimeGenerator } from './prompt-generators/anime.js';
 import { createZeroGravityGenerator } from './prompt-generators/zero-gravity.js';
 import { createZeroGravity2Generator } from './prompt-generators/zero-gravity-2.js';
+import { createZeroGravity3Generator } from './prompt-generators/zero-gravity-3.js';
 import { ANIME_BATCH_CHARACTER_IDS, generateAnimeBatch } from './prompt-generators/anime-batch.js';
 export { LIFE_STORY_SIZE, generateLifeStoryBatch, selectLifeStoryNumbers } from './prompt-generators/life-story.js';
 export { ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers } from './prompt-generators/anime-dress.js';
@@ -118,6 +119,7 @@ const beautiful = createBeautifulGenerator(common);
 const anime = createAnimeGenerator(common);
 const zeroGravity = createZeroGravityGenerator(common);
 const zeroGravity2 = createZeroGravity2Generator(common);
+const zeroGravity3 = createZeroGravity3Generator(common);
 
 export const ANIME_BATCH_SIZE = ANIME_BATCH_CHARACTER_IDS.length;
 
@@ -130,6 +132,7 @@ export function generateImagePrompt(style = 'natural') {
   if (style === 'beautiful-sexy') return beautiful.generateLegacy();
   if (style === 'zero-gravity') return zeroGravity.generate();
   if (style === 'zero-gravity-2') return zeroGravity2.generate();
+  if (style === 'zero-gravity-3') return zeroGravity3.generate();
   const context = natural.nextContext();
   switch (style) {
     case 'beautiful-sexy-2': return beautiful.generate(context);
