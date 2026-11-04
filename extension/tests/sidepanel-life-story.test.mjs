@@ -16,6 +16,7 @@ class Element {
   querySelector(selector) { return this.children.find(child => `.${child.className}` === selector); }
   querySelectorAll() { return []; }
   focus() {}
+  dispatchEvent() {}
   reportValidity() { return Number.isInteger(this.valueAsNumber) && this.valueAsNumber > 0; }
   addEventListener(type, callback) {
     if (!this.listeners.has(type)) this.listeners.set(type, []);
@@ -44,6 +45,7 @@ test('message-selected styles preview counts and directly append their batches t
   globalThis.document = {
     getElementById: getElement,
     createElement: () => new Element(),
+    createRange: () => ({ selectNodeContents() {}, collapse() {} }),
     querySelectorAll: () => [],
     addEventListener: (type, callback) => { if (type === 'DOMContentLoaded') ready = callback; }
   };
@@ -180,4 +182,31 @@ test('message-selected styles preview counts and directly append their batches t
   assert.equal(count.disabled, false);
   assert.equal(getElement('promptHelp').hidden, true);
   assert.equal(status.textContent, '');
+
+  // The random style follows the existing single-input and multi-prompt queue flow.
+  await getElement('clearQueue').trigger('click');
+  style.value = 'zero-gravity';
+  await style.trigger('change');
+  assert.equal(count.disabled, false);
+  assert.equal(getElement('promptHelp').hidden, true);
+  count.valueAsNumber = 3;
+  await getElement('genPromptBtn').trigger('click');
+  assert.equal(queue.children.length, 3);
+  for (const item of queue.children) assert.match(item.textContent, /20歲日本年輕女性/);
+
+  const previousWindow = globalThis.window;
+  const previousInputEvent = globalThis.InputEvent;
+  t.after(() => {
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+    if (previousInputEvent === undefined) delete globalThis.InputEvent;
+    else globalThis.InputEvent = previousInputEvent;
+  });
+  globalThis.window = { getSelection: () => ({ removeAllRanges() {}, addRange() {} }) };
+  globalThis.InputEvent = class {};
+  count.valueAsNumber = 1;
+  await getElement('genPromptBtn').trigger('click');
+  assert.match(text().textContent, /地點： 無重力空間/);
+  assert.ok(text().textContent.endsWith('\n畫面比例： 16:9'));
+  assert.equal(queue.children.length, 3);
 });

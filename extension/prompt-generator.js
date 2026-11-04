@@ -2,6 +2,7 @@
 import { createNaturalGenerator } from './prompt-generators/natural.js';
 import { createBeautifulGenerator } from './prompt-generators/beautiful.js';
 import { createAnimeGenerator } from './prompt-generators/anime.js';
+import { createZeroGravityGenerator } from './prompt-generators/zero-gravity.js';
 import { ANIME_BATCH_CHARACTER_IDS, generateAnimeBatch } from './prompt-generators/anime-batch.js';
 export { LIFE_STORY_SIZE, generateLifeStoryBatch, selectLifeStoryNumbers } from './prompt-generators/life-story.js';
 export { ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers } from './prompt-generators/anime-dress.js';
@@ -114,6 +115,7 @@ const common = { createLook, pick, chooseGaze, naturalInteractions, clothingScen
 const natural = createNaturalGenerator(common);
 const beautiful = createBeautifulGenerator(common);
 const anime = createAnimeGenerator(common);
+const zeroGravity = createZeroGravityGenerator(common);
 
 export const ANIME_BATCH_SIZE = ANIME_BATCH_CHARACTER_IDS.length;
 
@@ -124,6 +126,7 @@ export function generateAnimeCharacterBatch(count = ANIME_BATCH_SIZE) {
 export function generateImagePrompt(style = 'natural') {
   // Keep the older programmatic style key compatible with its original generator.
   if (style === 'beautiful-sexy') return beautiful.generateLegacy();
+  if (style === 'zero-gravity') return zeroGravity.generate();
   const context = natural.nextContext();
   switch (style) {
     case 'beautiful-sexy-2': return beautiful.generate(context);
