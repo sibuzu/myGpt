@@ -4,11 +4,12 @@ import test from 'node:test';
 import { generateImagePrompt } from '../prompt-generator.js';
 import { createZeroGravityGenerator } from '../prompt-generators/zero-gravity.js';
 
-test('zero-gravity prompts preserve the source template and end with 9:16', async () => {
+test('zero-gravity prompts preserve the source visual style and end with 9:16', async () => {
   const source = await readFile(new URL('../../dress/無重力.md', import.meta.url), 'utf8');
   const template = source.split('TEMPLATE:\n\n')[1].split('\n\n\nEXAMPLE:')[0];
   const prompt = generateImagePrompt('zero-gravity');
-  assert.equal(prompt.split('\n')[0], template.split('\n')[0]);
+  assert.match(prompt.split('\n')[0], /^獨立生圖：一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
+  assert.equal(prompt.split('\n')[0].replace(/^獨立生圖：一位氣質[^、]+、胸部圓潤的/, ''), `${template.split('。')[0]}。`);
   assert.match(prompt.split('\n')[4], /^上衣: .+。$/);
   assert.doesNotMatch(prompt.split('\n')[4], /自由設計|可搭配|或是/);
   for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '視角']) {
@@ -17,6 +18,22 @@ test('zero-gravity prompts preserve the source template and end with 9:16', asyn
   assert.equal(prompt.split('\n')[1], '地點： 無重力空間，天空。');
   assert.doesNotMatch(prompt, /\{[^}]+\}|16:9/);
   assert.ok(prompt.endsWith('\n畫面比例： 9:16'));
+});
+
+test('fills the outlook placeholder with at least ten distinct temperament choices', () => {
+  const outlooks = new Set();
+  let index = 0;
+  const generator = createZeroGravityGenerator({ pick: options =>
+    options.includes('清新自然') ? options[index++ % options.length] : options[0]
+  });
+  for (let i = 0; i < 20; i++) {
+    const prompt = generator.generate();
+    outlooks.add(prompt.match(/一位氣質([^、]+)、/)[1]);
+    assert.doesNotMatch(prompt, /\{outlook\}/);
+  }
+  assert.ok(outlooks.size >= 10);
+  assert.ok(outlooks.has('清新自然'));
+  assert.ok(outlooks.has('陽光開朗'));
 });
 
 test('samples all eight skirt parameters and uses different palettes on consecutive calls', () => {

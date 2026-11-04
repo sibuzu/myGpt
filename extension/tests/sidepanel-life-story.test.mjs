@@ -192,7 +192,7 @@ test('message-selected styles preview counts and directly append their batches t
   count.valueAsNumber = 3;
   await getElement('genPromptBtn').trigger('click');
   assert.equal(queue.children.length, 3);
-  for (const item of queue.children) assert.match(item.textContent, /20歲日本年輕女性/);
+  for (const item of queue.children) assert.match(item.textContent, /獨立生圖：一位氣質/);
 
   const previousWindow = globalThis.window;
   const previousInputEvent = globalThis.InputEvent;

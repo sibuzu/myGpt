@@ -1,6 +1,12 @@
 // 無重力: template and design choices from dress/無重力.md.
 export function createZeroGravityGenerator({ pick }) {
-  const subject = '20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。圓潤的胸前、纖細的腰身、修長的雙腿。';
+  const subject = '獨立生圖：一位氣質{outlook}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。';
+  const outlookOptions = [
+    '清新自然', '溫柔婉約', '甜美可愛', '優雅知性', '清冷高雅',
+    '自信大方', '活潑俏皮', '沉靜內斂', '浪漫夢幻', '明朗爽快',
+    '神秘空靈', '端莊秀麗', '率性灑脫', '柔美細膩', '慵懶從容',
+    '靈動輕盈', '文藝恬靜', '高貴典雅', '英氣俐落', '陽光開朗'
+  ];
   const topOptions = [
     '修身襯衫', '精緻針織衫', '絲緞上衣', '馬甲上衣',
     '細肩帶上衣', '斜肩帶上衣', '露肩上衣', '短版套裝上衣',
@@ -67,7 +73,7 @@ export function createZeroGravityGenerator({ pick }) {
     const top = pick(topOptions);
     const [primary, secondary, accent] = palette;
     return [
-      subject,
+      subject.replace('{outlook}', pick(outlookOptions)),
       `地點： 無重力空間，天空。`,
       `主色： ${primary}｜輔色： ${secondary}｜點綴： ${accent}`,
       `迷你裙： ${design.filter(Boolean).join('、')}`,
