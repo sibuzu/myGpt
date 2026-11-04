@@ -72,8 +72,8 @@ test('samples floating poses and camera angles independently without consecutive
   assert.ok(second.endsWith(`姿勢:${poses[1]}，與上張圖不同\n視角:${angles[1]}，與上張圖不同`));
 
   const choose = (poseIndex, angleIndex) => createZeroGravity2Generator({ pick: options => {
-    if (options.includes(poses[0])) return options[poseIndex];
-    if (options.includes(angles[0])) return options[angleIndex];
+    if (options.includes(poses[1])) return options[poseIndex];
+    if (options.includes(angles[1])) return options[angleIndex];
     return options[0];
   } }).generate().split('\n').slice(-2);
   assert.deepEqual(choose(1, 0), [`姿勢:${poses[1]}，與上張圖不同`, `視角:${angles[0]}，與上張圖不同`]);
