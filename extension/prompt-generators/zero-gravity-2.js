@@ -1,4 +1,4 @@
-// 無重力2: one subject paragraph followed by one short outfit/scene line.
+// 無重力2: subject and outfit/scene paragraphs with randomized pose and camera angle.
 export function createZeroGravity2Generator({ pick }) {
   const outlookOptions = [
     '清新自然', '溫柔婉約', '甜美可愛', '優雅知性', '清冷高雅',
@@ -46,7 +46,26 @@ export function createZeroGravity2Generator({ pick }) {
     ['蝴蝶結', '金屬扣', '隱形拉鍊', '手工刺繡', '水晶', '珍珠', '立體花朵', '金屬鍊飾', ''],
     ['修身', '直筒', 'A字', '傘狀', '蓬鬆', '']
   ];
+  const poseOptions = [
+    '直立漂浮，雙臂自然舒展', '側身漂浮，單手輕撥髮絲',
+    '仰身漂浮，雙手向上延伸', '俯身滑翔，雙臂向兩側展開',
+    '蜷身漂浮，雙手輕抱膝蓋', '側躺漂浮，一手輕托臉頰',
+    '坐姿懸浮，雙腿自然併攏', '雙腿交疊懸浮，雙手輕放身前',
+    '單膝微彎漂浮，另一腿自然伸展', '雙膝微彎漂浮，雙手向前伸出',
+    '轉身回眸漂浮，雙臂隨動作擺動', '緩慢旋身漂浮，雙手輕提至肩側',
+    '芭蕾式漂浮，一手上舉一手側展', '向前伸手漂浮，身體呈柔和弧線',
+    '雙手交握胸前漂浮，雙腿自然下垂', '雙手置於身後漂浮，身體微微前傾'
+  ];
+  const angleOptions = [
+    '正面平視', '左前方30度平視', '右前方30度平視',
+    '左前方45度平視', '右前方45度平視', '左側面平視', '右側面平視',
+    '左後方四分之三視角', '右後方四分之三視角',
+    '正面略高角度俯拍', '左前方略高角度俯拍', '右前方略高角度俯拍',
+    '正上方鳥瞰', '鏡頭順時針傾斜15度的正面視角', '鏡頭逆時針傾斜15度的側面視角'
+  ];
   let previousPalette;
+  let previousPose;
+  let previousAngle;
 
   function generate() {
     const palette = pick(palettes.filter(option => option !== previousPalette));
@@ -60,7 +79,12 @@ export function createZeroGravity2Generator({ pick }) {
     }
     const details = design.filter(Boolean).join('、');
     const skirt = `迷你裙${details ? `（${details}）` : ''}`;
-    return `獨立生圖： 9:16，一位氣質${pick(outlookOptions)}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。\n姿勢:AI決定，與上張圖不同\n視角:AI決定，與上張圖不同`;
+    const outlook = pick(outlookOptions);
+    const pose = pick(poseOptions.filter(option => option !== previousPose));
+    const angle = pick(angleOptions.filter(option => option !== previousAngle));
+    previousPose = pose;
+    previousAngle = angle;
+    return `獨立生圖： 9:16，一位氣質${outlook}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。\n\n${topColor}${top}＋${skirtColor}${skirt}，無重力空間，天空。\n姿勢:${pose}，與上張圖不同\n視角:${angle}，與上張圖不同`;
   }
 
   return { generate };
