@@ -14,7 +14,7 @@ test('zero-gravity prompts preserve the source template and end with 16:9', asyn
   for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '視角']) {
     assert.ok(prompt.includes(`${field}：`), `Missing template field: ${field}`);
   }
-  assert.match(prompt, /地點： 無重力空間，.+天空。/);
+  assert.equal(prompt.split('\n')[1], '地點： 無重力空間，天空。');
   assert.doesNotMatch(prompt, /\{[^}]+\}|9:16/);
   assert.ok(prompt.endsWith('\n畫面比例： 16:9'));
 });

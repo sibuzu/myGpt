@@ -68,7 +68,7 @@ export function createZeroGravityGenerator({ pick }) {
     const [primary, secondary, accent] = palette;
     return [
       subject,
-      `地點： 無重力空間，${pick(environments)}天空。`,
+      `地點： 無重力空間，天空。`,
       `主色： ${primary}｜輔色： ${secondary}｜點綴： ${accent}`,
       `迷你裙： ${design.join('、')}`,
       `上衣: ${top}。`,
