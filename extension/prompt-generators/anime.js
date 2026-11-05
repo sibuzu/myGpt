@@ -1,6 +1,9 @@
 // 動漫角色: character-specific wardrobes, appearance, facing and image captions.
 import { ANIME_CHARACTERS } from '../anime-characters.js';
 
+// Disabled records reserve their IDs for existing outfit references.
+const availableCharacters = ANIME_CHARACTERS.filter(character => character.enabled !== false);
+
 export function createAnimeGenerator(common) {
   const { pick, chooseGaze, naturalInteractions, clothingSceneDescription, renderNarrative } = common;
   let previousAnimeCharacter = null;
@@ -44,8 +47,8 @@ export function createAnimeGenerator(common) {
   function generate(context, characterId) {
     const { theme, scene, expression } = context;
     const character = characterId === undefined
-      ? pick(ANIME_CHARACTERS.filter(item => item !== previousAnimeCharacter))
-      : ANIME_CHARACTERS.find(item => item.id === characterId);
+      ? pick(availableCharacters.filter(item => item !== previousAnimeCharacter))
+      : availableCharacters.find(item => item.id === characterId);
     if (!character) throw new RangeError(`Unknown anime character ID: ${characterId}`);
     previousAnimeCharacter = character;
     const outfitDescription = describeCharacterOutfit(character);

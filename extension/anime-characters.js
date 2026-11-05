@@ -182,7 +182,8 @@ export const ANIME_CHARACTERS = [
       "粉紫雙色合身露背包臀洋裝、胸前水滴型剪裁與寬版黑皮革腰帶，搭配高跟細長靴"
     ],
     "wardrobeMode": "adult-fashion",
-    "coversEyes": true
+    "coversEyes": true,
+    "enabled": false
   },
   {
     "id": 13,
@@ -306,7 +307,8 @@ export const ANIME_CHARACTERS = [
       "黑色蕾絲鑲邊深V領露背短洋裝、高開衩百褶裙身與白羽毛刺繡袖口，搭配過膝皮革長靴"
     ],
     "wardrobeMode": "adult-fashion",
-    "coversEyes": true
+    "coversEyes": true,
+    "enabled": false
   },
   {
     "id": 21,
@@ -702,7 +704,8 @@ export const ANIME_CHARACTERS = [
       "黑色修身短洋裝、白色蕾絲領飾與紅色短披肩，保留粉色雙馬尾與皇冠",
       "黑紅撞色哥德風抹胸澎澎短裙、緊身黑色蕾絲馬甲束腰與紅色短披風，搭配繫帶膝上皮靴"
     ],
-    "wardrobeMode": "adult-fashion"
+    "wardrobeMode": "adult-fashion",
+    "enabled": false
   },
   {
     "id": 47,
@@ -732,7 +735,8 @@ export const ANIME_CHARACTERS = [
       "紫白配色修身改良和風短洋裝、寬版淡色腰封與短版忍者外套，保留溫柔俐落的長髮氣質",
       "淡紫削肩合身開襟短上衣、深藍貼身百褶短裙與忍者網紋腿套，展現溫柔優雅的成熟氣質"
     ],
-    "wardrobeMode": "general"
+    "wardrobeMode": "general",
+    "enabled": false
   },
   {
     "id": 49,
@@ -961,6 +965,51 @@ export const ANIME_CHARACTERS = [
       "暗紅色短版無袖立領開襟外套、黑色高腰貼身短褲與粉色百褶短下襬，搭配過膝皮靴與長馬尾",
       "酒紅色削肩修身連身短裙、胸前幾何鏤空剪裁與側邊皮質雙扣腰帶，展現率性叛逆的武鬥氣質",
       "深紅貼身深V領削肩短洋裝、黑色皮革束腰、不對稱側開衩裙身與金屬護臂，搭配黑色過膝戰靴"
+    ],
+    "wardrobeMode": "general"
+  },
+  {
+    "id": 64,
+    "name": "竈門禰豆子",
+    "jaName": "竈門禰豆子",
+    "work": "鬼滅之刃",
+    "workJa": "鬼滅の刃",
+    "features": "黑色長髮與橙紅色髮尾、粉紅色眼睛、粉色麻葉紋與綠色竹製口枷",
+    "baseOutfit": "粉色麻葉紋長和服、深棕色羽織、紅白腰帶與綁帶足袋鞋，保留竹製口枷",
+    "fashionOutfits": [
+      "粉色麻葉紋改良短和服、深棕色短羽織與紅白結帶，保留竹製口枷與粉色髮飾",
+      "粉白配色無袖襯衫、深棕色及膝百褶迷你裙與紅色細腰帶，搭配白色短靴與竹製口枷",
+      "粉色麻葉紋連身迷你裙、深棕色針織短外套與紅白緞帶，保留漸層髮尾與竹製口枷"
+    ],
+    "wardrobeMode": "general"
+  },
+  {
+    "id": 65,
+    "name": "胡蝶忍",
+    "jaName": "胡蝶しのぶ",
+    "work": "鬼滅之刃",
+    "workJa": "鬼滅の刃",
+    "features": "黑紫漸層盤髮、紫色眼睛、蝴蝶髮飾與白色蝶翼紋羽織",
+    "baseOutfit": "深色鬼殺隊制服、白色腰帶、白色蝶翼紋羽織與綁帶鞋履",
+    "fashionOutfits": [
+      "白紫蝶翼紋短羽織、深色立領上衣與及膝百褶迷你裙，搭配蝴蝶髮飾與繫帶短靴",
+      "淡紫色無袖襯衫、深色高腰長裙與白色蝶翼紋短披肩，保留黑紫漸層盤髮與蝴蝶髮飾",
+      "白紫漸層改良式短和服、蝶翼刺繡裙襬與深色束腰，搭配蝴蝶髮飾與日式草履"
+    ],
+    "wardrobeMode": "general"
+  },
+  {
+    "id": 66,
+    "name": "甘露寺蜜璃",
+    "jaName": "甘露寺蜜璃",
+    "work": "鬼滅之刃",
+    "workJa": "鬼滅の刃",
+    "features": "粉紅色三股長辮與淺綠色髮尾、綠色眼睛、白色羽織與粉綠配色",
+    "baseOutfit": "深色鬼殺隊制服、白色羽織、綠色長襪與日式鞋履",
+    "fashionOutfits": [
+      "白色短羽織、粉色袖短上衣與淺綠色高腰百褶迷你裙，保留粉綠漸層三股長辮",
+      "櫻花粉針織上衣、淺綠色及膝A字迷你裙與白色短外套，搭配綠色長襪與日式鞋履",
+      "粉綠漸層改良式短和服洋裝、白色披肩與花卉刺繡腰帶，搭配綁帶短靴與三股長辮"
     ],
     "wardrobeMode": "general"
   }

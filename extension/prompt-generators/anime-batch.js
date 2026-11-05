@@ -1,7 +1,7 @@
 import { ANIME_CHARACTERS } from '../anime-characters.js';
 
 export const ANIME_BATCH_CHARACTER_IDS = Object.freeze(
-  ANIME_CHARACTERS.map(character => character.id)
+  ANIME_CHARACTERS.filter(character => character.enabled !== false).map(character => character.id)
 );
 
 // Start a fresh shuffled round for each batch, then reshuffle only after all IDs are used.
