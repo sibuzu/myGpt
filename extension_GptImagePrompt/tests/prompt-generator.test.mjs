@@ -2,18 +2,29 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { createPromptGenerator, selectAutomaticClothing } from '../prompt-generator.js';
-import { BACKGROUNDS, POSES } from '../prompt-generators/scene-options.js';
+import { BACKGROUNDS } from '../prompt-generators/scene-options.js';
+import { POSES, CAMERA_ANGLES } from '../prompt-generators/pose-options.js';
 import { EXPRESSION_OPTIONS } from '../prompt-generators/expression-options.js';
 
-test('bundles local title-only scenes and removes pose reference numbers', async () => {
+test('bundles local title-only scenes', async () => {
   const titles = await readFile(new URL('../data/scene-titles.txt', import.meta.url), 'utf8');
   assert.deepEqual(BACKGROUNDS, titles.trim().split('\n'));
   assert.ok(BACKGROUNDS.includes('朱橋庭院的晨練'));
   assert.ok(BACKGROUNDS.includes('紙傘工坊的扇面'));
   assert.ok(BACKGROUNDS.every(title => !/[#｜\n]|氛圍。$/.test(title)));
-  const poses = await readFile(new URL('../data/poses.md', import.meta.url), 'utf8');
-  assert.deepEqual(POSES, poses.trim().split('\n').map(line => line.replace(/\s*\([\d,\s]+\)\s*$/, '')));
-  assert.ok(POSES.every(pose => !/\(\d/.test(pose)));
+});
+
+test('copies exactly 105 poses and 20 camera angles from local pos.md without numbering', async () => {
+  const source = await readFile(new URL('../pos.md', import.meta.url), 'utf8');
+  const [poseSection, angleSection] = source.split('# 人物攝影・20種通用拍攝角度');
+  const entries = section => [...section.matchAll(/^\d+\.\s+(.+)$/gm)].map(match => match[1].trim());
+  assert.deepEqual(POSES, entries(poseSection));
+  assert.deepEqual(CAMERA_ANGLES, entries(angleSection));
+  assert.equal(POSES.length, 105);
+  assert.equal(CAMERA_ANGLES.length, 20);
+  assert.equal(new Set(POSES).size, 105);
+  assert.equal(new Set(CAMERA_ANGLES).size, 20);
+  assert.ok([...POSES, ...CAMERA_ANGLES].every(text => !/^\d+\./.test(text)));
 });
 
 test('all five clothing modes render the requested five-part template', () => {
@@ -29,7 +40,9 @@ test('all five clothing modes render the requested five-part template', () => {
       assert.ok(EXPRESSION_OPTIONS.some(expression => parts[0].includes(`的成年日本年輕女性，${expression}，半寫實日系動畫風格人像，保留超寫實`)));
       assert.ok(parts[1].includes('身穿'));
       assert.ok(parts[2] === '無重力空間，天空。' || BACKGROUNDS.includes(parts[2]));
-      assert.ok(POSES.includes(parts[3].replace('姿勢：', '')));
+      const [pose, cameraAngle] = parts[3].split('\n');
+      assert.ok(POSES.includes(pose.replace('姿勢：', '')));
+      assert.ok(CAMERA_ANGLES.includes(cameraAngle.replace('拍攝角度：', '')));
       assert.equal(parts[4], '電影級構圖，細膩華麗，細節豐富，4K，高品質畫面，直式 9:16。');
       assert.doesNotMatch(prompt, /undefined|\{[^}]+\}|\(\d/);
       if (clothingType === 'mini') {
@@ -43,7 +56,7 @@ test('all five clothing modes render the requested five-part template', () => {
 test('applies the exact 10% appearance and 20% automatic-scene thresholds independently', () => {
   for (const appearance of [0.099999, 0.1]) {
     for (const scene of [0.199999, 0.2]) {
-      const rolls = [0.5, 0.5, appearance, scene, 0.5, 0.5, 0.5];
+      const rolls = [0.5, 0.5, appearance, scene, 0.5, 0.5, 0.5, 0.5];
       const generator = createPromptGenerator({ random: () => rolls.shift() });
       const parts = generator.generate({ clothingType: 'natural', sceneType: 'auto' }).split('\n\n');
       assert.equal(parts[0].includes('、胸部圓潤'), appearance < 0.1);
@@ -54,7 +67,7 @@ test('applies the exact 10% appearance and 20% automatic-scene thresholds indepe
   const generator = createPromptGenerator({ random: () => { draws++; return 0.999; } });
   const first = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
   const second = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
-  assert.equal(draws, 10); // Five choices each; forced zero gravity needs no probability draw.
+  assert.equal(draws, 12); // Six choices each; forced zero gravity needs no probability draw.
   assert.equal(first.split('\n\n')[2], '無重力空間，天空。');
   assert.notEqual(first.split('\n\n')[0], second.split('\n\n')[0]);
 });
@@ -68,11 +81,29 @@ test('every expression in the merged local list can appear at the requested posi
   assert.ok(EXPRESSION_OPTIONS.includes('人物眼神平靜，流露書寫時的從容'));
   for (let i = 0; i < EXPRESSION_OPTIONS.length; i++) {
     let draws = 0;
-    const generator = createPromptGenerator({ random: () => ++draws === 5 ? (i + 0.5) / EXPRESSION_OPTIONS.length : 0.5 });
+    const generator = createPromptGenerator({ random: () => ++draws === 6 ? (i + 0.5) / EXPRESSION_OPTIONS.length : 0.5 });
     const prompt = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
     assert.ok(prompt.includes(`的成年日本年輕女性，${EXPRESSION_OPTIONS[i]}，半寫實日系動畫風格人像，保留超寫實`));
-    assert.equal(draws, 5);
+    assert.equal(draws, 6);
   }
+});
+
+test('samples poses and camera angles independently and avoids consecutive repeats', () => {
+  const generate = (poseIndex, angleIndex) => {
+    const rolls = [0.5, 0.5, 0.5, (poseIndex + 0.5) / POSES.length, (angleIndex + 0.5) / CAMERA_ANGLES.length, 0.5];
+    return createPromptGenerator({ random: () => rolls.shift() })
+      .generate({ clothingType: 'natural', sceneType: 'zero-gravity' }).split('\n\n')[3];
+  };
+  for (let i = 0; i < POSES.length; i++) {
+    assert.equal(generate(i, i % 20), `姿勢：${POSES[i]}\n拍攝角度：${CAMERA_ANGLES[i % 20]}`);
+  }
+  assert.equal(generate(0, 19), `姿勢：${POSES[0]}\n拍攝角度：${CAMERA_ANGLES[19]}`);
+  assert.equal(generate(104, 0), `姿勢：${POSES[104]}\n拍攝角度：${CAMERA_ANGLES[0]}`);
+  const generator = createPromptGenerator({ random: () => 0 });
+  const first = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
+  const second = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
+  assert.equal(first.split('\n\n')[3], `姿勢：${POSES[0]}\n拍攝角度：${CAMERA_ANGLES[0]}`);
+  assert.equal(second.split('\n\n')[3], `姿勢：${POSES[1]}\n拍攝角度：${CAMERA_ANGLES[1]}`);
 });
 
 test('automatic clothing uses exact 30/30/40 boundaries and excludes natural outfits', () => {
@@ -108,7 +139,7 @@ test('rejects unknown modes before generating an unusable prompt', () => {
 
 test('manifest and local assets do not require other project folders or removed features', async () => {
   const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
-  assert.equal(manifest.name, 'GptImagePrompt 1.0.3');
+  assert.equal(manifest.name, 'GptImagePrompt 1.0.4');
   assert.deepEqual(manifest.host_permissions, ['https://chat.openai.com/*', 'https://chatgpt.com/*']);
   const html = await readFile(new URL('../sidepanel.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /promptStyle|notifyTelegram|downloadImages|Image Download/);
