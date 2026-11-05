@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>GptImagePrompt 1.0.1</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+
+<body>
+  <!-- SVG Template -->
+  <template id="toggle-icon-template">
+    <svg class="toggle-icon" viewBox="0 0 24 24" stroke="#065f46" fill="none" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="7" ry="7" stroke="#065f46" fill="none" />
+      <line x1="8" y1="12" x2="16" y2="12" stroke="#065f46" />
+      <line x1="12" y1="8" x2="12" y2="16" stroke="#065f46" id="v-line" />
+    </svg>
+  </template>
+
+  <div class="container">
+    <!-- State Panel - Initially expanded -->
+    <div class="panel panel-first">
+      <div class="panel-header">
+        State
+        <div class="toggle-icon-container" data-state="open"></div>
+      </div>
+      <div class="panel-content" style="display: block;">
+        <div id="state">State:</div>
+        <div id="elapsedTime">Elapsed:</div>
+      </div>
+    </div>
+
+    <!-- Send Message Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        Send Message
+        <div class="toggle-icon-container" data-state="open"></div>
+      </div>
+      <div class="input-section">
+        <div id="messageInput" class="message-input" contenteditable="true"
+          placeholder="Type your message or paste an image..."></div>
+        <div class="button-container">
+          <button id="sendMsg">Send</button>
+          <button id="clearQueue">Clear</button>
+          <button id="genPromptBtn" title="產生提示詞：1 張填入輸入框，多張自動加入佇列">生提示詞</button>
+          <button id="scriptBtn" title="複製目前網頁的 DOM 到剪貼簿">複製網頁</button>
+        </div>
+        <div id="scriptStatus" role="status" aria-live="polite"></div>
+        <div class="prompt-controls">
+          <label class="pause-checkbox">
+            <input type="checkbox" id="pauseQueue" checked> Pause
+          </label>
+          <label class="count-select" for="promptCount">
+            張數:
+            <input id="promptCount" type="number" min="1" max="100" step="1" value="1" required>
+          </label>
+        </div>
+        <div class="prompt-options wardrobe-options">
+          <label class="style-select" for="clothingType">衣服:
+            <select id="clothingType">
+              <option value="natural">清新</option>
+              <option value="sexy">性感</option>
+              <option value="anime">動漫</option>
+              <option value="mini">迷你裙</option>
+            </select>
+          </label>
+          <label class="style-select" for="sceneType">場景:
+            <select id="sceneType">
+              <option value="zero-gravity">無重力</option>
+              <option value="auto">自動</option>
+            </select>
+          </label>
+        </div>
+        <div id="promptStatus" class="mt-2" role="status" aria-live="polite"></div>
+        <div id="promptList" class="mt-2">
+          <!-- Prompt list will be displayed here -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+
+</html>
