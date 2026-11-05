@@ -8,5 +8,6 @@ const batch = createAnimeOutfitBatch(ANIME_DRESS_PROMPTS, (prompt, random) =>
     : prompt);
 
 export const ANIME_DRESS_SIZE = batch.size;
+export const ANIME_DRESS_CHARACTER_HELP = batch.characterHelp;
 export const selectAnimeDressNumbers = batch.selectNumbers;
 export const generateAnimeDressBatch = batch.generate;

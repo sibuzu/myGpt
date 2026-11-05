@@ -107,7 +107,7 @@ test('message-selected styles preview counts and directly append their batches t
   assert.equal(count.disabled, true);
   assert.equal(getElement('promptHelp').hidden, false);
   assert.match(getElement('promptHelp').textContent, /56#1 - 57#4/);
-  assert.equal(status.textContent, '將產生 252 個 prompt。');
+  assert.equal(status.textContent, '將產生 248 個 prompt。');
 
   text().textContent = '63#4';
   await input.trigger('input');
@@ -127,15 +127,15 @@ test('message-selected styles preview counts and directly append their batches t
   assert.equal(status.textContent, '已產生 8 個 prompt，已加入 queue。');
   assert.equal(text().textContent, '56#1 - 57#4');
 
-  text().textContent = '64#1';
+  text().textContent = '67#1';
   await getElement('genPromptBtn').trigger('click');
   assert.match(status.textContent, /角色編號須介於/);
   assert.equal(queue.children.length, 9);
 
   text().textContent = '';
   await getElement('genPromptBtn').trigger('click');
-  assert.equal(queue.children.length, 261);
-  assert.equal(status.textContent, '已產生 252 個 prompt，已加入 queue。');
+  assert.equal(queue.children.length, 257);
+  assert.equal(status.textContent, '已產生 248 個 prompt，已加入 queue。');
 
   await getElement('clearQueue').trigger('click');
   style.value = 'anime-complete';
@@ -144,7 +144,7 @@ test('message-selected styles preview counts and directly append their batches t
   assert.equal(getElement('promptHelp').hidden, false);
   assert.match(getElement('promptHelp').textContent, /56#1 - 57#4/);
   assert.doesNotMatch(getElement('promptHelp').textContent, /10%|胸部圓潤/);
-  assert.equal(status.textContent, '將產生 252 個 prompt。');
+  assert.equal(status.textContent, '將產生 248 個 prompt。');
 
   text().textContent = '56#1 - 57#4';
   await input.trigger('input');
@@ -169,8 +169,40 @@ test('message-selected styles preview counts and directly append their batches t
 
   text().textContent = '';
   await getElement('genPromptBtn').trigger('click');
-  assert.equal(queue.children.length, 261);
-  assert.equal(status.textContent, '已產生 252 個 prompt，已加入 queue。');
+  assert.equal(queue.children.length, 257);
+  assert.equal(status.textContent, '已產生 248 個 prompt，已加入 queue。');
+
+  for (const styleName of ['anime-dress', 'anime-complete']) {
+    await getElement('clearQueue').trigger('click');
+    style.value = styleName;
+    await style.trigger('change');
+    assert.match(getElement('promptHelp').textContent, /全部 248 個/);
+    assert.match(getElement('promptHelp').textContent, /1–66/);
+    assert.match(getElement('promptHelp').textContent, /12、20、46、48 已停用/);
+    assert.match(getElement('promptHelp').textContent, /64：禰豆子、65：胡蝶忍、66：甘露寺蜜璃/);
+
+    text().textContent = '64#1-66#4';
+    await input.trigger('input');
+    assert.equal(status.textContent, '將產生 12 個 prompt。');
+    await getElement('genPromptBtn').trigger('click');
+    assert.equal(queue.children.length, 12);
+    assert.match(queue.children[0].textContent, /^1\. 64#1｜/);
+    assert.match(queue.children.at(-1).textContent, /^12\. 66#4｜/);
+
+    text().textContent = '12#1';
+    await input.trigger('input');
+    assert.match(status.textContent, /角色編號 12 已停用/);
+    await getElement('genPromptBtn').trigger('click');
+    assert.equal(queue.children.length, 12);
+
+    text().textContent = '66#4';
+    await input.trigger('input');
+    assert.equal(status.textContent, '將產生 1 個 prompt。');
+    await getElement('genPromptBtn').trigger('click');
+    assert.equal(queue.children.length, 13);
+    assert.match(queue.children.at(-1).textContent, /^13\. 66#4｜/);
+    text().textContent = '';
+  }
 
   style.value = 'life-story';
   await style.trigger('change');

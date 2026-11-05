@@ -1,17 +1,21 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { ANIME_CHARACTERS } from '../anime-characters.js';
 import { ANIME_DRESS_SIZE, generateAnimeDressBatch, selectAnimeDressNumbers } from '../prompt-generator.js';
 
 const keepOrderAndText = () => 0.999;
 
-test('bundles all 252 prompts exactly as the source, with complete character/outfit IDs', async () => {
+test('bundles 248 active prompts exactly as the source, preserving character/outfit IDs', async () => {
   const source = await readFile(new URL('../../dress/anime_dress.txt', import.meta.url), 'utf8');
-  const expected = source.trim().split(/\n\s*\n/);
-  assert.equal(ANIME_DRESS_SIZE, 252);
-  assert.equal(expected.length, 252);
+  const activeIds = ANIME_CHARACTERS.filter(character => character.enabled !== false).map(character => character.id);
+  const all = source.trim().split(/\n\s*\n/);
+  const expected = all.filter(prompt => activeIds.includes(Number(prompt.split('#')[0])));
+  assert.equal(all.length, 264);
+  assert.equal(ANIME_DRESS_SIZE, 248);
+  assert.equal(expected.length, 248);
   assert.deepEqual(expected.map(prompt => prompt.split('｜')[0]),
-    Array.from({ length: 63 }, (_, i) => Array.from({ length: 4 }, (_, j) => `${String(i + 1).padStart(2, '0')}#${j + 1}`)).flat());
+    activeIds.flatMap(id => Array.from({ length: 4 }, (_, j) => `${String(id).padStart(2, '0')}#${j + 1}`)));
   assert.deepEqual(generateAnimeDressBatch('', keepOrderAndText), expected);
   assert.deepEqual(generateAnimeDressBatch(' \n ', keepOrderAndText), expected);
 });
@@ -19,7 +23,7 @@ test('bundles all 252 prompts exactly as the source, with complete character/out
 test('selects eight inclusive outfits across characters and deduplicates mixed selections', () => {
   assert.deepEqual(selectAnimeDressNumbers('56#1 - 57#4'), [221, 222, 223, 224, 225, 226, 227, 228]);
   assert.deepEqual(selectAnimeDressNumbers('57#4，56#1-57#4、01#1\n56#2'), [1, 221, 222, 223, 224, 225, 226, 227, 228]);
-  assert.deepEqual(selectAnimeDressNumbers('63#4-'), [252]);
+  assert.deepEqual(selectAnimeDressNumbers('63#4-'), Array.from({ length: 13 }, (_, i) => 252 + i));
   assert.equal(generateAnimeDressBatch('63#4', keepOrderAndText).length, 1);
 });
 
@@ -58,8 +62,9 @@ test('applies the 10% threshold independently per prompt and leaves source data 
 });
 
 test('rejects invalid character IDs, outfits and ranges before consuming randomness', () => {
-  for (const input of ['0#1', '64#1', '56#0', '56#5', '57#4-56#1', '56#4-56#1',
-    '56#1-64#1', '56#1-57#5', '56-1', '56', '#1', '56#1,', '56#1,,57#1', '56#1, bad']) {
+  for (const input of ['0#1', '67#1', '56#0', '56#5', '57#4-56#1', '56#4-56#1',
+    '56#1-67#1', '56#1-57#5', '12#1', '20#1', '46#1', '48#1',
+    '56-1', '56', '#1', '56#1,', '56#1,,57#1', '56#1, bad']) {
     assert.throws(() => generateAnimeDressBatch(input, () => {
       assert.fail('Invalid selections must not consume randomness');
     }), /編號|範圍/);
