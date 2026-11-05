@@ -49,7 +49,7 @@ test('samples all eight skirt parameters and uses different palettes on consecut
   const last = createZeroGravityGenerator({ pick: options => options.at(-1) }).generate();
   assert.equal(last.split('\n')[3], '迷你裙： 超迷你');
   assert.match(last, /視覺特效： 絲綢光帶｜光線： 霓虹夜景/);
-  assert.match(last, /表情：甜蜜心動\n姿勢：完全放鬆的長弧形漂浮\n視角：斜前方30度俯拍：鏡頭從人物前側上方約30度斜向拍攝，同時呈現臉部、肩線與四肢層次，讓身體沿畫面自然延伸。\n畫面比例： 9:16$/);
+  assert.match(last, /表情：堅定有神\n姿勢：完全放鬆的長弧形漂浮\n視角：斜前方30度俯拍：鏡頭從人物前側上方約30度斜向拍攝，同時呈現臉部、肩線與四肢層次，讓身體沿畫面自然延伸。\n畫面比例： 9:16$/);
 });
 
 test('selects exactly one top', () => {
