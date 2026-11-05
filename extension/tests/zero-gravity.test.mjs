@@ -15,13 +15,13 @@ test('zero-gravity prompts preserve the source visual style and end with 9:16', 
   for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '姿勢', '視角']) {
     assert.ok(prompt.includes(`${field}：`), `Missing template field: ${field}`);
   }
-  assert.equal(prompt.split('\n')[1], '地點： 無重力空間，天空。');
+  assert.equal(prompt.split('\n')[1], '地點： 無重力空間，夢境。');
   assert.doesNotMatch(prompt, /\{[^}]+\}|16:9/);
   assert.ok(prompt.endsWith('\n畫面比例： 9:16'));
 });
 
-test('adds the chest description only below the independent 10% threshold on each call', () => {
-  const rolls = [0.099999, 0.1, 0, 0.999999];
+test('adds the chest description only below the independent 50% threshold on each call', () => {
+  const rolls = [0.499999, 0.5, 0, 0.999999];
   const generator = createZeroGravityGenerator({
     pick: options => options[0],
     random: () => rolls.shift()
@@ -64,7 +64,7 @@ test('samples all eight skirt parameters and uses different palettes on consecut
   const last = createZeroGravityGenerator({ pick: options => options.at(-1) }).generate();
   assert.equal(last.split('\n')[3], '迷你裙： 超迷你');
   assert.match(last, /視覺特效： 絲綢光帶｜光線： 霓虹夜景/);
-  assert.match(last, /表情：堅定有神\n姿勢：完全放鬆的長弧形漂浮\n視角：斜前方30度俯拍：鏡頭從人物前側上方約30度斜向拍攝，同時呈現臉部、肩線與四肢層次，讓身體沿畫面自然延伸。\n畫面比例： 9:16$/);
+  assert.match(last, /表情：堅定有神\n姿勢：軀幹接近水平，胸口略朝鏡頭，一隻手向前下方延伸，另一隻手向側邊展開。雙腿在身後自然彎曲，腳踝放鬆。 像被雲層中的氣流輕輕帶向鏡頭。\n視角：低角度廣角透視\n畫面比例： 9:16$/);
 });
 
 test('selects exactly one top', () => {
