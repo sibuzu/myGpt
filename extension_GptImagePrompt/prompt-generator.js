@@ -2,6 +2,7 @@ import { NATURAL_OUTFITS } from './prompt-generators/natural-outfits.js';
 import { createFashionWardrobe } from './prompt-generators/fashion.js';
 import { ANIME_CHARACTERS } from './prompt-generators/anime-characters.js';
 import { BACKGROUNDS, POSES } from './prompt-generators/scene-options.js';
+import { EXPRESSION_OPTIONS } from './prompt-generators/expression-options.js';
 
 export const ZERO_GRAVITY_RATE = 0.2;
 export const APPEARANCE_RATE = 0.1;
@@ -52,8 +53,9 @@ export function createPromptGenerator({ random = Math.random } = {}) {
     const scene = sceneType === 'zero-gravity' || random() < ZERO_GRAVITY_RATE
       ? '無重力空間，天空。' : next('background', BACKGROUNDS);
     const pose = next('pose', POSES);
+    const expression = pick(EXPRESSION_OPTIONS);
     return [
-      `一位氣質${outlook}${appearance}的成年日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官。`,
+      `一位氣質${outlook}${appearance}的成年日本年輕女性，${expression}，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官。`,
       outfit,
       scene,
       `姿勢：${pose}`,

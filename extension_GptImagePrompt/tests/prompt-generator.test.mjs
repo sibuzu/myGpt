@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { createPromptGenerator, selectAutomaticClothing } from '../prompt-generator.js';
 import { BACKGROUNDS, POSES } from '../prompt-generators/scene-options.js';
+import { EXPRESSION_OPTIONS } from '../prompt-generators/expression-options.js';
 
 test('bundles local title-only scenes and removes pose reference numbers', async () => {
   const titles = await readFile(new URL('../data/scene-titles.txt', import.meta.url), 'utf8');
@@ -24,7 +25,8 @@ test('all five clothing modes render the requested five-part template', () => {
       const prompt = generator.generate({ clothingType, sceneType: 'auto' });
       const parts = prompt.split('\n\n');
       assert.equal(parts.length, 5);
-      assert.match(parts[0], /^一位氣質.+的成年日本年輕女性，半寫實日系動畫風格人像/);
+      assert.match(parts[0], /^一位氣質.+的成年日本年輕女性，/);
+      assert.ok(EXPRESSION_OPTIONS.some(expression => parts[0].includes(`的成年日本年輕女性，${expression}，半寫實日系動畫風格人像，保留超寫實`)));
       assert.ok(parts[1].includes('身穿'));
       assert.ok(parts[2] === '無重力空間，天空。' || BACKGROUNDS.includes(parts[2]));
       assert.ok(POSES.includes(parts[3].replace('姿勢：', '')));
@@ -41,7 +43,7 @@ test('all five clothing modes render the requested five-part template', () => {
 test('applies the exact 10% appearance and 20% automatic-scene thresholds independently', () => {
   for (const appearance of [0.099999, 0.1]) {
     for (const scene of [0.199999, 0.2]) {
-      const rolls = [0.5, 0.5, appearance, scene, 0.5, 0.5];
+      const rolls = [0.5, 0.5, appearance, scene, 0.5, 0.5, 0.5];
       const generator = createPromptGenerator({ random: () => rolls.shift() });
       const parts = generator.generate({ clothingType: 'natural', sceneType: 'auto' }).split('\n\n');
       assert.equal(parts[0].includes('、胸部圓潤'), appearance < 0.1);
@@ -52,9 +54,25 @@ test('applies the exact 10% appearance and 20% automatic-scene thresholds indepe
   const generator = createPromptGenerator({ random: () => { draws++; return 0.999; } });
   const first = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
   const second = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
-  assert.equal(draws, 8); // Four choices each; forced zero gravity needs no probability draw.
+  assert.equal(draws, 10); // Five choices each; forced zero gravity needs no probability draw.
   assert.equal(first.split('\n\n')[2], '無重力空間，天空。');
   assert.notEqual(first.split('\n\n')[0], second.split('\n\n')[0]);
+});
+
+test('every expression in the merged local list can appear at the requested position', () => {
+  assert.equal(EXPRESSION_OPTIONS.length, new Set(EXPRESSION_OPTIONS).size);
+  assert.equal(EXPRESSION_OPTIONS.length, 88);
+  assert.ok(EXPRESSION_OPTIONS.includes('開心大笑'));
+  assert.ok(EXPRESSION_OPTIONS.includes('甜蜜心動'));
+  assert.ok(EXPRESSION_OPTIONS.includes('人物露出溫柔自然的微笑'));
+  assert.ok(EXPRESSION_OPTIONS.includes('人物眼神平靜，流露書寫時的從容'));
+  for (let i = 0; i < EXPRESSION_OPTIONS.length; i++) {
+    let draws = 0;
+    const generator = createPromptGenerator({ random: () => ++draws === 5 ? (i + 0.5) / EXPRESSION_OPTIONS.length : 0.5 });
+    const prompt = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
+    assert.ok(prompt.includes(`的成年日本年輕女性，${EXPRESSION_OPTIONS[i]}，半寫實日系動畫風格人像，保留超寫實`));
+    assert.equal(draws, 5);
+  }
 });
 
 test('automatic clothing uses exact 30/30/40 boundaries and excludes natural outfits', () => {
@@ -90,7 +108,7 @@ test('rejects unknown modes before generating an unusable prompt', () => {
 
 test('manifest and local assets do not require other project folders or removed features', async () => {
   const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
-  assert.equal(manifest.name, 'GptImagePrompt 1.0.2');
+  assert.equal(manifest.name, 'GptImagePrompt 1.0.3');
   assert.deepEqual(manifest.host_permissions, ['https://chat.openai.com/*', 'https://chatgpt.com/*']);
   const html = await readFile(new URL('../sidepanel.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /promptStyle|notifyTelegram|downloadImages|Image Download/);
