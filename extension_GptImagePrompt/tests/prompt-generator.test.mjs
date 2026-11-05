@@ -139,7 +139,7 @@ test('rejects unknown modes before generating an unusable prompt', () => {
 
 test('manifest and local assets do not require other project folders or removed features', async () => {
   const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
-  assert.equal(manifest.name, 'GptImagePrompt 1.0.4');
+  assert.equal(manifest.name, 'GptImagePrompt 1.0.5');
   assert.deepEqual(manifest.host_permissions, ['https://chat.openai.com/*', 'https://chatgpt.com/*']);
   const html = await readFile(new URL('../sidepanel.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /promptStyle|notifyTelegram|downloadImages|Image Download/);
