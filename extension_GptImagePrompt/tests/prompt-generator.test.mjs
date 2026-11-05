@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { createPromptGenerator } from '../prompt-generator.js';
+import { createPromptGenerator, selectAutomaticClothing } from '../prompt-generator.js';
 import { BACKGROUNDS, POSES } from '../prompt-generators/scene-options.js';
 
 test('bundles local title-only scenes and removes pose reference numbers', async () => {
@@ -15,11 +15,11 @@ test('bundles local title-only scenes and removes pose reference numbers', async
   assert.ok(POSES.every(pose => !/\(\d/.test(pose)));
 });
 
-test('all four clothing modes render the requested five-part template', () => {
+test('all five clothing modes render the requested five-part template', () => {
   let seed = 44;
   const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
   const generator = createPromptGenerator({ random });
-  for (const clothingType of ['natural', 'sexy', 'anime', 'mini']) {
+  for (const clothingType of ['auto', 'natural', 'sexy', 'anime', 'mini']) {
     for (let i = 0; i < 20; i++) {
       const prompt = generator.generate({ clothingType, sceneType: 'auto' });
       const parts = prompt.split('\n\n');
@@ -43,18 +43,43 @@ test('applies the exact 10% appearance and 20% automatic-scene thresholds indepe
     for (const scene of [0.199999, 0.2]) {
       const rolls = [0.5, 0.5, appearance, scene, 0.5, 0.5];
       const generator = createPromptGenerator({ random: () => rolls.shift() });
-      const parts = generator.generate({ sceneType: 'auto' }).split('\n\n');
+      const parts = generator.generate({ clothingType: 'natural', sceneType: 'auto' }).split('\n\n');
       assert.equal(parts[0].includes('、胸部圓潤'), appearance < 0.1);
       assert.equal(parts[2] === '無重力空間，天空。', scene < 0.2);
     }
   }
   let draws = 0;
   const generator = createPromptGenerator({ random: () => { draws++; return 0.999; } });
-  const first = generator.generate();
-  const second = generator.generate();
+  const first = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
+  const second = generator.generate({ clothingType: 'natural', sceneType: 'zero-gravity' });
   assert.equal(draws, 8); // Four choices each; forced zero gravity needs no probability draw.
   assert.equal(first.split('\n\n')[2], '無重力空間，天空。');
   assert.notEqual(first.split('\n\n')[0], second.split('\n\n')[0]);
+});
+
+test('automatic clothing uses exact 30/30/40 boundaries and excludes natural outfits', () => {
+  for (const [roll, expected] of [[0, 'sexy'], [0.299999, 'sexy'], [0.3, 'anime'], [0.599999, 'anime'], [0.6, 'mini'], [0.999999, 'mini']]) {
+    assert.equal(selectAutomaticClothing(() => roll), expected);
+    const rolls = [roll];
+    const auto = createPromptGenerator({ random: () => rolls.length ? rolls.shift() : 0.5 });
+    const manual = createPromptGenerator({ random: () => 0.5 });
+    assert.equal(auto.generate({ clothingType: 'auto' }), manual.generate({ clothingType: expected }));
+  }
+  const counts = { sexy: 0, anime: 0, mini: 0 };
+  for (let i = 0; i < 100; i++) counts[selectAutomaticClothing(() => (i + 0.5) / 100)]++;
+  assert.deepEqual(counts, { sexy: 30, anime: 30, mini: 40 });
+});
+
+test('clothing and scene default to auto in both generator and menu order', async () => {
+  const defaults = createPromptGenerator({ random: () => 0.5 }).generate();
+  const explicit = createPromptGenerator({ random: () => 0.5 }).generate({ clothingType: 'auto', sceneType: 'auto' });
+  assert.equal(defaults, explicit);
+  const html = await readFile(new URL('../sidepanel.html', import.meta.url), 'utf8');
+  for (const [id, expected] of [['clothingType', ['auto', 'natural', 'sexy', 'anime', 'mini']], ['sceneType', ['auto', 'zero-gravity']]]) {
+    const options = html.match(new RegExp(`<select id="${id}">([\\s\\S]*?)</select>`))[1];
+    assert.deepEqual([...options.matchAll(/value="([^"]+)"/g)].map(match => match[1]), expected);
+    assert.match(options, /value="auto" selected/);
+  }
 });
 
 test('rejects unknown modes before generating an unusable prompt', () => {
@@ -65,7 +90,7 @@ test('rejects unknown modes before generating an unusable prompt', () => {
 
 test('manifest and local assets do not require other project folders or removed features', async () => {
   const manifest = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
-  assert.equal(manifest.name, 'GptImagePrompt 1.0.1');
+  assert.equal(manifest.name, 'GptImagePrompt 1.0.2');
   assert.deepEqual(manifest.host_permissions, ['https://chat.openai.com/*', 'https://chatgpt.com/*']);
   const html = await readFile(new URL('../sidepanel.html', import.meta.url), 'utf8');
   assert.doesNotMatch(html, /promptStyle|notifyTelegram|downloadImages|Image Download/);

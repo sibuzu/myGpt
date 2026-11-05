@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  element('sceneType').title = '無重力：固定天空；自動：20% 無重力，其餘隨機場景 title。';
+  element('clothingType').title = '自動：30% 性感、30% 動漫、40% 迷你裙。';
+  element('sceneType').title = '自動：20% 無重力，其餘隨機場景 title；無重力：固定天空。';
   const scriptButton = element('scriptBtn');
   scriptButton.addEventListener('click', async () => {
     scriptButton.disabled = true;

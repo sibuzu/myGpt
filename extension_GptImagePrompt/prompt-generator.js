@@ -5,6 +5,12 @@ import { BACKGROUNDS, POSES } from './prompt-generators/scene-options.js';
 
 export const ZERO_GRAVITY_RATE = 0.2;
 export const APPEARANCE_RATE = 0.1;
+
+export function selectAutomaticClothing(random = Math.random) {
+  const roll = random();
+  return roll < 0.3 ? 'sexy' : roll < 0.6 ? 'anime' : 'mini';
+}
+
 const OUTLOOKS = [
   '堅毅爽朗', '清新自然', '溫柔沉靜', '甜美優雅', '知性溫柔', '親切自然',
   '清新優雅', '恬靜清雅', '高貴優雅', '清新自在', '溫柔自然', '從容優雅',
@@ -34,13 +40,13 @@ export function createPromptGenerator({ random = Math.random } = {}) {
         const outfits = character.fashionOutfits?.length ? character.fashionOutfits : [character.baseOutfit];
         return `${character.features}，身穿${next(`outfit-${character.id}`, outfits)}`;
       }
-      default: throw new RangeError('請選擇清新、性感、動漫或迷你裙。');
+      default: throw new RangeError('請選擇自動、清新、性感、動漫或迷你裙。');
     }
   }
 
-  function generate({ clothingType = 'natural', sceneType = 'zero-gravity' } = {}) {
+  function generate({ clothingType = 'auto', sceneType = 'auto' } = {}) {
     if (!['zero-gravity', 'auto'].includes(sceneType)) throw new RangeError('請選擇無重力或自動場景。');
-    const outfit = clothing(clothingType);
+    const outfit = clothing(clothingType === 'auto' ? selectAutomaticClothing(random) : clothingType);
     const outlook = next('outlook', OUTLOOKS);
     const appearance = random() < APPEARANCE_RATE ? '、胸部圓潤' : '';
     const scene = sceneType === 'zero-gravity' || random() < ZERO_GRAVITY_RATE
