@@ -8,8 +8,8 @@ test('zero-gravity prompts preserve the source visual style and end with 9:16', 
   const source = await readFile(new URL('../../dress/無重力.md', import.meta.url), 'utf8');
   const template = source.split('TEMPLATE:\n\n')[1].split('\n\n\nEXAMPLE:')[0];
   const prompt = generateImagePrompt('zero-gravity');
-  assert.match(prompt.split('\n')[0], /^獨立生圖：一位氣質[^、]+、胸部圓潤的20歲日本年輕女性/);
-  assert.equal(prompt.split('\n')[0].replace(/^獨立生圖：一位氣質[^、]+、胸部圓潤的/, ''), `${template.split('。')[0]}。`);
+  assert.match(prompt.split('\n')[0], /^獨立生圖：一位氣質[^、的]+(?:、胸部圓潤)?的20歲日本年輕女性/);
+  assert.equal(prompt.split('\n')[0].replace(/^獨立生圖：一位氣質[^、的]+(?:、胸部圓潤)?的/, ''), `${template.split('。')[0]}。`);
   assert.match(prompt.split('\n')[4], /^上衣: .+。$/);
   assert.doesNotMatch(prompt.split('\n')[4], /自由設計|可搭配|或是/);
   for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '姿勢', '視角']) {
@@ -20,10 +20,25 @@ test('zero-gravity prompts preserve the source visual style and end with 9:16', 
   assert.ok(prompt.endsWith('\n畫面比例： 9:16'));
 });
 
+test('adds the chest description only below the independent 10% threshold on each call', () => {
+  const rolls = [0.099999, 0.1, 0, 0.999999];
+  const generator = createZeroGravityGenerator({
+    pick: options => options[0],
+    random: () => rolls.shift()
+  });
+  for (const included of [true, false, true, false]) {
+    const prompt = generator.generate();
+    assert.equal(prompt.includes('胸部圓潤'), included);
+    assert.ok(prompt.startsWith(`獨立生圖：一位氣質清新自然${included ? '、胸部圓潤' : ''}的20歲日本年輕女性，`));
+    assert.doesNotMatch(prompt, /\{[^}]+\}|、的/);
+  }
+  assert.equal(rolls.length, 0);
+});
+
 test('fills the outlook placeholder with at least ten distinct temperament choices', () => {
   const outlooks = new Set();
   let index = 0;
-  const generator = createZeroGravityGenerator({ pick: options =>
+  const generator = createZeroGravityGenerator({ random: () => 0, pick: options =>
     options.includes('清新自然') ? options[index++ % options.length] : options[0]
   });
   for (let i = 0; i < 20; i++) {

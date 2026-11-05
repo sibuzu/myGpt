@@ -1,6 +1,6 @@
 // 無重力: template and design choices from dress/無重力.md.
-export function createZeroGravityGenerator({ pick }) {
-  const subject = '獨立生圖：一位氣質{outlook}、胸部圓潤的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。';
+export function createZeroGravityGenerator({ pick, random = Math.random }) {
+  const subject = '獨立生圖：一位氣質{outlook}{appearance}的20歲日本年輕女性，半寫實日系動畫風格人像，保留超寫實的真人肌膚質感、細微毛孔與細膩的臉部五官，其餘畫面採用精緻動畫渲染，呈現自然光影與柔和的日系美感。';
   const outlookOptions = [
     '清新自然', '溫柔婉約', '甜美可愛', '優雅知性', '清冷高雅',
     '自信大方', '活潑俏皮', '沉靜內斂', '浪漫夢幻', '明朗爽快',
@@ -139,7 +139,8 @@ export function createZeroGravityGenerator({ pick }) {
     const top = pick(topOptions);
     const [primary, secondary, accent] = palette;
     return [
-      subject.replace('{outlook}', pick(outlookOptions)),
+      subject.replace('{outlook}', pick(outlookOptions))
+        .replace('{appearance}', random() < 0.1 ? '、胸部圓潤' : ''),
       `地點： 無重力空間，天空。`,
       `主色： ${primary}｜輔色： ${secondary}｜點綴： ${accent}`,
       `迷你裙： ${design.filter(Boolean).join('、')}`,
