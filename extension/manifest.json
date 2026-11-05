@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "MyGPT 1.0.33",
-  "version": "1.0.33",
+  "name": "MyGPT 1.0.34",
+  "version": "1.0.34",
   "description": "Send selected text to ChatGPT",
   "permissions": [
     "contextMenus",
