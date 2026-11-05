@@ -12,7 +12,7 @@ test('zero-gravity prompts preserve the source visual style and end with 9:16', 
   assert.equal(prompt.split('\n')[0].replace(/^獨立生圖：一位氣質[^、]+、胸部圓潤的/, ''), `${template.split('。')[0]}。`);
   assert.match(prompt.split('\n')[4], /^上衣: .+。$/);
   assert.doesNotMatch(prompt.split('\n')[4], /自由設計|可搭配|或是/);
-  for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '視角']) {
+  for (const field of ['地點', '主色', '輔色', '點綴', '迷你裙', '視覺特效', '光線', '表情', '姿勢', '視角']) {
     assert.ok(prompt.includes(`${field}：`), `Missing template field: ${field}`);
   }
   assert.equal(prompt.split('\n')[1], '地點： 無重力空間，天空。');
@@ -44,12 +44,12 @@ test('samples all eight skirt parameters and uses different palettes on consecut
   assert.match(first, /主色： 曜石黑｜輔色： 香檳金｜點綴： 象牙白/);
   assert.match(second, /主色： 冰川藍｜輔色： 月光銀｜點綴： 雪白/);
   assert.match(first, /視覺特效： 星塵流光｜光線： 柔和晨光/);
-  assert.match(first, /表情：開心大笑\n視角：動態構圖\n畫面比例： 9:16$/);
+  assert.match(first, /表情：開心大笑\n姿勢：全身拉直漂浮\n視角：動態構圖\n畫面比例： 9:16$/);
 
   const last = createZeroGravityGenerator({ pick: options => options.at(-1) }).generate();
   assert.equal(last.split('\n')[3], '迷你裙： 超迷你');
   assert.match(last, /視覺特效： 絲綢光帶｜光線： 霓虹夜景/);
-  assert.match(last, /表情：甜蜜心動\n視角：動態斜角\n畫面比例： 9:16$/);
+  assert.match(last, /表情：甜蜜心動\n姿勢：完全放鬆的長弧形漂浮\n視角：斜前方30度俯拍：鏡頭從人物前側上方約30度斜向拍攝，同時呈現臉部、肩線與四肢層次，讓身體沿畫面自然延伸。\n畫面比例： 9:16$/);
 });
 
 test('selects exactly one top', () => {
